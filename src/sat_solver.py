@@ -17,6 +17,10 @@ Expected Interface:
             which returns the product of two ExtClass instances
         - get_name_latex(self) -> str
             which returns the LaTeX representation of the name of the element
+        - __hash__(self) -> int
+            which return the hash of the tuple (name, degree) of the element, for use in hashing and equality checks
+        - __eq__(self, other: ExtClass) -> bool
+            which returns True if the two ExtClass instances have the same name and degree, and False otherwise
 
 - In differential.py, an implementation of possible differentials in Ext 
   including:
@@ -43,4 +47,10 @@ Expected Interface:
             which returns the list of classes whose "fixed degree" s + f - w equals N
         - get_classes_in_tridegree(self, tridegree: tuple[int, int, int]) -> list[ExtClass]
             which returns the list of classes in a given motivic tridegree (s, f, w)
+        - get_rho_periodic_elements(self) -> list[ExtClass]
+            which retuns the list of ext classes which converge to rho torsion-free elements in the real motivic Ext, i.e. that are permanent cycles starting on the E1 page
+        - get_known_differentials(self) -> list[Differential]
+            which returns the list of known differentials in Ext, as Differential instances
 """
+
+
