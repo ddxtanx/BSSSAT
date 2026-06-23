@@ -83,8 +83,8 @@ def possible_differentials_in_a_range(bounds,r):
     return differentials
 
 # test
-# differentials = possible_differentials_in_a_range((10,10,10), 1)
-# for element, diffs in differentials.items():
-#    print(f"Possible d_1 differentials for {element}:")
-#   for diff in diffs:
-#       print(diff)
+differentials = possible_differentials_in_a_range((10,10,10), 1)
+for element, diffs in differentials.items():
+   print(f"Possible d_1 differentials for {element}:")
+   for diff in diffs:
+      print(diff)
