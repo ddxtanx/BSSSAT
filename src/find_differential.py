@@ -11,7 +11,7 @@ def degree(element):
     return (element["stem"], element["Adams filtration"], element["weight"])
 
 def add_degree(degree1, degree2):
-    return (int(degree1[0]) + int(degree2[0]), int(degree1[1]) + int(degree2[1]), int(degree1[2]) + int(degree2[2])) 
+    return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
 
 
 def sfdegree(element):
@@ -165,7 +165,3 @@ def finding_sources_with_fixed_number_of_differentials(classes, number):
         if len(values) == number:
             sources.append(element)
     return sources
-
-tricky_sources = finding_sources_with_fixed_number_of_differentials(differentials, maximal_number_from_one_source)
-for source in tricky_sources:
-    print(source)

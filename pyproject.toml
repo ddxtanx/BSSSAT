@@ -1,0 +1,7 @@
+[project]
+name = "satsolver"
+version = "0.1.0"
+description = "Using SAT solvers for Automatic Differential Propogation in the rho-Bockstein Spectral Sequence"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = ["python-sat[aiger,approxmc,cryptosat,pblib]~=1.9.0"]
