@@ -11,12 +11,11 @@ def degree(element):
     return (element["stem"], element["Adams filtration"], element["weight"])
 
 def add_degree(degree1, degree2):
-    return (int(degree1[0]) + int(degree2[0]), int(degree1[1]) + int(degree2[1]), int(degree1[2]) + int(degree2[2])) 
-
+    return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
 
 def sfdegree(element):
         return (element["stem"], element["Adams filtration"])
-    
+
 group_by_sf = {}
 for element in classes:
     if sfdegree(element) not in group_by_sf:
@@ -26,7 +25,6 @@ for element in classes:
 
 sf_list = list(group_by_sf.keys())
 
-
 def element_by_degree(a_degree):
     elements_in_degree = []
     for element in group_by_sf.get((a_degree[0], a_degree[1]), []):
@@ -34,7 +32,7 @@ def element_by_degree(a_degree):
             elements_in_degree.append(element)
         if degree(element)[2] > a_degree[2]:
             difference_degree =   degree(element)[2] - a_degree[2]
-            if int(element["tautorsion"]) == 0:
+            if element["tautorsion"] == 0:
                  elements_in_degree.append({
                     "name": f"tau^{difference_degree} {element['name']}",
                     "stem": a_degree[0],
@@ -77,7 +75,9 @@ def group_by_degree(bounds):
     return grouped
 
 # test
-# print(group_by_degree((10, 10, 10)))
+for element in group_by_degree((10, 10, 10)):
+    print(f"Degree: {element}, Elements: {[e['name'] for e in group_by_degree((10, 10, 10))[element]]}")
+
 
 
 def possible_differentials_in_a_range(bounds,r):
@@ -96,76 +96,8 @@ def possible_differentials_in_a_range(bounds,r):
     return differentials
 
 # test
-# differentials = possible_differentials_in_a_range((10,10,10), 1)
+# differentials = possible_differentials_in_a_range((5,10,10), 1)
 # for element, diffs in differentials.items():
-#    print(f"Possible d_1 differentials for {element}:")#   for diff in diffs:
-#   print(diffs)
-
-def possible_differentials_by_source(source_degree, bounds):
-    grouped = group_by_degree(bounds)
-    differentials = {}
-    degree_list = set(grouped.keys())
-    source_elements = grouped.get(source_degree, [])
-    max_r = min(bounds[0] - source_degree[0] + 1, bounds[2] - source_degree[2])
-    if max_r < 1 or not source_elements:
-        return {}
-    for r in range(1, max_r + 1):
-        target_degree = add_degree(source_degree, (r - 1, 1, r))
-        if target_degree in degree_list:
-            for source in source_elements:
-                source_name = source['name']
-                if source_name not in differentials:
-                    differentials[source_name] = []
-                for target in grouped[target_degree]:
-                    differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
-    return differentials
-
-#test
-#differentials = possible_differentials_by_source((15,8,3),(100, 60, 50))
-#for element, diffs in differentials.items():
-#   print(f"Possible d_r differentials for {element}:")#   for diff in diffs:
-#   print(diffs)
-
-
-def possible_differentials_within_bounds(bounds):
-    grouped = group_by_degree(bounds)
-    degree_list = set(grouped.keys())
-    differentials = {}
-    # Single-pass counting: avoid recomputing possible_differentials_by_source
-    # (which rebuilds grouped) for every source degree.
-    for source_degree, source_elements in grouped.items():
-        max_r = min(bounds[0] - source_degree[0] + 1, bounds[2] - source_degree[2])
-        if max_r < 1 or not source_elements:
-            continue
-        for r in range(1, max_r + 1):
-            target_degree = add_degree(source_degree, (r - 1, 1, r))
-            if target_degree in degree_list:
-                 for source in source_elements:
-                     source_name = source['name']
-            if source_name not in differentials:
-                            differentials[source_name] = []
-                            for target in grouped[target_degree]:
-                               differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
-    return differentials
-
-def counting_values(classes):
-    counting = {}
-    for element, values in classes.items():
-        counting[element] = len(values)
-    return counting
-
-#test
-differentials = possible_differentials_within_bounds((110,60,50))
-counting = counting_values(differentials)
-maximal_number_from_one_source = max(counting.values()) if counting else 0
-
-def finding_sources_with_fixed_number_of_differentials(classes, number):
-    sources = []
-    for element, values in classes.items():
-        if len(values) == number:
-            sources.append(element)
-    return sources
-
-tricky_sources = finding_sources_with_fixed_number_of_differentials(differentials, maximal_number_from_one_source)
-for source in tricky_sources:
-    print(source)
+#    print(f"Possible d_1 differentials for {element}:")
+#    for diff in diffs:
+#       print(diff)
