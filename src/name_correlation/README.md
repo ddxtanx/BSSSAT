@@ -21,11 +21,27 @@ know by its chart name.
 
 Neither input CSV ships in this directory (the chart file is checked in
 already at `src/Adams-motivic-E2.csv`; the machine file is not, to avoid
-bloating the repo with another ~500KB data file). Download
-`Adams-motivic-E2-machine.csv` from the Zenodo record above and place it next
-to `Adams-motivic-E2.csv`, or pass `--machine` pointing wherever you put it.
+bloating the repo with another ~500KB data file). Either:
 
-## Usage
+- run `./run_pipeline.sh`, which downloads `Adams-motivic-E2-machine.csv`
+  from Zenodo (verified by checksum) if it's not already in `src/`, then runs
+  both scripts below, or
+- download it yourself from the Zenodo record above and place it next to
+  `Adams-motivic-E2.csv`, or pass `--machine` pointing wherever you put it.
+
+## Scripts
+
+### run_pipeline.sh
+
+Coordinator script: downloads the two input CSVs if needed (see Setup
+above), then runs `correlate_motivic_names.py` followed by
+`classify_h1_periodicity.py`.
+
+```
+./run_pipeline.sh [outdir]   # outdir defaults to ./out
+```
+
+### correlate_motivic_names.py
 
 ```
 python3 correlate_motivic_names.py
@@ -34,6 +50,33 @@ python3 correlate_motivic_names.py --e2 PATH --machine PATH --outdir out/
 
 Run with no arguments, it looks for both CSVs in `src/` (one level up from
 this script) and writes output into the current directory.
+
+### classify_h1_periodicity.py
+
+```
+python3 classify_h1_periodicity.py
+python3 classify_h1_periodicity.py --e2 PATH --machine PATH --outdir out/
+```
+
+For every generator in `Adams-motivic-E2-machine.csv`, determines whether
+it's h1-periodic, h1-torsion, or unknown, using the chart file's `h1target`
+column (`h1target == "loc"` means h1-periodic) by way of the correlation
+above. Even when `correlate_motivic_names.py` can't pin down exactly which
+chart candidate a machine generator corresponds to, if *every* chart
+candidate in that bidegree group has the same h1-periodicity status, the
+machine generator's status is still determined — it just doesn't matter
+which one of them it actually is. Writes
+`Adams-motivic-h1-periodicity.csv` with columns `machine_name`, `stem`,
+`Adams filtration`, `weight`, `tautorsion`, `h1_status`
+(`h1-periodic`/`h1-torsion`/`unknown`), `basis` (how it was determined —
+`matched (key)`, `matched (structural)`, `ambiguous-unanimous`,
+`ambiguous-mixed`, or `no-chart-candidate`), and `motivic_names` (the
+chart name(s) the determination is based on).
+
+On the full computed range: 553 h1-periodic, 2923 h1-torsion, 7588 unknown
+(of which all but 7 are `no-chart-candidate` — periodic-tower continuations
+the chart has no entry for at all — and 7 are genuine `ambiguous-mixed`
+ties).
 
 ## How matching works
 
