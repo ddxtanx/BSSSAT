@@ -1,7 +1,7 @@
 import csv
 
 classes =[]
-with open('Adams-motivic-E2.csv', newline='') as csvfile:
+with open('data/Adams-motivic-E2.csv', newline='') as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
         classes.append({"name": row['name'], "stem": int(row['stem']), "Adams filtration": int(row['Adams filtration']), "weight": int(row['weight']), "tautorsion": int(row['tautorsion'])})
@@ -50,7 +50,6 @@ def element_by_degree(a_degree):
             continue
     return elements_in_degree
 
-
 def possible_differentials_by_r(source_degree,r):
     source_elements = element_by_degree(source_degree)
     target_degree = add_degree(source_degree, (r-1, 1, r))
@@ -66,9 +65,9 @@ def possible_differentials_by_r(source_degree,r):
             
 def group_by_degree(bounds):
     grouped = {}
-    for s in range(0, int(bounds[0]) + 1):
-        for f in range(0, int(bounds[1]) + 1):
-            for w in range(-int(bounds[2]), int(bounds[2]) + 1):
+    for s in range(bounds[0] + 1):
+        for f in range(bounds[1] + 1):
+            for w in range(-bounds[2], int(bounds[2]) + 1):
                 a_degree = (s, f, w)
                 elements = element_by_degree(a_degree)
                 if elements:
