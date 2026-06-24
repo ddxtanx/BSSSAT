@@ -1,26 +1,30 @@
-"""
-This module defines the ExtClass class, which provides a 
-useful abstraction for working with classes in the 
-cohomology of the C-motivic steenrod algebra.
-It also defines ZeroClass,
-which is an instance of ExtClass that represents the zero class.
-"""
+from __future__ import annotations
+try:
+    from . import find_differential
+except ImportError:
+    import find_differential
+
 
 class ExtClass:
     """
     This class represents a class in the cohomology of the C-motivic steenrod algebra.
     """
+    def __init__(self, tridegree: tuple[int, int, int], vector: list[bool]) -> None:
+
+
     def get_name(self) -> str:
         """
         Returns the name of the class as a string.
         """
-        pass
+        if not self._name:
+            return "0"
+        return " + ".join(self._name)
 
     def get_degree(self) -> tuple[int, int, int]:
         """
         Returns the tridegree (s, f, w) of the class as a tuple of three integers.
         """
-        pass
+        return (self._stem, self._filtration, self._weight)
 
     def get_differential_targets(self, r: int) -> list[ExtClass]:
         """
@@ -33,38 +37,29 @@ class ExtClass:
         Returns:
             list[ExtClass]: A list of ExtClass instances that are possible targets of the differential d_r.
         """
-        pass
+        return find_differential.possible_differentials_by_r(self.get_degree(), r)
 
     def __add__(self, other: ExtClass) -> ExtClass:
-        """
-        Constructs a new ExtClass instance that represents the sum of this class and another class.
-
-        Args:
-            other (ExtClass): The other ExtClass instance to add to this class.
-
-        Returns:
-            ExtClass: A new ExtClass instance that represents the sum of this class and the other
-        """
-        pass
+        if other is ZeroClass:
+            return self
+        if self.get_degree() != other.get_degree():
+            raise ValueError("Cannot add ExtClass instances with different degrees")
+        else:
+            if self.get_name() == other.get_name():
+                return ZeroClass
+            else:
+                new_terms = []
+                temporary_terms = list(self._name, other._name)
+                for term in other._name:
+                    if counting(term, self._name) % 2 == 1:
+                        continue
+                
+           
 
     def __mul__(self, other: ExtClass) -> ExtClass:
-        """
-        Constructs a new ExtClass instance that represents the product of this class and another class.
-        This either just returns the naive juxtaposition of the two classes,
-        or it returns the result of a known product in the Ext algebra.
-
-        Args:
-            other (ExtClass): The other ExtClass instance to multiply with this class.
-
-        Returns:
-            ExtClass: A new ExtClass instance that represents the product of this class and the other
-        """
         pass
 
     def get_name_latex(self) -> str:
-        """
-        Returns the name of the class in LaTeX format as a string.
-        """
         pass
 
     def __hash__(self) -> int:

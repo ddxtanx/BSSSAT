@@ -1,9 +1,9 @@
-import c
 import csv
+import json
 
 def get_classes():
     classes = []
-    with open('data/Adams-motivic-E2.csv', newline='') as csvfile:
+    with open('Adams-motivic-E2.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             classes.append({"name": row['name'], "stem": int(row['stem']), "Adams filtration": int(row['Adams filtration']), "weight": int(row['weight']), "tautorsion": int(row['tautorsion'])})
@@ -157,14 +157,23 @@ def counting_values(classes):
         counting[element] = len(values)
     return counting
 
-#test
-differentials = possible_differentials_within_bounds((110,60,50))
-counting = counting_values(differentials)
-maximal_number_from_one_source = max(counting.values()) if counting else 0
-
 def finding_sources_with_fixed_number_of_differentials(classes, number):
     sources = []
     for element, values in classes.items():
         if len(values) == number:
             sources.append(element)
     return sources
+
+# group the elements by degree and write to a CSV file
+# elements = get_classes()
+# max_stem = max(element["stem"] for element in elements)
+# max_filtration = max(element["Adams filtration"] for element in elements)
+# max_weight = max(element["weight"] for element in elements)
+# grouped = group_by_degree((max_stem, max_filtration+1, max_weight+1))
+
+# with open("grouped_by_degree.csv", "w", newline="") as f:
+#     writer = csv.writer(f)
+#     writer.writerow(["degree", "number_of_elements", "elements"])
+#     for degree_key, source_elements in sorted(grouped.items()):
+#         names = [element["name"] for element in source_elements]
+#         writer.writerow([str(degree_key), len(names), json.dumps(names, ensure_ascii=False)])
