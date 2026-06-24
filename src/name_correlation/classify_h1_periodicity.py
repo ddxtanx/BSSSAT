@@ -20,6 +20,11 @@ Three ways a machine generator's status gets determined:
    (typical for periodic-tower continuations the chart collapses into a
    single "loc" entry). Status is "unknown" either way; `basis` distinguishes
    the two cases.
+4. basis-mismatch-suspected -- correlate_motivic_names found that this
+   generator's (stem, filtration, weight) slice has a real basis disagreement
+   between the chart and machine files (same dimension, different tautorsion
+   multiset -- see that script's docstring), so any pairing in that slice is
+   unreliable. Status is "unknown".
 
 Usage:
     python3 classify_h1_periodicity.py
@@ -34,7 +39,6 @@ from correlate_motivic_names import (
     DEFAULT_E2_PATH,
     DEFAULT_MACHINE_PATH,
     correlate,
-    key_of,
     load_rows,
 )
 
@@ -50,7 +54,7 @@ def classify(e2_path, machine_path):
     machine_rows = load_rows(machine_path)
     e2_by_name = {r["name"]: r for r in e2_rows}
 
-    matched_rows, ambiguous_rows, _unmatched, _stats = correlate(e2_path, machine_path)
+    matched_rows, ambiguous_rows, _unmatched, basis_mismatch_rows, _stats = correlate(e2_path, machine_path)
 
     machine_to_match = {r["machine_name"]: r for r in matched_rows}
 
@@ -65,6 +69,8 @@ def classify(e2_path, machine_path):
     machine_name_to_ambiguous_key = {
         name: key for key, names in key_to_machine_names.items() for name in names
     }
+
+    basis_mismatch_machine_names = {r["name"] for r in basis_mismatch_rows if r["side"] == "machine"}
 
     output_rows = []
     for machine_row in machine_rows:
@@ -84,6 +90,8 @@ def classify(e2_path, machine_path):
                 status, basis = next(iter(statuses)), "ambiguous-unanimous"
             else:
                 status, basis = "unknown", "ambiguous-mixed"
+        elif name in basis_mismatch_machine_names:
+            status, basis, candidates = "unknown", "basis-mismatch-suspected", ""
         else:
             status, basis, candidates = "unknown", "no-chart-candidate", ""
 
