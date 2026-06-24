@@ -7,14 +7,13 @@ which is an instance of ExtClass that represents the zero class.
 """
 
 import find_differential
-from .find_differential import element_degree
 
 class ExtClass:
     """
     This class represents a class in the cohomology of the C-motivic steenrod algebra.
     """
     def __init__(self, name: str, stem: int, adams_filtration: int, weight: int):
-        self.name = 
+        self.name = name
         self.stem = stem
         self.adams_filtration = adams_filtration
         self.weight = weight
@@ -42,9 +41,11 @@ class ExtClass:
         Returns:
             list[ExtClass]: A list of ExtClass instances that are possible targets of the differential d_r.
         """
-        if self._ext is None:
-            return []
-        return self._ext.get_possible_differential_targets(self, r)
+        targets = []
+        for target in find_differential.possible_differentials_by_r(self.get_degree(), r):
+            targets.append(ExtClass(target['name'], target['stem'], target['Adams filtration'], target['weight']))
+        return targets
+        
 
     def __add__(self, other: ExtClass) -> ExtClass:
         """
@@ -58,14 +59,10 @@ class ExtClass:
         """
         if self.get_degree() != other.get_degree():
             raise ValueError("Can only add Ext classes in the same tridegree")
-        return ExtClass(
-            f"{self.name} + {other.name}",
-            self.stem,
-            self.adams_filtration,
-            self.weight,
-            min(self.tautorsion, other.tautorsion),
-            self._ext,
-        )
+        else :
+            if self.get_name() == other.get_name():
+                return ZeroClass
+            if self.get_name() =
 
     def __mul__(self, other: ExtClass) -> ExtClass:
         """

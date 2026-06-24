@@ -1,10 +1,12 @@
 import csv
 
-classes =[]
+
+classes = []
 with open('data/Adams-motivic-E2.csv', newline='') as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        classes.append({"name": row['name'], "stem": int(row['stem']), "Adams filtration": int(row['Adams filtration']), "weight": int(row['weight']), "tautorsion": int(row['tautorsion'])})
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            classes.append({"name": row['name'], "stem": int(row['stem']), "Adams filtration": int(row['Adams filtration']), "weight": int(row['weight']), "tautorsion": int(row['tautorsion'])})
+
 
 
 def degree(element):
@@ -17,7 +19,7 @@ def sfdegree(element):
         return (element["stem"], element["Adams filtration"])
 
 group_by_sf = {}
-for element in classes:
+for element in get_classes():
     if sfdegree(element) not in group_by_sf:
         group_by_sf[sfdegree(element)] = [element]
     else:
