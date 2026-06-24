@@ -1,7 +1,7 @@
 import csv
 
 classes =[]
-with open('Adams-motivic-E2.csv', newline='') as csvfile:
+with open('data/Adams-motivic-E2.csv', newline='') as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
         classes.append({"name": row['name'], "stem": int(row['stem']), "Adams filtration": int(row['Adams filtration']), "weight": int(row['weight']), "tautorsion": int(row['tautorsion'])})
