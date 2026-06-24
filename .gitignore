@@ -1,0 +1,6 @@
+.DS_Store
+__pycache__
+*.pyc
+*.egg_info
+ext_data/*.csv
+.python-version
