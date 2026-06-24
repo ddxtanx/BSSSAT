@@ -4,6 +4,8 @@ useful abstraction for working with classes in the
 cohomology of the C-motivic steenrod algebra.
 It also defines ZeroClass,
 which is an instance of ExtClass that represents the zero class.
+Finally there is Undefined which is the ``None" variant of ExtClass,
+used as the ``target" of a differential when the source is not a cycle on the E_r page.
 """
 
 class ExtClass:
@@ -91,3 +93,4 @@ class ExtClass:
         return self.get_degree() == other.get_degree()
 
 ZeroClass: ExtClass = None
+Undefined: ExtClass = None
