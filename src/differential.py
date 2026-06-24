@@ -11,9 +11,6 @@ class Differential:
     def is_cycle(self) -> bool:
         pass
 
-    def get_id(self) -> int:
-        pass
-
     def get_tridegree(self) -> tuple[int, int, int]:
         pass
 
