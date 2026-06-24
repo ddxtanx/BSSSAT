@@ -1,6 +1,7 @@
 from .ext_class import ExtClass
-from .differential import Differential
+from .differential import Differential, UNDEFINED
 from .ext import Ext
+from pysat.solvers import Gluecard4
 
 """
 Expected Interface:
@@ -56,3 +57,8 @@ Expected Interface:
         - get_known_differentials(self) -> list[Differential]
             which returns the list of known differentials in Ext, as Differential instances
 """
+
+class SATSolver:
+    E1_page: Ext
+
+
