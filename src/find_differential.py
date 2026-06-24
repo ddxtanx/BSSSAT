@@ -75,10 +75,6 @@ def group_by_degree(bounds):
                     grouped[a_degree] = elements
     return grouped
 
-# test
-for element in group_by_degree((10, 10, 10)):
-    print(f"Degree: {element}, Elements: {[e['name'] for e in group_by_degree((10, 10, 10))[element]]}")
-
 
 
 def possible_differentials_in_a_range(bounds,r):
@@ -97,8 +93,8 @@ def possible_differentials_in_a_range(bounds,r):
     return differentials
 
 # test
-# differentials = possible_differentials_in_a_range((5,10,10), 1)
-# for element, diffs in differentials.items():
-#    print(f"Possible d_1 differentials for {element}:")
-#    for diff in diffs:
-#       print(diff)
+differentials = possible_differentials_in_a_range((5,10,10), 1)
+for element, diffs in differentials.items():
+   print(f"Possible d_1 differentials for {element}:")
+   for diff in diffs:
+      print(diff)
