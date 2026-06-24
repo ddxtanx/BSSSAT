@@ -3,3 +3,4 @@ __pycache__
 *.pyc
 *.egg_info
 ext_data/*.csv
+.python-version
