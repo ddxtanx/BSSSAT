@@ -14,3 +14,5 @@ class Differential:
 
     def get_tridegree(self) -> tuple[int, int, int]:
         pass
+
+    
