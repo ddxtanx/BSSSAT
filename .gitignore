@@ -3,3 +3,5 @@ __pycache__
 *.pyc
 *.egg_info
 ext_data/*.csv
+src/Adams-motivic-E2-machine.csv
+src/name_correlation/out/
