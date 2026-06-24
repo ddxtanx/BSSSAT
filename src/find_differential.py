@@ -11,16 +11,28 @@ def degree(element):
     return (element["stem"], element["Adams filtration"], element["weight"])
 
 def add_degree(degree1, degree2):
-    return (int(degree1[0]) + int(degree2[0]), int(degree1[1]) + int(degree2[1]), int(degree1[2]) + int(degree2[2])) 
+    return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
+
+def sfdegree(element):
+        return (element["stem"], element["Adams filtration"])
+
+group_by_sf = {}
+for element in classes:
+    if sfdegree(element) not in group_by_sf:
+        group_by_sf[sfdegree(element)] = [element]
+    else:
+        group_by_sf[sfdegree(element)].append(element)
+
+sf_list = list(group_by_sf.keys())
 
 def element_by_degree(a_degree):
     elements_in_degree = []
-    for element in classes:
-        if int(degree(element)[0]) == int(a_degree[0]) and int(degree(element)[1]) == int(a_degree[1]) and int(degree(element)[2]) == int(a_degree[2]):
+    for element in group_by_sf.get((a_degree[0], a_degree[1]), []):
+        if degree(element)[2] == a_degree[2]:
             elements_in_degree.append(element)
-        if int(degree(element)[0]) == int(a_degree[0]) and int(degree(element)[1]) == int(a_degree[1]) and int(degree(element)[2]) > int(a_degree[2]):
-            difference_degree =   int(degree(element)[2]) - int(a_degree[2])
-            if int(element["tautorsion"]) == 0:
+        if degree(element)[2] > a_degree[2]:
+            difference_degree =   degree(element)[2] - a_degree[2]
+            if element["tautorsion"] == 0:
                  elements_in_degree.append({
                     "name": f"tau^{difference_degree} {element['name']}",
                     "stem": a_degree[0],
@@ -83,7 +95,7 @@ def possible_differentials_in_a_range(bounds,r):
     return differentials
 
 # test
-differentials = possible_differentials_in_a_range((10,10,10), 1)
+differentials = possible_differentials_in_a_range((5,10,10), 1)
 for element, diffs in differentials.items():
    print(f"Possible d_1 differentials for {element}:")
    for diff in diffs:

@@ -1,436 +1,110 @@
-Possible d_1 differentials for 1:
-1
-Possible d_2 differentials for 1:
-1
-Possible d_1 differentials for h0:
-h0
-Possible d_2 differentials for h0:
-h0
-Possible d_1 differentials for h0^2:
-h0^2
-Possible d_2 differentials for h0^2:
-h0^2
-Possible d_1 differentials for h0^3:
-h0^3
-Possible d_2 differentials for h0^3:
-h0^3
-Possible d_1 differentials for tau^1 h1:
-tau^1 h1
-Possible d_2 differentials for tau^1 h1:
-tau^1 h1
-Possible d_1 differentials for h1:
-h1
-Possible d_2 differentials for h1:
-h1
-Possible d_1 differentials for tau^2 h1^2:
-tau^2 h1^2
-Possible d_2 differentials for tau^2 h1^2:
-tau^2 h1^2
-Possible d_1 differentials for tau^1 h1^2:
-tau^1 h1^2
-Possible d_2 differentials for tau^1 h1^2:
-tau^1 h1^2
-Possible d_1 differentials for h1^2:
-h1^2
-Possible d_2 differentials for h1^2:
-h1^2
+Possible d_1 differentials for tau^10 1:
+d_1(tau^10 1)=rho^1 tau^9 h0
+Possible d_1 differentials for tau^9 1:
+d_1(tau^9 1)=rho^1 tau^8 h0
+Possible d_1 differentials for tau^8 1:
+d_1(tau^8 1)=rho^1 tau^7 h0
+Possible d_1 differentials for tau^7 1:
+d_1(tau^7 1)=rho^1 tau^6 h0
+Possible d_1 differentials for tau^6 1:
+d_1(tau^6 1)=rho^1 tau^5 h0
+Possible d_1 differentials for tau^5 1:
+d_1(tau^5 1)=rho^1 tau^4 h0
+Possible d_1 differentials for tau^4 1:
+d_1(tau^4 1)=rho^1 tau^3 h0
+Possible d_1 differentials for tau^3 1:
+d_1(tau^3 1)=rho^1 tau^2 h0
+Possible d_1 differentials for tau^2 1:
+d_1(tau^2 1)=rho^1 tau^1 h0
+Possible d_1 differentials for tau^1 1:
+d_1(tau^1 1)=rho^1 h0
+Possible d_1 differentials for tau^10 h0:
+d_1(tau^10 h0)=rho^1 tau^9 h0^2
+Possible d_1 differentials for tau^9 h0:
+d_1(tau^9 h0)=rho^1 tau^8 h0^2
+Possible d_1 differentials for tau^8 h0:
+d_1(tau^8 h0)=rho^1 tau^7 h0^2
+Possible d_1 differentials for tau^7 h0:
+d_1(tau^7 h0)=rho^1 tau^6 h0^2
+Possible d_1 differentials for tau^6 h0:
+d_1(tau^6 h0)=rho^1 tau^5 h0^2
+Possible d_1 differentials for tau^5 h0:
+d_1(tau^5 h0)=rho^1 tau^4 h0^2
+Possible d_1 differentials for tau^4 h0:
+d_1(tau^4 h0)=rho^1 tau^3 h0^2
+Possible d_1 differentials for tau^3 h0:
+d_1(tau^3 h0)=rho^1 tau^2 h0^2
+Possible d_1 differentials for tau^2 h0:
+d_1(tau^2 h0)=rho^1 tau^1 h0^2
+Possible d_1 differentials for tau^1 h0:
+d_1(tau^1 h0)=rho^1 h0^2
+Possible d_1 differentials for tau^10 h0^2:
+d_1(tau^10 h0^2)=rho^1 tau^9 h0^3
+Possible d_1 differentials for tau^9 h0^2:
+d_1(tau^9 h0^2)=rho^1 tau^8 h0^3
+Possible d_1 differentials for tau^8 h0^2:
+d_1(tau^8 h0^2)=rho^1 tau^7 h0^3
+Possible d_1 differentials for tau^7 h0^2:
+d_1(tau^7 h0^2)=rho^1 tau^6 h0^3
+Possible d_1 differentials for tau^6 h0^2:
+d_1(tau^6 h0^2)=rho^1 tau^5 h0^3
+Possible d_1 differentials for tau^5 h0^2:
+d_1(tau^5 h0^2)=rho^1 tau^4 h0^3
+Possible d_1 differentials for tau^4 h0^2:
+d_1(tau^4 h0^2)=rho^1 tau^3 h0^3
+Possible d_1 differentials for tau^3 h0^2:
+d_1(tau^3 h0^2)=rho^1 tau^2 h0^3
+Possible d_1 differentials for tau^2 h0^2:
+d_1(tau^2 h0^2)=rho^1 tau^1 h0^3
+Possible d_1 differentials for tau^1 h0^2:
+d_1(tau^1 h0^2)=rho^1 h0^3
+Possible d_1 differentials for tau^12 h2:
+d_1(tau^12 h2)=rho^1 tau^11 h0 h2
+Possible d_1 differentials for tau^11 h2:
+d_1(tau^11 h2)=rho^1 tau^10 h0 h2
+Possible d_1 differentials for tau^10 h2:
+d_1(tau^10 h2)=rho^1 tau^9 h0 h2
+Possible d_1 differentials for tau^9 h2:
+d_1(tau^9 h2)=rho^1 tau^8 h0 h2
+Possible d_1 differentials for tau^8 h2:
+d_1(tau^8 h2)=rho^1 tau^7 h0 h2
+Possible d_1 differentials for tau^7 h2:
+d_1(tau^7 h2)=rho^1 tau^6 h0 h2
+Possible d_1 differentials for tau^6 h2:
+d_1(tau^6 h2)=rho^1 tau^5 h0 h2
+Possible d_1 differentials for tau^5 h2:
+d_1(tau^5 h2)=rho^1 tau^4 h0 h2
+Possible d_1 differentials for tau^4 h2:
+d_1(tau^4 h2)=rho^1 tau^3 h0 h2
+Possible d_1 differentials for tau^3 h2:
+d_1(tau^3 h2)=rho^1 tau^2 h0 h2
 Possible d_1 differentials for tau^2 h2:
-tau^2 h2
-Possible d_2 differentials for tau^2 h2:
-tau^2 h2
+d_1(tau^2 h2)=rho^1 tau^1 h0 h2
 Possible d_1 differentials for tau^1 h2:
-tau^1 h2
-Possible d_2 differentials for tau^1 h2:
-tau^1 h2
-Possible d_1 differentials for h2:
-h2
-Possible d_2 differentials for h2:
-h2
+d_1(tau^1 h2)=rho^1 h0 h2
+Possible d_1 differentials for tau^12 h0 h2:
+d_1(tau^12 h0 h2)=rho^1 tau^12 h1^3
+Possible d_1 differentials for tau^11 h0 h2:
+d_1(tau^11 h0 h2)=rho^1 tau^11 h1^3
+Possible d_1 differentials for tau^10 h0 h2:
+d_1(tau^10 h0 h2)=rho^1 tau^10 h1^3
+Possible d_1 differentials for tau^9 h0 h2:
+d_1(tau^9 h0 h2)=rho^1 tau^9 h1^3
+Possible d_1 differentials for tau^8 h0 h2:
+d_1(tau^8 h0 h2)=rho^1 tau^8 h1^3
+Possible d_1 differentials for tau^7 h0 h2:
+d_1(tau^7 h0 h2)=rho^1 tau^7 h1^3
+Possible d_1 differentials for tau^6 h0 h2:
+d_1(tau^6 h0 h2)=rho^1 tau^6 h1^3
+Possible d_1 differentials for tau^5 h0 h2:
+d_1(tau^5 h0 h2)=rho^1 tau^5 h1^3
+Possible d_1 differentials for tau^4 h0 h2:
+d_1(tau^4 h0 h2)=rho^1 tau^4 h1^3
+Possible d_1 differentials for tau^3 h0 h2:
+d_1(tau^3 h0 h2)=rho^1 tau^3 h1^3
 Possible d_1 differentials for tau^2 h0 h2:
-tau^2 h0 h2
-Possible d_2 differentials for tau^2 h0 h2:
-tau^2 h0 h2
+d_1(tau^2 h0 h2)=rho^1 tau^2 h1^3
 Possible d_1 differentials for tau^1 h0 h2:
-tau^1 h0 h2
-Possible d_2 differentials for tau^1 h0 h2:
-tau^1 h0 h2
+d_1(tau^1 h0 h2)=rho^1 tau^1 h1^3
 Possible d_1 differentials for h0 h2:
-h0 h2
-Possible d_2 differentials for h0 h2:
-h0 h2
-Possible d_1 differentials for tau^3 h1^3:
-tau^3 h1^3
-Possible d_2 differentials for tau^3 h1^3:
-tau^3 h1^3
-Possible d_1 differentials for tau^2 h1^3:
-tau^2 h1^3
-Possible d_2 differentials for tau^2 h1^3:
-tau^2 h1^3
-Possible d_1 differentials for tau^1 h1^3:
-tau^1 h1^3
-Possible d_2 differentials for tau^1 h1^3:
-tau^1 h1^3
-Possible d_1 differentials for h1^3:
-h1^3
-Possible d_2 differentials for h1^3:
-h1^3
-Possible d_1 differentials for tau^4 h1^4:
-tau^4 h1^4
-Possible d_2 differentials for tau^4 h1^4:
-tau^4 h1^4
-Possible d_1 differentials for tau^3 h1^4:
-tau^3 h1^4
-Possible d_2 differentials for tau^3 h1^4:
-tau^3 h1^4
-Possible d_1 differentials for tau^2 h1^4:
-tau^2 h1^4
-Possible d_2 differentials for tau^2 h1^4:
-tau^2 h1^4
-Possible d_1 differentials for h1^4:
-h1^4
-Possible d_2 differentials for h1^4:
-h1^4
-Possible d_1 differentials for tau^4 h2^2:
-tau^4 h2^2
-Possible d_2 differentials for tau^4 h2^2:
-tau^4 h2^2
-Possible d_1 differentials for tau^3 h2^2:
-tau^3 h2^2
-Possible d_2 differentials for tau^3 h2^2:
-tau^3 h2^2
-Possible d_1 differentials for tau^2 h2^2:
-tau^2 h2^2
-Possible d_2 differentials for tau^2 h2^2:
-tau^2 h2^2
-Possible d_1 differentials for tau^1 h2^2:
-tau^1 h2^2
-Possible d_2 differentials for tau^1 h2^2:
-tau^1 h2^2
-Possible d_1 differentials for h2^2:
-h2^2
-Possible d_2 differentials for h2^2:
-h2^2
-Possible d_1 differentials for tau^4 h3:
-tau^4 h3
-Possible d_2 differentials for tau^4 h3:
-tau^4 h3
-Possible d_1 differentials for tau^3 h3:
-tau^3 h3
-Possible d_2 differentials for tau^3 h3:
-tau^3 h3
-Possible d_1 differentials for tau^2 h3:
-tau^2 h3
-Possible d_2 differentials for tau^2 h3:
-tau^2 h3
-Possible d_1 differentials for tau^1 h3:
-tau^1 h3
-Possible d_2 differentials for tau^1 h3:
-tau^1 h3
-Possible d_1 differentials for h3:
-h3
-Possible d_2 differentials for h3:
-h3
-Possible d_1 differentials for tau^4 h0 h3:
-tau^4 h0 h3
-Possible d_2 differentials for tau^4 h0 h3:
-tau^4 h0 h3
-Possible d_1 differentials for tau^3 h0 h3:
-tau^3 h0 h3
-Possible d_2 differentials for tau^3 h0 h3:
-tau^3 h0 h3
-Possible d_1 differentials for tau^2 h0 h3:
-tau^2 h0 h3
-Possible d_2 differentials for tau^2 h0 h3:
-tau^2 h0 h3
-Possible d_1 differentials for tau^1 h0 h3:
-tau^1 h0 h3
-Possible d_2 differentials for tau^1 h0 h3:
-tau^1 h0 h3
-Possible d_1 differentials for h0 h3:
-h0 h3
-Possible d_2 differentials for h0 h3:
-h0 h3
-Possible d_1 differentials for tau^4 h0^2 h3:
-tau^4 h0^2 h3
-Possible d_2 differentials for tau^4 h0^2 h3:
-tau^4 h0^2 h3
-Possible d_1 differentials for tau^3 h0^2 h3:
-tau^3 h0^2 h3
-Possible d_2 differentials for tau^3 h0^2 h3:
-tau^3 h0^2 h3
-Possible d_1 differentials for tau^2 h0^2 h3:
-tau^2 h0^2 h3
-Possible d_2 differentials for tau^2 h0^2 h3:
-tau^2 h0^2 h3
-Possible d_1 differentials for tau^1 h0^2 h3:
-tau^1 h0^2 h3
-Possible d_2 differentials for tau^1 h0^2 h3:
-tau^1 h0^2 h3
-Possible d_1 differentials for h0^2 h3:
-h0^2 h3
-Possible d_2 differentials for h0^2 h3:
-h0^2 h3
-Possible d_1 differentials for tau^4 h0^3 h3:
-tau^4 h0^3 h3
-Possible d_2 differentials for tau^4 h0^3 h3:
-tau^4 h0^3 h3
-Possible d_1 differentials for tau^3 h0^3 h3:
-tau^3 h0^3 h3
-Possible d_2 differentials for tau^3 h0^3 h3:
-tau^3 h0^3 h3
-Possible d_1 differentials for tau^2 h0^3 h3:
-tau^2 h0^3 h3
-Possible d_2 differentials for tau^2 h0^3 h3:
-tau^2 h0^3 h3
-Possible d_1 differentials for tau^1 h0^3 h3:
-tau^1 h0^3 h3
-Possible d_2 differentials for tau^1 h0^3 h3:
-tau^1 h0^3 h3
-Possible d_1 differentials for h0^3 h3:
-h0^3 h3
-Possible d_2 differentials for h0^3 h3:
-h0^3 h3
-Possible d_1 differentials for tau^5 h1 h3:
-tau^5 h1 h3
-Possible d_2 differentials for tau^5 h1 h3:
-tau^5 h1 h3
-Possible d_1 differentials for tau^4 h1 h3:
-tau^4 h1 h3
-Possible d_2 differentials for tau^4 h1 h3:
-tau^4 h1 h3
-Possible d_1 differentials for tau^3 h1 h3:
-tau^3 h1 h3
-Possible d_2 differentials for tau^3 h1 h3:
-tau^3 h1 h3
-Possible d_1 differentials for tau^2 h1 h3:
-tau^2 h1 h3
-Possible d_2 differentials for tau^2 h1 h3:
-tau^2 h1 h3
-Possible d_1 differentials for tau^1 h1 h3:
-tau^1 h1 h3
-Possible d_2 differentials for tau^1 h1 h3:
-tau^1 h1 h3
-Possible d_1 differentials for h1 h3:
-h1 h3
-Possible d_2 differentials for h1 h3:
-h1 h3
-Possible d_1 differentials for tau^5 c0:
-tau^5 c0
-Possible d_2 differentials for tau^5 c0:
-tau^5 c0
-Possible d_1 differentials for tau^4 c0:
-tau^4 c0
-Possible d_2 differentials for tau^4 c0:
-tau^4 c0
-Possible d_1 differentials for tau^3 c0:
-tau^3 c0
-Possible d_2 differentials for tau^3 c0:
-tau^3 c0
-Possible d_1 differentials for tau^2 c0:
-tau^2 c0
-Possible d_2 differentials for tau^2 c0:
-tau^2 c0
-Possible d_1 differentials for tau^1 c0:
-tau^1 c0
-Possible d_2 differentials for tau^1 c0:
-tau^1 c0
-Possible d_1 differentials for c0:
-c0
-Possible d_2 differentials for c0:
-c0
-Possible d_1 differentials for tau^6 h1^2 h3:
-tau^6 h1^2 h3
-Possible d_2 differentials for tau^6 h1^2 h3:
-tau^6 h1^2 h3
-Possible d_1 differentials for tau^5 h1^2 h3:
-tau^5 h1^2 h3
-Possible d_2 differentials for tau^5 h1^2 h3:
-tau^5 h1^2 h3
-Possible d_1 differentials for tau^4 h1^2 h3:
-tau^4 h1^2 h3
-Possible d_2 differentials for tau^4 h1^2 h3:
-tau^4 h1^2 h3
-Possible d_1 differentials for tau^3 h1^2 h3:
-tau^3 h1^2 h3
-Possible d_2 differentials for tau^3 h1^2 h3:
-tau^3 h1^2 h3
-Possible d_1 differentials for tau^2 h1^2 h3:
-tau^2 h1^2 h3
-Possible d_2 differentials for tau^2 h1^2 h3:
-tau^2 h1^2 h3
-Possible d_1 differentials for tau^1 h1^2 h3:
-tau^1 h1^2 h3
-Possible d_2 differentials for tau^1 h1^2 h3:
-tau^1 h1^2 h3
-Possible d_1 differentials for h1^2 h3:
-h1^2 h3
-Possible d_2 differentials for h1^2 h3:
-h1^2 h3
-Possible d_1 differentials for tau^6 h1 c0:
-tau^6 h1 c0
-Possible d_2 differentials for tau^6 h1 c0:
-tau^6 h1 c0
-Possible d_1 differentials for tau^5 h1 c0:
-tau^5 h1 c0
-Possible d_2 differentials for tau^5 h1 c0:
-tau^5 h1 c0
-Possible d_1 differentials for tau^4 h1 c0:
-tau^4 h1 c0
-Possible d_2 differentials for tau^4 h1 c0:
-tau^4 h1 c0
-Possible d_1 differentials for tau^3 h1 c0:
-tau^3 h1 c0
-Possible d_2 differentials for tau^3 h1 c0:
-tau^3 h1 c0
-Possible d_1 differentials for tau^2 h1 c0:
-tau^2 h1 c0
-Possible d_2 differentials for tau^2 h1 c0:
-tau^2 h1 c0
-Possible d_1 differentials for tau^1 h1 c0:
-tau^1 h1 c0
-Possible d_2 differentials for tau^1 h1 c0:
-tau^1 h1 c0
-Possible d_1 differentials for h1 c0:
-h1 c0
-Possible d_2 differentials for h1 c0:
-h1 c0
-Possible d_1 differentials for tau^5 P h1:
-tau^5 P h1
-Possible d_2 differentials for tau^5 P h1:
-tau^5 P h1
-Possible d_1 differentials for tau^4 P h1:
-tau^4 P h1
-Possible d_2 differentials for tau^4 P h1:
-tau^4 P h1
-Possible d_1 differentials for tau^3 P h1:
-tau^3 P h1
-Possible d_2 differentials for tau^3 P h1:
-tau^3 P h1
-Possible d_1 differentials for tau^2 P h1:
-tau^2 P h1
-Possible d_2 differentials for tau^2 P h1:
-tau^2 P h1
-Possible d_1 differentials for tau^1 P h1:
-tau^1 P h1
-Possible d_2 differentials for tau^1 P h1:
-tau^1 P h1
-Possible d_1 differentials for P h1:
-P h1
-Possible d_2 differentials for P h1:
-P h1
-Possible d_1 differentials for tau^6 P h1^2:
-tau^6 P h1^2
-Possible d_2 differentials for tau^6 P h1^2:
-tau^6 P h1^2
-Possible d_1 differentials for tau^5 P h1^2:
-tau^5 P h1^2
-Possible d_2 differentials for tau^5 P h1^2:
-tau^5 P h1^2
-Possible d_1 differentials for tau^4 P h1^2:
-tau^4 P h1^2
-Possible d_2 differentials for tau^4 P h1^2:
-tau^4 P h1^2
-Possible d_1 differentials for tau^3 P h1^2:
-tau^3 P h1^2
-Possible d_2 differentials for tau^3 P h1^2:
-tau^3 P h1^2
-Possible d_1 differentials for tau^2 P h1^2:
-tau^2 P h1^2
-Possible d_2 differentials for tau^2 P h1^2:
-tau^2 P h1^2
-Possible d_1 differentials for tau^1 P h1^2:
-tau^1 P h1^2
-Possible d_2 differentials for tau^1 P h1^2:
-tau^1 P h1^2
-Possible d_1 differentials for P h1^2:
-P h1^2
-Possible d_2 differentials for P h1^2:
-P h1^2
-Possible d_1 differentials for tau^6 P h2:
-tau^6 P h2
-Possible d_2 differentials for tau^6 P h2:
-tau^6 P h2
-Possible d_1 differentials for tau^5 P h2:
-tau^5 P h2
-Possible d_2 differentials for tau^5 P h2:
-tau^5 P h2
-Possible d_1 differentials for tau^4 P h2:
-tau^4 P h2
-Possible d_2 differentials for tau^4 P h2:
-tau^4 P h2
-Possible d_1 differentials for tau^3 P h2:
-tau^3 P h2
-Possible d_2 differentials for tau^3 P h2:
-tau^3 P h2
-Possible d_1 differentials for tau^2 P h2:
-tau^2 P h2
-Possible d_2 differentials for tau^2 P h2:
-tau^2 P h2
-Possible d_1 differentials for tau^1 P h2:
-tau^1 P h2
-Possible d_2 differentials for tau^1 P h2:
-tau^1 P h2
-Possible d_1 differentials for P h2:
-P h2
-Possible d_2 differentials for P h2:
-P h2
-Possible d_1 differentials for tau^6 P h0 h2:
-tau^6 P h0 h2
-Possible d_2 differentials for tau^6 P h0 h2:
-tau^6 P h0 h2
-Possible d_1 differentials for tau^5 P h0 h2:
-tau^5 P h0 h2
-Possible d_2 differentials for tau^5 P h0 h2:
-tau^5 P h0 h2
-Possible d_1 differentials for tau^4 P h0 h2:
-tau^4 P h0 h2
-Possible d_2 differentials for tau^4 P h0 h2:
-tau^4 P h0 h2
-Possible d_1 differentials for tau^3 P h0 h2:
-tau^3 P h0 h2
-Possible d_2 differentials for tau^3 P h0 h2:
-tau^3 P h0 h2
-Possible d_1 differentials for tau^2 P h0 h2:
-tau^2 P h0 h2
-Possible d_2 differentials for tau^2 P h0 h2:
-tau^2 P h0 h2
-Possible d_1 differentials for tau^1 P h0 h2:
-tau^1 P h0 h2
-Possible d_2 differentials for tau^1 P h0 h2:
-tau^1 P h0 h2
-Possible d_1 differentials for P h0 h2:
-P h0 h2
-Possible d_2 differentials for P h0 h2:
-P h0 h2
-Possible d_1 differentials for tau^7 P h1^3:
-tau^7 P h1^3
-Possible d_2 differentials for tau^7 P h1^3:
-tau^7 P h1^3
-Possible d_1 differentials for tau^6 P h1^3:
-tau^6 P h1^3
-Possible d_2 differentials for tau^6 P h1^3:
-tau^6 P h1^3
-Possible d_1 differentials for tau^5 P h1^3:
-tau^5 P h1^3
-Possible d_2 differentials for tau^5 P h1^3:
-tau^5 P h1^3
-Possible d_1 differentials for tau^4 P h1^3:
-tau^4 P h1^3
-Possible d_2 differentials for tau^4 P h1^3:
-tau^4 P h1^3
-Possible d_1 differentials for tau^3 P h1^3:
-tau^3 P h1^3
-Possible d_2 differentials for tau^3 P h1^3:
-tau^3 P h1^3
-Possible d_1 differentials for tau^2 P h1^3:
-tau^2 P h1^3
-Possible d_2 differentials for tau^2 P h1^3:
-tau^2 P h1^3
-Possible d_1 differentials for tau^1 P h1^3:
-tau^1 P h1^3
-Possible d_2 differentials for tau^1 P h1^3:
-tau^1 P h1^3
-Possible d_1 differentials for P h1^3:
-P h1^3
-Possible d_2 differentials for P h1^3:
-P h1^3
+d_1(h0 h2)=rho^1 h1^3
