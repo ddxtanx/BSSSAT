@@ -1,23 +1,12 @@
-from __future__ import annotations
+import find_differential
+from .find_differential import element_degree
 
-from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    try:
-        from .ext import Ext
-    except ImportError:
-        from ext import Ext
-
-
-@dataclass(frozen=True)
 class ExtClass:
-    name: str
-    stem: int
-    adams_filtration: int
-    weight: int
-    tautorsion: int = 0
-    _ext: Ext | None = field(default=None, compare=False, hash=False, repr=False)
+    def __init__(self, name: str, stem: int, adams_filtration: int, weight: int):
+        self.name = 
+        self.stem = stem
+        self.adams_filtration = adams_filtration
+        self.weight = weight
 
     def get_name(self) -> str:
         return self.name
