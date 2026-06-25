@@ -9,8 +9,6 @@ def get_classes():
             classes.append({"name": row['name'], "stem": int(row['stem']), "Adams filtration": int(row['Adams filtration']), "weight": int(row['weight']), "tautorsion": int(row['tautorsion'])})
     return classes
 
-
-
 def degree(element):
     return (element["stem"], element["Adams filtration"], element["weight"])
 
@@ -29,6 +27,9 @@ for element in get_classes():
         group_by_sf[sfdegree(element)].append(element)
 
 sf_list = list(group_by_sf.keys())
+
+
+#this function adds the tau multiples and gives the elements in a given degree (s, f, w).
 
 def element_by_degree(a_degree):
     elements_in_degree = []
@@ -55,6 +56,28 @@ def element_by_degree(a_degree):
             continue
     return elements_in_degree
 
+#defining the index of an element in a given degree.
+def class_index(a_degree):
+    indexed_elements = []
+    for index, element in enumerate(element_by_degree(a_degree)):
+        indexed_element = element.copy()
+        indexed_element["index"] = index
+        indexed_elements.append(indexed_element)
+    return indexed_elements
+
+
+#always remenber that index starts from 0.
+def class_name_by_index(a_degree, index):
+    for element in class_index(a_degree):
+        if element["index"] == index:
+            return element["name"]
+    return None
+
+#print(class_name_by_index((110, 34, 58), 0))
+
+
+#then this differential function takes a source degree and a differential degree r and returns the possible differentials.
+
 def possible_differentials_by_r(source_degree,r):
     source_elements = element_by_degree(source_degree)
     target_degree = add_degree(source_degree, (r-1, 1, r))
@@ -67,7 +90,9 @@ def possible_differentials_by_r(source_degree,r):
         for target in target_elements:
             differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
     return differentials
-            
+
+
+#returns a dictionary for all the elements in a range.
 def group_by_degree(bounds):
     grouped = {}
     for s in range(bounds[0] + 1):
@@ -81,6 +106,8 @@ def group_by_degree(bounds):
 
 
 
+
+#returns a dictionary for all the possible differentials for a range of r.
 def possible_differentials_in_a_range(bounds,r):
     grouped = group_by_degree(bounds)
     differentials = {}
@@ -96,12 +123,17 @@ def possible_differentials_in_a_range(bounds,r):
                     differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
     return differentials
 
+
+
 # test
 # differentials = possible_differentials_in_a_range((10,10,10), 1)
 # for element, diffs in differentials.items():
 #    print(f"Possible d_1 differentials for {element}:")#   for diff in diffs:
 #   print(diffs)
 
+
+
+#returns a dictionary for all the possible differentials for a range of r and a range of source degrees.
 def possible_differentials_by_source(source_degree, bounds):
     grouped = group_by_degree(bounds)
     differentials = {}
@@ -175,3 +207,5 @@ def finding_sources_with_fixed_number_of_differentials(classes, number):
 #     for degree_key, source_elements in sorted(grouped.items()):
 #         names = [element["name"] for element in source_elements]
 #         writer.writerow([str(degree_key), len(names), json.dumps(names, ensure_ascii=False)])
+
+
