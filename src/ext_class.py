@@ -9,6 +9,8 @@ used as the ``target" of a differential when the source is not a cycle on the E_
 """
 
 from tkinter.font import names
+import re
+
 
 import find_differential
 
@@ -41,53 +43,45 @@ class ExtClass:
         """
         return (self.tridegree)
 
-#     def get_differential_targets(self, r: int) -> list[ExtClass]:
-#         """
-#         Returns the possible targets of the differential d_r applied to this class as a list of ExtClass instances.
-#         If d_r(x) = rho^r y, then y should be included in the list of targets.
+    def get_differential_targets(self, r: int) -> list["ExtClass"]:
+        """
+        Returns the possible targets of the differential d_r applied to this class as a list of ExtClass instances.
+        If d_r(x) = rho^r y, then y should be included in the list of targets.
+        """
+        target_degree = find_differential.add_degree(self.get_degree(),(r - 1, 1, r))
 
-#         Args:
-#             r (int): The degree of the differential d_r.
+        target_elements = find_differential.element_by_degree(target_degree)
 
-#         Returns:
-#             list[ExtClass]: A list of ExtClass instances that are possible targets of the differential d_r.
-#         """
-#         return find_differential.possible_differentials_by_r(self.get_degree(), r)
+        targets = []
+        for index in range(len(target_elements)):
+            vector = [0] * len(target_elements)
+            vector[index] = 1
+            targets.append(ExtClass(target_degree, vector))
 
-
-#     def get_differential_targets(self, r: int) -> list[ExtClass]:
-#         """
-#         Returns the possible targets of the differential d_r applied to this class as a list of ExtClass instances.
-#         If d_r(x) = rho^r y, then y should be included in the list of targets.
-
-#         Args:
-#             r (int): The degree of the differential d_r.
-
-#         Returns:
-#             list[ExtClass]: A list of ExtClass instances that are possible targets of the differential d_r.
-#         """
-#         targets = []
-#         for target in find_differential.possible_differentials_by_r(self.get_degree(), r):
-#             targets.append(ExtClass(target['name'], target['stem'], target['Adams filtration'], target['weight']))
-#         return targets
+        return targets
         
 
-#     def __add__(self, other: ExtClass) -> ExtClass:
-#         """
-#         Constructs a new ExtClass instance that represents the sum of this class and another class.
+    def __add__(self, other: ExtClass) -> ExtClass:
+        """
+        Constructs a new ExtClass instance that represents the sum of this class and another class.
 
-#         Args:
-#             other (ExtClass): The other ExtClass instance to add to this class.
+        Args:
+            other (ExtClass): The other ExtClass instance to add to this class.
 
-#         Returns:
-#             ExtClass: A new ExtClass instance that represents the sum of this class and the other
-#         """
-#         if self.get_degree() != other.get_degree():
-#             raise ValueError("Can only add Ext classes in the same tridegree")
-#         else :
-#             if self.get_name() == other.get_name():
-#                 return ZeroClass
-#             if self.get_name() =
+        Returns:
+            ExtClass: A new ExtClass instance that represents the sum of this class and the other
+        """
+        if self.get_degree() != other.get_degree():
+            raise ValueError("Cannot add ExtClass instances with different degrees")
+
+        #if len(self.vector) != len(other.vector):
+         #   raise ValueError("Cannot add ExtClass instances with different vector lengths")
+
+        new_vector = []
+        for a, b in zip(self.vector, other.vector):
+            new_vector.append((a + b) % 2)
+
+        return ExtClass(self.get_degree(), new_vector)
 
 #     def __mul__(self, other: ExtClass) -> ExtClass:
 #         """
@@ -110,11 +104,24 @@ class ExtClass:
 #             self._ext,
 #         )
 
-#     def get_name_latex(self) -> str:
-#         """
-#         Returns the name of the class in LaTeX format as a string.
-#         """
-#         return self.name.replace("tau", r"\tau").replace("rho", r"\rho")
+
+    def get_name_latex(self) -> str:
+        """
+        Returns the name of the class in LaTeX format as a string.
+        """
+        name = self.get_name()
+
+        name = name.replace("tau", r"\tau")
+        name = name.replace("rho", r"\rho")
+
+        # Change exponents like ^4 into ^{4}
+        name = re.sub(r"\^(\d+)", r"^{\1}", name)
+
+        # Change names like h0, h1, d0, e0 into h_{0}, h_{1}, d_{0}, e_{0}
+        name = re.sub(r"\b([a-zA-Z])(\d+)\b", r"\1_{\2}", name)
+
+        return name
+
 
 #     def __hash__(self) -> int:
 #         return hash((self.get_name(), self.get_degree()))
@@ -124,24 +131,44 @@ class ExtClass:
 #             return False
 #         return self.get_name() == other.get_name() and self.get_degree() == other.get_degree()
 
-#     def in_same_tridegree_as(self, other: ExtClass) -> bool:
-#         """
-#         Determines whether this class and other are in the same tridegree.
+    def in_same_tridegree_as(self, other: ExtClass) -> bool:
+        """
+        Determines whether this class and other are in the same tridegree.
 
-#         Args:
-#             other (ExtClass): The other ExtClass instance to compare with this class.
+        Args:
+            other (ExtClass): The other ExtClass instance to compare with this class.
 
-#         Returns:
-#             bool: True if this class and other are in the same tridegree, False otherwise
-#         """
-#         if other == ZeroClass:
-#             return True
+        Returns:
+            bool: True if this class and other are in the same tridegree, False otherwise
+        """
+        if other == ZeroClass:
+            return True
 
-#         return self.get_degree() == other.get_degree()
+        return self.get_degree() == other.get_degree()
+   
 
-# ZeroClass: ExtClass = None
+ZeroClass: ExtClass = None
 # Undefined: ExtClass = None
 
 if __name__ == "__main__":
-    x = ExtClass((110, 34, 54), [1, 1, 0])
+    x = ExtClass((0, 0, -1), [1, 0, 0])
     print(x.get_name())
+
+    for target in x.get_differential_targets(2):
+        print(target.get_name())
+
+    y = ExtClass((110, 34, 54), [1, 0, 0])
+    z = ExtClass((110, 34, 54), [0, 1, 0])
+    t = ExtClass((110, 34, 54), [1, 0, 0])
+
+    print((t + y).get_name())
+    print((t + z).get_name())
+
+    m = ExtClass((110, 27, 58), [1, 1, 0])
+    print(m.get_name())
+    print(m.get_name_latex())
+
+    print(x.in_same_tridegree_as(y))
+    print(x.in_same_tridegree_as(z))
+    print(x.in_same_tridegree_as(ZeroClass))
+
