@@ -178,10 +178,14 @@ class SATSolver:
         conditional_consequents = []
 
         source = diff.get_source()
+        source_degree = source.get_degree()
         degree = diff.get_degree()
         target = diff.get_target()
 
         for other_class in self.E1_page.get_classes_up_to_coweight(self.max_coweight):
+            other_deg = other_class.get_degree()
+            if other_deg < source_degree:
+                continue
             target_classes = [ZeroClass]
             target_classes += other_class.get_differential_targets(degree)
             for target_class in target_classes:
