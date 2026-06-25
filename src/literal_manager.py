@@ -1,15 +1,16 @@
 """
 This module provides a class for efficiently and correctly
 managing the translation between questions about values of
-differentials (i.e. "Is d_8(tau^(2^8)) = 0?") and the 
+differentials (i.e. "Is d_8(tau^(2^8)) = 0?") and the
 boolean literals expected by the SAT solver.
 It is responsible for assigning to each differential question
-an Atom representing the question, and for quickly returning 
+an Atom representing the question, and for quickly returning
 the differential question associated to the given literal representation.
 """
 
 from .differential import Differential
-from pysat.formula import Atom, CNF
+from pysat.formula import Atom
+
 
 class LiteralManager:
     """
@@ -21,9 +22,6 @@ class LiteralManager:
     differentials: list[Differential]
 
     def __init__(self):
-        """
-        Initializes the LiteralManager with empty lists and dictionaries.
-        """
         self.differentials_to_ids = {}
         self.differentials = []
 
@@ -47,7 +45,9 @@ class LiteralManager:
             self.differentials_to_ids[differential] = atom
             ident = atom.name
             if ident != len(self.differentials) + 1:
-                raise ValueError(f"Unexpected literal ID {ident} for differential {differential}. Expected {len(self.differentials) + 1}.")
+                raise ValueError(
+                    f"Unexpected literal ID {ident} for differential {differential}. Expected {len(self.differentials) + 1}."
+                )
             self.differentials.append(differential)
             return atom
 
@@ -89,4 +89,3 @@ class LiteralManager:
             return self.differentials[id - 1]
         else:
             return None
-

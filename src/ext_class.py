@@ -1,6 +1,6 @@
 """
-This module defines the ExtClass class, which provides a 
-useful abstraction for working with classes in the 
+This module defines the ExtClass class, which provides a
+useful abstraction for working with classes in the
 cohomology of the C-motivic steenrod algebra.
 It also defines ZeroClass,
 which is an instance of ExtClass that represents the zero class.
@@ -8,10 +8,12 @@ Finally there is Undefined which is the ``None" variant of ExtClass,
 used as the ``target" of a differential when the source is not a cycle on the E_r page.
 """
 
+
 class ExtClass:
     """
     This class represents a class in the cohomology of the C-motivic steenrod algebra.
     """
+
     def get_name(self) -> str:
         """
         Returns the name of the class as a string.
@@ -75,7 +77,10 @@ class ExtClass:
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ExtClass):
             return False
-        return self.get_name() == other.get_name() and self.get_degree() == other.get_degree()
+        return (
+            self.get_name() == other.get_name()
+            and self.get_degree() == other.get_degree()
+        )
 
     def in_same_tridegree_as(self, other: ExtClass) -> bool:
         """
@@ -100,6 +105,7 @@ class ExtClass:
         """
         s, f, w = self.get_degree()
         return s - w
+
 
 ZeroClass: ExtClass = None
 Undefined: ExtClass = None

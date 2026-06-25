@@ -1,5 +1,5 @@
 """
-This module defines the Ext class which serves as the interface to 
+This module defines the Ext class which serves as the interface to
 interact with the entire cohomology of the C-motivic Steenrod Algebra
 all at once. It provides methods to retrieve various kinds of elements
 in the Ext algebra that should be useful for the creation of SAT constraints.
@@ -10,10 +10,12 @@ known differentials that will be used to bootstrap the SAT solver.
 from .ext_class import ExtClass
 from .differential import Differential
 
+
 class Ext:
     """
     This class represents useful pieces of information contained in the cohomology of the C-motivic Steenrod algebra.
     """
+
     def get_classes_up_to_coweight(self, coweight: int) -> list[ExtClass]:
         """
         This method returns a list of ExtClasses whose coweight (s - w) is less that a given maximum,
@@ -24,7 +26,7 @@ class Ext:
 
         Returns:
             list[ExtClass]: A list of all the ExtClasses whose coweight is less than the given maximum.
-        """ 
+        """
         pass
 
     def get_classes_in_fixed_degree(self, N: int) -> list[ExtClass]:
@@ -39,7 +41,9 @@ class Ext:
         """
         pass
 
-    def get_classes_in_tridegree(self, tridegree: tuple[int, int, int]) -> list[ExtClass]:
+    def get_classes_in_tridegree(
+        self, tridegree: tuple[int, int, int]
+    ) -> list[ExtClass]:
         """
         This method returns a list of ExtClasses in a given tridegree (s, f, w).
 
@@ -114,4 +118,3 @@ class Ext:
             differential (Differential): The Differential to add to the list of known differentials.
         """
         pass
-

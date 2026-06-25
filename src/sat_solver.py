@@ -1,13 +1,11 @@
-from pysat.formula import Neg
-from pysat.formula import CNFPlus
-from pysat.formula import Formula
 from .ext_class import ZeroClass, Undefined, ExtClass
 from .differential import Differential
 from .ext import Ext
 from .literal_manager import LiteralManager
 from pysat.solvers import Solver
-from pysat.formula import And, Or, Implies
+from pysat.formula import And, Implies, Neg, Formula
 from pysat.card import CardEnc
+
 
 class SATSolver:
     E1_page: Ext
@@ -32,13 +30,16 @@ class SATSolver:
 
     def create_literals(self):
         classes = self.E1_page.get_classes_up_to_coweight(self.max_coweight)
-        classes += [ZeroClass, Undefined] #TODO: Verify that these are not already included in the list of classes
+        classes += [
+            ZeroClass,
+            Undefined,
+        ]  # TODO: Verify that these are not already included in the list of classes
         for ext_class in classes:
             for r in range(1, self.max_differential + 1):
                 target_classes = [ZeroClass, Undefined]
                 target_classes += ext_class.get_differential_targets(r)
                 for target_class in target_classes:
-                    #TODO: Verify this is the interface Pengkun wants for creating a differential
+                    # TODO: Verify this is the interface Pengkun wants for creating a differential
                     differential = Differential(ext_class, target_class, r)
                     self.literal_manager.add_differential(differential)
 
@@ -51,7 +52,7 @@ class SATSolver:
 
         Raises:
             ValueError: If a known differential is not found in the literal manager.
-        """ 
+        """
         knowns = []
         for (source, degree), target in self.known_differentials.items():
             differential = Differential(source, target, degree)
@@ -59,25 +60,35 @@ class SATSolver:
             if atom is not None:
                 knowns.append(atom)
             else:
-                raise ValueError(f"Known differential {differential} not found in literal manager.")
+                raise ValueError(
+                    f"Known differential {differential} not found in literal manager."
+                )
         for r in range(1, self.max_differential + 1):
             zero_differential = Differential(ZeroClass, ZeroClass, r)
             zero_atom = self.literal_manager.get_differential_id(zero_differential)
             if zero_atom is not None:
                 knowns.append(zero_atom)
             else:
-                raise ValueError(f"Zero differential {zero_differential} not found in literal manager.")
+                raise ValueError(
+                    f"Zero differential {zero_differential} not found in literal manager."
+                )
 
             undefined_differential = Differential(Undefined, Undefined, r)
-            undefined_atom = self.literal_manager.get_differential_id(undefined_differential)
+            undefined_atom = self.literal_manager.get_differential_id(
+                undefined_differential
+            )
             if undefined_atom is not None:
                 knowns.append(undefined_atom)
             else:
-                raise ValueError(f"Undefined differential {undefined_differential} not found in literal manager.")
+                raise ValueError(
+                    f"Undefined differential {undefined_differential} not found in literal manager."
+                )
 
         return [known.name for known in knowns]
 
-    def create_leibniz_differentials(self, diff1: Differential, diff2: Differential) -> Differential:
+    def create_leibniz_differentials(
+        self, diff1: Differential, diff2: Differential
+    ) -> Differential:
         """
         Given two differential questions, this creates the differential question that represents the Leibniz rule applied to these two differentials.
 
@@ -89,10 +100,12 @@ class SATSolver:
             Differential: A differential question representing the Leibniz rule applied to the two input differentials.
 
         Raises:
-            ValueError: If the two differentials do not have the same degree. 
-        """ 
+            ValueError: If the two differentials do not have the same degree.
+        """
         if diff1.get_degree() != diff2.get_degree():
-            raise ValueError(f"Differentials {diff1} and {diff2} do not have the same degree.")
+            raise ValueError(
+                f"Differentials {diff1} and {diff2} do not have the same degree."
+            )
         source1 = diff1.get_source()
         source2 = diff2.get_source()
         target1 = diff1.get_target()
@@ -103,7 +116,9 @@ class SATSolver:
 
         return Differential(leibniz_source, leibniz_target, diff1.get_degree())
 
-    def create_linearity_differential(self, diff1: Differential, diff2: Differential) -> Differential:
+    def create_linearity_differential(
+        self, diff1: Differential, diff2: Differential
+    ) -> Differential:
         """
         Given two differential questions, this creates the differential question that represents the linearity rule applied to these two differentials.
 
@@ -118,24 +133,27 @@ class SATSolver:
             ValueError: If the two differentials do not have the same degree or if their sources are not in the same tridegree.
         """
         if diff1.get_degree() != diff2.get_degree():
-            raise ValueError(f"Differentials {diff1} and {diff2} do not have the same degree.")
+            raise ValueError(
+                f"Differentials {diff1} and {diff2} do not have the same degree."
+            )
         source1 = diff1.get_source()
         source2 = diff2.get_source()
         target1 = diff1.get_target()
         target2 = diff2.get_target()
 
         if not source1.in_same_tridegree_as(source2):
-            raise ValueError(f"Differentials {diff1} and {diff2} do not have sources in the same tridegree.")
+            raise ValueError(
+                f"Differentials {diff1} and {diff2} do not have sources in the same tridegree."
+            )
 
         linearity_source = source1 + source2
         linearity_target = target1 + target2
 
         return Differential(linearity_source, linearity_target, diff1.get_degree())
 
-
     def create_clauses_from_assumed_differential(self, diff: Differential) -> Formula:
         """
-        Given a differential question, this creates the clauses that enforce the Leibniz, linearity, and square-zero rules for this differential 
+        Given a differential question, this creates the clauses that enforce the Leibniz, linearity, and square-zero rules for this differential
         via implications.
 
         Args:
@@ -150,7 +168,7 @@ class SATSolver:
         """
         antecedent = self.literal_manager.get_differential_atom(diff)
         conditional_consequents = []
-        
+
         source = diff.get_source()
         degree = diff.get_degree()
         target = diff.get_target()
@@ -160,45 +178,70 @@ class SATSolver:
             target_classes += other_class.get_differential_targets(degree)
             for target_class in target_classes:
                 other_diff = Differential(other_class, target_class, degree)
-                other_antecedent = self.literal_manager.get_differential_atom(other_diff)
+                other_antecedent = self.literal_manager.get_differential_atom(
+                    other_diff
+                )
                 other_consequents = []
 
                 leibniz_diff = self.create_leibniz_differentials(diff, other_diff)
                 diff_source = leibniz_diff.get_source()
                 diff_target = leibniz_diff.get_target()
-                if diff_source.get_coweight() <= self.max_coweight and diff_target.get_coweight() <= self.max_coweight:
-                    leibniz_consequent = self.literal_manager.get_differential_atom(leibniz_diff)
+                if (
+                    diff_source.get_coweight() <= self.max_coweight
+                    and diff_target.get_coweight() <= self.max_coweight
+                ):
+                    leibniz_consequent = self.literal_manager.get_differential_atom(
+                        leibniz_diff
+                    )
                     if leibniz_consequent is not None:
                         other_consequents.append(leibniz_consequent)
                     else:
-                        raise ValueError(f"Leibniz differential {leibniz_diff} not found in literal manager.")
+                        raise ValueError(
+                            f"Leibniz differential {leibniz_diff} not found in literal manager."
+                        )
 
                 if source.in_same_tridegree_as(other_class) and source != other_class:
-                    linearity_diff = self.create_linearity_differential(diff, other_diff)
-                    linearity_consequent = self.literal_manager.get_differential_atom(linearity_diff)
+                    linearity_diff = self.create_linearity_differential(
+                        diff, other_diff
+                    )
+                    linearity_consequent = self.literal_manager.get_differential_atom(
+                        linearity_diff
+                    )
                     if linearity_consequent is not None:
                         other_consequents.append(linearity_consequent)
                     else:
-                        raise ValueError(f"Linearity differential {linearity_diff} not found in literal manager.")
+                        raise ValueError(
+                            f"Linearity differential {linearity_diff} not found in literal manager."
+                        )
 
                 other_consequent = And(*other_consequents)
-                conditional_consequents.append(Implies(other_antecedent, other_consequent))
+                conditional_consequents.append(
+                    Implies(other_antecedent, other_consequent)
+                )
 
         square_zero_diff = Differential(target, ZeroClass, degree)
-        square_zero_consequent = self.literal_manager.get_differential_atom(square_zero_diff)
+        square_zero_consequent = self.literal_manager.get_differential_atom(
+            square_zero_diff
+        )
         if square_zero_consequent is not None:
             conditional_consequents.append(square_zero_consequent)
         else:
-            raise ValueError(f"Square-zero differential {square_zero_diff} not found in literal manager.")
+            raise ValueError(
+                f"Square-zero differential {square_zero_diff} not found in literal manager."
+            )
 
         if target != ZeroClass:
             for higher_degree in range(degree + 1, self.max_differential + 1):
                 higher_diff = Differential(source, Undefined, higher_degree)
-                higher_consequent = self.literal_manager.get_differential_atom(higher_diff)
+                higher_consequent = self.literal_manager.get_differential_atom(
+                    higher_diff
+                )
                 if higher_consequent is not None:
                     conditional_consequents.append(higher_consequent)
                 else:
-                    raise ValueError(f"Higher-degree differential {higher_diff} not found in literal manager.")
+                    raise ValueError(
+                        f"Higher-degree differential {higher_diff} not found in literal manager."
+                    )
 
         consequent = And(*conditional_consequents)
         return Implies(antecedent, consequent)
@@ -221,19 +264,26 @@ class SATSolver:
                     diff = Differential(source, target, r)
                     diff_id = self.literal_manager.get_differential_id(diff)
                     if diff_id is None:
-                        raise ValueError(f"Differential {diff} not found in literal manager.")
+                        raise ValueError(
+                            f"Differential {diff} not found in literal manager."
+                        )
                     equals_one_literals.append(diff_id)
-                    all_clauses.append(self.create_clauses_from_assumed_differential(diff))
-                card_constraint = CardEnc.equals(lits=equals_one_literals, bound=1, encoding=9)
+                    all_clauses.append(
+                        self.create_clauses_from_assumed_differential(diff)
+                    )
+                card_constraint = CardEnc.equals(
+                    lits=equals_one_literals, bound=1, encoding=9
+                )
                 cardinality_constraints.append(card_constraint)
         constraint = And(*all_clauses).simplified()
-        with Solver('Gluecard4') as s:
+        with Solver("Gluecard4") as s:
             for card in cardinality_constraints:
                 s.append_formula(card)
             s.append_formula(constraint)
             s.solve(assumptions=known_clauses)
             for model in s.enum_models():
                 formula_models = Formula.formulas(model, atoms_only=True)
-                only_true = [atom for atom in formula_models if not isinstance(atom, Neg)]
+                only_true = [
+                    atom for atom in formula_models if not isinstance(atom, Neg)
+                ]
                 print(f"Model: {only_true}")
-
