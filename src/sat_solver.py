@@ -100,7 +100,7 @@ class SATSolver:
             Differential: A differential question representing the Leibniz rule applied to the two input differentials.
 
         Raises:
-            ValueError: If the two differentials do not have the same degree.
+            ValueError: If the two differentials do not have the same degree or if the target of either differential is Undefined.
         """
         if diff1.get_degree() != diff2.get_degree():
             raise ValueError(
@@ -110,6 +110,10 @@ class SATSolver:
         source2 = diff2.get_source()
         target1 = diff1.get_target()
         target2 = diff2.get_target()
+        if target1 == Undefined or target2 == Undefined:
+            raise ValueError(
+                f"Differentials {diff1} and {diff2} have Undefined targets, which is not allowed for Leibniz differentials."
+            )
 
         leibniz_source = source1 * source2
         leibniz_target = target1 * source2 + source1 * target2
@@ -130,7 +134,7 @@ class SATSolver:
             Differential: A differential question representing the linearity rule applied to the two input differentials.
 
         Raises:
-            ValueError: If the two differentials do not have the same degree or if their sources are not in the same tridegree.
+            ValueError: If the two differentials do not have the same degree or if their sources are not in the same tridegree or if the targets of either differential are Undefined.
         """
         if diff1.get_degree() != diff2.get_degree():
             raise ValueError(
@@ -144,6 +148,10 @@ class SATSolver:
         if not source1.in_same_tridegree_as(source2):
             raise ValueError(
                 f"Differentials {diff1} and {diff2} do not have sources in the same tridegree."
+            )
+        if target1 == Undefined or target2 == Undefined:
+            raise ValueError(
+                f"Differentials {diff1} and {diff2} have Undefined targets, which is not allowed for linearity differentials."
             )
 
         linearity_source = source1 + source2
@@ -174,7 +182,7 @@ class SATSolver:
         target = diff.get_target()
 
         for other_class in self.E1_page.get_classes_up_to_coweight(self.max_coweight):
-            target_classes = [ZeroClass, Undefined]
+            target_classes = [ZeroClass]
             target_classes += other_class.get_differential_targets(degree)
             for target_class in target_classes:
                 other_diff = Differential(other_class, target_class, degree)
