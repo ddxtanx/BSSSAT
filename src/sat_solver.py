@@ -238,19 +238,6 @@ class SATSolver:
                 f"Square-zero differential {square_zero_diff} not found in literal manager."
             )
 
-        if target != ZeroClass:
-            for higher_degree in range(degree + 1, self.max_differential + 1):
-                higher_diff = Differential(source, Undefined, higher_degree)
-                higher_consequent = self.literal_manager.get_differential_atom(
-                    higher_diff
-                )
-                if higher_consequent is not None:
-                    conditional_consequents.append(higher_consequent)
-                else:
-                    raise ValueError(
-                        f"Higher-degree differential {higher_diff} not found in literal manager."
-                    )
-
         consequent = And(*conditional_consequents)
         return Implies(antecedent, consequent)
 
@@ -283,6 +270,21 @@ class SATSolver:
                     lits=equals_one_literals, bound=1, encoding=9
                 )
                 cardinality_constraints.append(card_constraint)
+
+                zero_diff = Differential(source, ZeroClass, r)
+                zero_diff_atom = self.literal_manager.get_differential_atom(zero_diff)
+                not_zero_clause = Neg(zero_diff_atom)
+                higher_undef_atoms = []
+                for higher_r in range(r + 1, self.max_differential + 1):
+                    higher_diff = Differential(source, Undefined, higher_r)
+                    higher_diff_atom = self.literal_manager.get_differential_atom(
+                        higher_diff
+                    )
+                    higher_undef_atoms.append(higher_diff_atom)
+                if higher_undef_atoms:
+                    implies_clause = Implies(not_zero_clause, And(*higher_undef_atoms))
+                    all_clauses.append(implies_clause)
+
         constraint = And(*all_clauses).simplified()
         with Solver("Gluecard4") as s:
             for card in cardinality_constraints:
