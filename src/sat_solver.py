@@ -184,6 +184,7 @@ class SATSolver:
 
         for other_class in self.E1_page.get_classes_up_to_coweight(self.max_coweight):
             other_deg = other_class.get_degree()
+            # Multiplication is commutative, choose only one of a * b, b * a
             if other_deg < source_degree:
                 continue
             target_classes = [ZeroClass]
