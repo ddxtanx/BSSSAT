@@ -62,6 +62,18 @@ class LiteralManager:
         """
         return self.differentials_to_ids.get(differential, None)
 
+    def get_differential_atom(self, differential: Differential) -> Atom | None:
+        """
+        Retrieves the Atom for a given differential question.
+
+        Args:
+            differential (Differential): The differential question to look up.
+
+        Returns:
+            Atom | None: The Atom representing the differential question, or None if it doesn't exist
+        """
+        return self.differentials_to_ids.get(differential, None)
+
     def get_differential_by_id(self, id: int) -> Differential | None:
         """
         Retrieves the differential question associated with a given ID.

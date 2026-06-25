@@ -94,5 +94,12 @@ class ExtClass:
 
         return self.get_degree() == other.get_degree()
 
+    def get_coweight(self) -> int:
+        """
+        Returns the coweight s - w of the class as an integer.
+        """
+        s, f, w = self.get_degree()
+        return s - w
+
 ZeroClass: ExtClass = None
 Undefined: ExtClass = None
