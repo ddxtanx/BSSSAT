@@ -89,6 +89,8 @@ class ExtClass:
         """
         if other == ZeroClass:
             return True
+        if other == Undefined:
+            return False
 
         return self.get_degree() == other.get_degree()
 

@@ -21,6 +21,12 @@ class Differential:
         """
         pass
 
+    def get_degree(self) -> int:
+        """
+        Returns the degree of the differential as an integer.
+        """
+        pass
+
     def is_cycle(self) -> bool:
         """
         Returns if the source of the differential is a cycle, i.e. if the target is ZeroClass.
