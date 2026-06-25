@@ -19,18 +19,7 @@ class Differential:
         """
         Returns the target of the differential as an ExtClass instance.
         """
-        if self.degree_of_differential < 1:
-            raise ValueError("degree_of_differential must be at least 1")
-        target_degree = find_differential.add_degree(self.source.get_degree(), (self.degree_of_differential - 1, 1, self.degree_of_differential))
-        basis = find_differential.class_index(target_degree)
-        dimension = len(basis)
-
-        # No classes in target degree: only zero is possible.
-        if dimension == 0:
-            return ExtClass(target_degree, [])
-
-        # For now, we return Undefined to indicate that the target is not yet determined.
-        return Undefined
+        return self.target
     
 
     def is_cycle(self) -> bool:

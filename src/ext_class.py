@@ -119,15 +119,7 @@ class ExtClass:
         return self.tridegree == other.tridegree and self.vector == other.vector
 
     def in_same_tridegree_as(self, other: ExtClass) -> bool:
-#         """
-#         Determines whether this class and other are in the same tridegree.
-
-        Args:
-            other (ExtClass): The other ExtClass instance to compare with this class.
-
-#         Returns:
-#             bool: True if this class and other are in the same tridegree, False otherwise
-#         """
+#    
         return self.get_degree() == other.get_degree()
 
 
