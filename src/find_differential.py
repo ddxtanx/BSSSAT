@@ -37,17 +37,17 @@ def element_by_degree(a_degree):
         if degree(element)[2] == a_degree[2]:
             elements_in_degree.append(element)
         if degree(element)[2] > a_degree[2]:
-            difference_degree =   degree(element)[2] - a_degree[2]
+            difference_degree = degree(element)[2] - a_degree[2]
             if element["tautorsion"] == 0:
-                 elements_in_degree.append({
+                elements_in_degree.append({
                     "name": f"tau^{difference_degree} {element['name']}",
                     "stem": a_degree[0],
                     "Adams filtration": a_degree[1],
                     "weight": a_degree[2],
                 })
             if int(element["tautorsion"]) > 0 and difference_degree > int(element["tautorsion"]):
-                  elements_in_degree.append({
-                     "name": f"tau^{difference_degree} {element['name']}",
+                elements_in_degree.append({
+                    "name": f"tau^{difference_degree} {element['name']}",
                     "stem": a_degree[0],
                     "Adams filtration": a_degree[1],
                     "weight": a_degree[2],
