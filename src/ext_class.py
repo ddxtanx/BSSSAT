@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 This module defines the ExtClass class, which provides a 
 useful abstraction for working with classes in the 
@@ -9,28 +10,51 @@ used as the ``target" of a differential when the source is not a cycle on the E_
 """
 
 import find_differential
+=======
+from __future__ import annotations
+try:
+    from . import find_differential
+except ImportError:
+    import find_differential
+
+>>>>>>> a358322ab2b5f6c6694a15a30de930625fa16283
 
 class ExtClass:
     """
     This class represents a class in the cohomology of the C-motivic steenrod algebra.
     """
+<<<<<<< HEAD
     def __init__(self, name: str, stem: int, adams_filtration: int, weight: int):
         self.name = name
         self.stem = stem
         self.adams_filtration = adams_filtration
         self.weight = weight
+=======
+    def __init__(self, tridegree: tuple[int, int, int], vector: list[bool]) -> None:
+
+>>>>>>> a358322ab2b5f6c6694a15a30de930625fa16283
 
     def get_name(self) -> str:
         """
         Returns the name of the class as a string.
         """
+<<<<<<< HEAD
         return self.name
+=======
+        if not self._name:
+            return "0"
+        return " + ".join(self._name)
+>>>>>>> a358322ab2b5f6c6694a15a30de930625fa16283
 
     def get_degree(self) -> tuple[int, int, int]:
         """
         Returns the tridegree (s, f, w) of the class as a tuple of three integers.
         """
+<<<<<<< HEAD
         return (self.stem, self.adams_filtration, self.weight)
+=======
+        return (self._stem, self._filtration, self._weight)
+>>>>>>> a358322ab2b5f6c6694a15a30de930625fa16283
 
     def get_differential_targets(self, r: int) -> list[ExtClass]:
         """
@@ -43,6 +67,7 @@ class ExtClass:
         Returns:
             list[ExtClass]: A list of ExtClass instances that are possible targets of the differential d_r.
         """
+<<<<<<< HEAD
         targets = []
         for target in find_differential.possible_differentials_by_r(self.get_degree(), r):
             targets.append(ExtClass(target['name'], target['stem'], target['Adams filtration'], target['weight']))
@@ -92,6 +117,32 @@ class ExtClass:
         Returns the name of the class in LaTeX format as a string.
         """
         return self.name.replace("tau", r"\tau").replace("rho", r"\rho")
+=======
+        return find_differential.possible_differentials_by_r(self.get_degree(), r)
+
+    def __add__(self, other: ExtClass) -> ExtClass:
+        if other is ZeroClass:
+            return self
+        if self.get_degree() != other.get_degree():
+            raise ValueError("Cannot add ExtClass instances with different degrees")
+        else:
+            if self.get_name() == other.get_name():
+                return ZeroClass
+            else:
+                new_terms = []
+                temporary_terms = list(self._name, other._name)
+                for term in other._name:
+                    if counting(term, self._name) % 2 == 1:
+                        continue
+                
+           
+
+    def __mul__(self, other: ExtClass) -> ExtClass:
+        pass
+
+    def get_name_latex(self) -> str:
+        pass
+>>>>>>> a358322ab2b5f6c6694a15a30de930625fa16283
 
     def __hash__(self) -> int:
         return hash((self.get_name(), self.get_degree()))
@@ -117,4 +168,7 @@ class ExtClass:
         return self.get_degree() == other.get_degree()
 
 ZeroClass: ExtClass = None
+<<<<<<< HEAD
 Undefined: ExtClass = None
+=======
+>>>>>>> a358322ab2b5f6c6694a15a30de930625fa16283
