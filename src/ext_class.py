@@ -123,13 +123,13 @@ class ExtClass:
         return name
 
 
-#     def __hash__(self) -> int:
-#         return hash((self.get_name(), self.get_degree()))
+    def __hash__(self) -> int:
+        return hash((self.get_name(), self.get_degree()))
 
-#     def __eq__(self, other: object) -> bool:
-#         if not isinstance(other, ExtClass):
-#             return False
-#         return self.get_name() == other.get_name() and self.get_degree() == other.get_degree()
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, ExtClass):
+            return False
+        return self.get_name() == other.get_name() and self.get_degree() == other.get_degree()
 
     def in_same_tridegree_as(self, other: ExtClass) -> bool:
         """
@@ -148,7 +148,7 @@ class ExtClass:
    
 
 ZeroClass: ExtClass = None
-# Undefined: ExtClass = None
+Undefined: ExtClass = None
 
 if __name__ == "__main__":
     x = ExtClass((0, 0, -1), [1, 0, 0])
