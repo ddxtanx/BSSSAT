@@ -8,15 +8,15 @@ Finally there is Undefined which is the ``None" variant of ExtClass,
 used as the ``target" of a differential when the source is not a cycle on the E_r page.
 """
 
-from __future__ import annotations
+from tkinter.font import names
 from itertools import product
 
 try:
-    from . import find_differential
-    from .latex_utils import convert_to_latex
+    from . import Main_code_for_diffls
+
 except ImportError:
-    import find_differential
-    from latex_utils import convert_to_latex
+    import Main_code_for_diffls
+
 
 class ExtClass:
     """
@@ -31,7 +31,7 @@ class ExtClass:
         """
          Returns the name of the class as a string.
         """
-        classes = find_differential.class_index(self.tridegree)
+        classes = Main_code_for_diffls.class_index(self.tridegree)
         names = []
         for index, coefficient in enumerate(self.vector):
             if coefficient:
@@ -57,8 +57,8 @@ class ExtClass:
             raise ValueError("r must be at least 1")
 
         source_degree = self.get_degree()
-        target_degree = find_differential.add_degree(source_degree, (r - 1, 1, r))
-        basis = find_differential.class_index(target_degree)
+        target_degree = Main_code_for_diffls.add_degree(source_degree, (r - 1, 1, r))
+        basis = Main_code_for_diffls.class_index(target_degree)
         dimension = len(basis)
 
         # No classes in target degree: only zero is possible.
@@ -104,11 +104,13 @@ class ExtClass:
 #         """
         pass  # Placeholder for the actual implementation of the product operation.
 
+
+
     def get_name_latex(self) -> str:
         """
         Returns the name of the class in LaTeX format as a string.
         """
-        return convert_to_latex(self.get_name())
+        return Main_code_for_diffls.convert_to_latex(self.get_name())
 
     def __hash__(self) -> int:
         return hash((self.tridegree, tuple(self.vector)))
@@ -118,9 +120,29 @@ class ExtClass:
             return False
         return self.tridegree == other.tridegree and self.vector == other.vector
 
+
     def in_same_tridegree_as(self, other: ExtClass) -> bool:
-#    
+        """
+        Determines whether this class and other are in the same tridegree.
+
+        Args:
+            other (ExtClass): The other ExtClass instance to compare with this class.
+
+        Returns:
+            bool: True if this class and other are in the same tridegree, False otherwise
+        """
+        if other == ZeroClass:
+            return True
+
         return self.get_degree() == other.get_degree()
+   
+
+ZeroClass: ExtClass = None
+Undefined: ExtClass = None
+#         Returns:
+#             bool: True if this class and other are in the same tridegree, False otherwise
+#         """
+
 
 
 #test
@@ -145,5 +167,6 @@ if __name__ == "__main__":
 
     print(x.in_same_tridegree_as(y))
     print(x.in_same_tridegree_as(z))
+    print(x.in_same_tridegree_as(ZeroClass))
     
 
