@@ -55,6 +55,7 @@ def element_by_degree(a_degree):
         else:
             continue
     return elements_in_degree
+#print(element_by_degree((0, 0, -1)))
 
 #defining the index of an element in a given degree.
 def class_index(a_degree):

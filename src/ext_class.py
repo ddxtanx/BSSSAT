@@ -76,6 +76,8 @@ class ExtClass:
 
         Args:
             other (ExtClass): The other ExtClass instance to add to this class.
+        Args:
+            other (ExtClass): The other ExtClass instance to add to this class.
 
         Returns:
             ExtClass: A new ExtClass instance that represents the sum of this class and the other
@@ -120,8 +122,8 @@ class ExtClass:
 #         """
 #         Determines whether this class and other are in the same tridegree.
 
-#         Args:
-#             other (ExtClass): The other ExtClass instance to compare with this class.
+        Args:
+            other (ExtClass): The other ExtClass instance to compare with this class.
 
 #         Returns:
 #             bool: True if this class and other are in the same tridegree, False otherwise
@@ -131,6 +133,7 @@ class ExtClass:
 
 #test
 if __name__ == "__main__":
+    x = ExtClass((0, 0, -1), [1, 0, 0])
     x = ExtClass((0, 0, -1), [1, 0, 0])
     print(x.get_name())
 

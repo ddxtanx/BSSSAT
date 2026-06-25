@@ -49,29 +49,38 @@ This module defined the Differential class which provides a
 useful interface for working with questions about the values of differentials.
 """
 
-from .ext_class import ExtClass, ZeroClass, Undefined
+try:
+    from .ext_class import ExtClass, ZeroClass, Undefined
+except ImportError:
+    from ext_class import ExtClass, ZeroClass, Undefined
 
 class Differential:
     """
     This class represents a differential in the rho-Bockstein spectral sequence.
     """
+
+    def __init__(self, source: ExtClass, r: int, target: ExtClass) -> None:
+        self.source = source
+        self.r = r
+        self.target = target
+
     def get_source(self) -> ExtClass:
         """
         Returns the source of the differential as an ExtClass instance.
         """
-        pass
+        return self.source
 
     def get_target(self) -> ExtClass:
         """
         Returns the target of the differential as an ExtClass instance.
         """
-        pass
+        return self.target
 
     def is_cycle(self) -> bool:
         """
         Returns if the source of the differential is a cycle, i.e. if the target is ZeroClass.
         """
-        return self.get_target() == ZeroClass 
+        return self.get_target() is ZeroClass
 
     def __hash__(self) -> int:
         return hash((self.get_source(), self.get_target()))
@@ -80,3 +89,22 @@ class Differential:
         if not isinstance(other, Differential):
             return False
         return self.get_source() == other.get_source() and self.get_target() == other.get_target()
+
+
+
+
+if __name__ == "__main__":
+    source = ExtClass((110, 34, 54), [1, 0, 0])
+    print("The differentials for " + source.get_name() + ":")
+    for r in range(1, 6):
+
+        possible_targets = source.get_differential_targets(r)
+        if not possible_targets:        #is this correct way to handle no targets? i don't wanna use zero class because as zero class is different from undefined, and we want to know if there are no targets, not if the target is zero class.
+            continue
+
+        print(f"d_{r} targets:")
+        for target in possible_targets:
+            print(" ", target.get_name())
+
+
+
