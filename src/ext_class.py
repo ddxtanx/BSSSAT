@@ -9,6 +9,7 @@ used as the ``target" of a differential when the source is not a cycle on the E_
 """
 
 from __future__ import annotations
+from itertools import product
 
 try:
     from . import find_differential
@@ -81,6 +82,8 @@ class ExtClass:
         """
         if self.get_degree() != other.get_degree():
             raise ValueError("Can only add Ext classes in the same tridegree")
+        if len(self.vector) != len(other.vector):
+            raise ValueError("Can only add Ext classes with the same vector length")
         else :
             new_vector = [a ^ b for a, b in zip(self.vector, other.vector)]
             return ExtClass(self.get_degree(), new_vector)
@@ -126,11 +129,26 @@ class ExtClass:
         return self.get_degree() == other.get_degree()
 
 
+#test
+if __name__ == "__main__":
+    x = ExtClass((0, 0, -1), [1, 0, 0])
+    print(x.get_name())
 
-a=ExtClass((31, 3, -30), [True, False])
-b=ExtClass((31, 3, -30), [False, True])
-c=a + b
-d=a+a
-print(d.get_name(), d.get_degree(), d.get_name_latex())
+    for target in x.get_differential_targets(2):
+        print(target.get_name())
 
+    y = ExtClass((110, 34, 54), [1, 0, 0])
+    z = ExtClass((110, 34, 54), [0, 1, 0])
+    t = ExtClass((110, 34, 54), [1, 0, 0])
+
+    print((t + y).get_name())
+    print((t + z).get_name())
+
+    m = ExtClass((110, 27, 58), [1, 1, 0])
+    print(m.get_name())
+    print(m.get_name_latex())
+
+    print(x.in_same_tridegree_as(y))
+    print(x.in_same_tridegree_as(z))
+    
 
