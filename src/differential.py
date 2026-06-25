@@ -8,15 +8,24 @@ try:
 except ImportError:
     from ext_class import ExtClass, ZeroClass, Undefined
 
+UNDEFINED = -1
+
+
 class Differential:
     """
     This class represents a differential in the rho-Bockstein spectral sequence.
     """
 
-    def __init__(self, source: ExtClass, r: int, target: ExtClass) -> None:
+    def __init__(self, source: ExtClass, target: ExtClass) -> None:
         self.source = source
-        self.r = r
         self.target = target
+        difference = (target.get_degree()[0] - source.get_degree()[0],
+                      target.get_degree()[1] - source.get_degree()[1],
+                      target.get_degree()[2] - source.get_degree()[2])
+        if difference[1] != 1 or difference[2] < 1 or difference[2]-difference[0] != 1:
+            raise ValueError("Invalid differential: target degree must be source degree + (r-1, 1, r) for some r >= 1")
+        self.degree_of_differential = difference[2]
+
 
     def get_source(self) -> ExtClass:
         """
@@ -43,8 +52,6 @@ class Differential:
         if not isinstance(other, Differential):
             return False
         return self.get_source() == other.get_source() and self.get_target() == other.get_target()
-
-
 
 
 if __name__ == "__main__":
