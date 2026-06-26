@@ -1,0 +1,1 @@
+python-sat[aiger,approxmc,cryptosat,pblib]~=1.0

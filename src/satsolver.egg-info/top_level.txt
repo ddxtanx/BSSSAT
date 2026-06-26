@@ -1,0 +1,2 @@
+MinimalResolution
+sat_solver

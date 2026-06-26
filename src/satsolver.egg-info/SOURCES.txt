@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+src/sat_solver/Main_code_for_diffls.py
+src/sat_solver/__init__.py
+src/sat_solver/differential.py
+src/sat_solver/ext.py
+src/sat_solver/ext_class.py
+src/sat_solver/latex_utils.py
+src/sat_solver/literal_manager.py
+src/sat_solver/sat_solver.py
+src/sat_solver/yoneda_table.py
+src/satsolver.egg-info/PKG-INFO
+src/satsolver.egg-info/SOURCES.txt
+src/satsolver.egg-info/dependency_links.txt
+src/satsolver.egg-info/requires.txt
+src/satsolver.egg-info/top_level.txt
