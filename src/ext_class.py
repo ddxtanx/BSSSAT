@@ -8,36 +8,67 @@ Finally there is Undefined which is the ``None" variant of ExtClass,
 used as the ``target" of a differential when the source is not a cycle on the E_r page.
 """
 
+from tkinter.font import names
+from itertools import product
+
+try:
+    from . import Main_code_for_diffls
+
+except ImportError:
+    import Main_code_for_diffls
+
 
 class ExtClass:
     """
     This class represents a class in the cohomology of the C-motivic steenrod algebra.
     """
+    def __init__(self, tridegree: tuple[int, int, int], vector: list[bool]) -> None:
+        self.tridegree = tridegree
+        self.vector = vector
+
 
     def get_name(self) -> str:
         """
-        Returns the name of the class as a string.
+         Returns the name of the class as a string.
         """
-        pass
+        classes = Main_code_for_diffls.class_index(self.tridegree)
+        names = []
+        for index, coefficient in enumerate(self.vector):
+            if coefficient:
+                names.append(classes[index]["name"])
+        if not names:
+            return "0"
+        return " + ".join(names)
 
     def get_degree(self) -> tuple[int, int, int]:
         """
         Returns the tridegree (s, f, w) of the class as a tuple of three integers.
         """
-        pass
+        return (self.tridegree)
 
     def get_differential_targets(self, r: int) -> list[ExtClass]:
         """
-        Returns the possible targets of the differential d_r applied to this class as a list of ExtClass instances.
-        If d_r(x) = rho^r y, then y should be included in the list of targets.
+        Returns all possible targets y for a differential d_r(x) = rho^r y.
 
-        Args:
-            r (int): The degree of the differential d_r.
-
-        Returns:
-            list[ExtClass]: A list of ExtClass instances that are possible targets of the differential d_r.
+        This includes every linear combination in the target tridegree, and the
+        zero target (all coefficients False).
         """
-        pass
+        if r < 1:
+            raise ValueError("r must be at least 1")
+
+        source_degree = self.get_degree()
+        target_degree = Main_code_for_diffls.add_degree(source_degree, (r - 1, 1, r))
+        basis = Main_code_for_diffls.class_index(target_degree)
+        dimension = len(basis)
+
+        # No classes in target degree: only zero is possible.
+        if dimension == 0:
+            return [ExtClass(target_degree, [])]
+
+        targets: list[ExtClass] = []
+        for coeffs in product([False, True], repeat=dimension):
+            targets.append(ExtClass(target_degree, list(coeffs)))
+        return targets
 
     def __add__(self, other: ExtClass) -> ExtClass:
         """
@@ -49,38 +80,44 @@ class ExtClass:
         Returns:
             ExtClass: A new ExtClass instance that represents the sum of this class and the other
         """
-        pass
+        if self.get_degree() != other.get_degree():
+            raise ValueError("Can only add Ext classes in the same tridegree")
+        if len(self.vector) != len(other.vector):
+            raise ValueError("Can only add Ext classes with the same vector length")
+        else :
+            new_vector = [a ^ b for a, b in zip(self.vector, other.vector)]
+            return ExtClass(self.get_degree(), new_vector)
 
     def __mul__(self, other: ExtClass) -> ExtClass:
-        """
-        Constructs a new ExtClass instance that represents the product of this class and another class.
-        This either just returns the naive juxtaposition of the two classes,
-        or it returns the result of a known product in the Ext algebra.
+#         """
+#         Constructs a new ExtClass instance that represents the product of this class and another class.
+#         This either just returns the naive juxtaposition of the two classes,
+#         or it returns the result of a known product in the Ext algebra.
 
-        Args:
-            other (ExtClass): The other ExtClass instance to multiply with this class.
+#         Args:
+#             other (ExtClass): The other ExtClass instance to multiply with this class.
 
-        Returns:
-            ExtClass: A new ExtClass instance that represents the product of this class and the other
-        """
-        pass
+#         Returns:
+#             ExtClass: A new ExtClass instance that represents the product of this class and the other
+#         """
+        pass  # Placeholder for the actual implementation of the product operation.
+
+
 
     def get_name_latex(self) -> str:
         """
         Returns the name of the class in LaTeX format as a string.
         """
-        pass
+        return Main_code_for_diffls.convert_to_latex(self.get_name())
 
     def __hash__(self) -> int:
-        return hash((self.get_name(), self.get_degree()))
+        return hash((self.tridegree, tuple(self.vector)))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, ExtClass):
             return False
-        return (
-            self.get_name() == other.get_name()
-            and self.get_degree() == other.get_degree()
-        )
+        return self.tridegree == other.tridegree and self.vector == other.vector
+
 
     def in_same_tridegree_as(self, other: ExtClass) -> bool:
         """
@@ -94,18 +131,40 @@ class ExtClass:
         """
         if other == ZeroClass:
             return True
-        if other == Undefined:
-            return False
 
         return self.get_degree() == other.get_degree()
-
-    def get_coweight(self) -> int:
-        """
-        Returns the coweight s - w of the class as an integer.
-        """
-        s, f, w = self.get_degree()
-        return s - w
-
+   
 
 ZeroClass: ExtClass = None
 Undefined: ExtClass = None
+#         Returns:
+#             bool: True if this class and other are in the same tridegree, False otherwise
+#         """
+
+
+
+#test
+if __name__ == "__main__":
+    x = ExtClass((0, 0, -1), [1, 0, 0])
+    print(x.get_name())
+
+    for target in x.get_differential_targets(2):
+        print(target.get_name())
+
+    y = ExtClass((110, 34, 54), [1, 0, 0])
+    z = ExtClass((110, 34, 54), [0, 1, 0])
+    t = ExtClass((110, 34, 54), [1, 0, 0])
+
+    print((t + y).get_name())
+    print((t + z).get_name())
+
+    m = ExtClass((110, 27, 58), [1, 1, 0])
+    print(m.get_name())
+    print(m.get_name_latex())
+
+    print(x.in_same_tridegree_as(y))
+    print(x.in_same_tridegree_as(z))
+    print(x.in_same_tridegree_as(ZeroClass))
+    
+
+
