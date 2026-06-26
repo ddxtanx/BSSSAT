@@ -104,6 +104,8 @@ class ExtClass:
 #         """
         pass  # Placeholder for the actual implementation of the product operation.
 
+    def get_tau_torsion(self) -> int:
+
 
 
     def get_name_latex(self) -> str:
@@ -136,8 +138,21 @@ class ExtClass:
 
         return self.get_degree() == other.get_degree()
    
+def zeroclass_at_degree(tridegree: tuple[int, int, int]) -> ExtClass:
+    """
+    Returns a new ExtClass instance that represents the zero class in a given tridegree.
+    """
+    target_element = Main_code_for_diffls.class_index(tridegree)
+    dimension = len(target_element)
+    if dimension == 0:
+        return ExtClass(tridegree, [])
+    else:
+        return ExtClass(tridegree, [False] * dimension)
 
-ZeroClass: ExtClass = None
+
+
+
+
 Undefined: ExtClass = None
 #         Returns:
 #             bool: True if this class and other are in the same tridegree, False otherwise
