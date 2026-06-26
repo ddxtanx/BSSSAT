@@ -9,6 +9,7 @@ known differentials that will be used to bootstrap the SAT solver.
 
 from .ext_class import ExtClass
 from .differential import Differential
+from .Main_code_for_diffls import get_classes
 
 
 class Ext:
