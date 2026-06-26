@@ -3,7 +3,7 @@ import json
 
 def get_classes():
     classes = []
-    with open('Adams-motivic-E2.csv', newline='') as csvfile:
+    with open('Adams-motivic-E2-machine.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             classes.append({"name": row['name'], "stem": int(row['stem']), "Adams filtration": int(row['Adams filtration']), "weight": int(row['weight']), "tautorsion": int(row['tautorsion'])})
@@ -15,9 +15,11 @@ def degree(element):
 def add_degree(degree1, degree2):
     return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
 
-
 def sfdegree(element):
         return (element["stem"], element["Adams filtration"])
+
+def tautorsion(element):
+    return element["tautorsion"]
 
 group_by_sf = {}
 for element in get_classes():
@@ -38,12 +40,13 @@ def element_by_degree(a_degree):
             elements_in_degree.append(element)
         if degree(element)[2] > a_degree[2]:
             difference_degree = degree(element)[2] - a_degree[2]
-            if element["tautorsion"] == 0:
+            if tautorsion(element) == 0:
                 elements_in_degree.append({
                     "name": f"tau^{difference_degree} {element['name']}",
                     "stem": a_degree[0],
                     "Adams filtration": a_degree[1],
                     "weight": a_degree[2],
+                    "tautorsion": 0
                 })
             if int(element["tautorsion"]) > 0 and difference_degree > int(element["tautorsion"]):
                 elements_in_degree.append({
@@ -51,6 +54,7 @@ def element_by_degree(a_degree):
                     "stem": a_degree[0],
                     "Adams filtration": a_degree[1],
                     "weight": a_degree[2],
+                    "tautorsion": tautorsion(element) - difference_degree
                 })
         else:
             continue
