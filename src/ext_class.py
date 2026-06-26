@@ -105,14 +105,13 @@ class ExtClass:
         pass  # Placeholder for the actual implementation of the product operation.
 
     def get_tau_torsion(self) -> int:
+        pass
 
-
-
-    def get_name_latex(self) -> str:
-        """
-        Returns the name of the class in LaTeX format as a string.
-        """
-        return Main_code_for_diffls.convert_to_latex(self.get_name())
+    # def get_name_latex(self) -> str:
+    #     """
+    #     Returns the name of the class in LaTeX format as a string.
+    #     """
+    #     return Main_code_for_diffls.convert_to_latex(self.get_name())
 
     def __hash__(self) -> int:
         return hash((self.tridegree, tuple(self.vector)))
@@ -133,8 +132,6 @@ class ExtClass:
         Returns:
             bool: True if this class and other are in the same tridegree, False otherwise
         """
-        if other == ZeroClass:
-            return True
 
         return self.get_degree() == other.get_degree()
    
@@ -148,15 +145,6 @@ def zeroclass_at_degree(tridegree: tuple[int, int, int]) -> ExtClass:
         return ExtClass(tridegree, [])
     else:
         return ExtClass(tridegree, [False] * dimension)
-
-
-
-
-
-Undefined: ExtClass = None
-#         Returns:
-#             bool: True if this class and other are in the same tridegree, False otherwise
-#         """
 
 
 
@@ -176,12 +164,9 @@ if __name__ == "__main__":
     print((t + y).get_name())
     print((t + z).get_name())
 
-    m = ExtClass((110, 27, 58), [1, 1, 0])
-    print(m.get_name())
-    print(m.get_name_latex())
 
     print(x.in_same_tridegree_as(y))
     print(x.in_same_tridegree_as(z))
-    print(x.in_same_tridegree_as(ZeroClass))
-    
+
+
 

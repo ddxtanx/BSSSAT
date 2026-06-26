@@ -4,9 +4,12 @@ useful interface for working with questions about the values of differentials.
 """
 
 try:
-    from .ext_class import ExtClass, ZeroClass, Undefined
+    from . import Main_code_for_diffls
+    from ext_class import ExtClass, zeroclass_at_degree
+
 except ImportError:
-    from ext_class import ExtClass, ZeroClass, Undefined
+    import Main_code_for_diffls
+    from ext_class import ExtClass, zeroclass_at_degree
 
 UNDEFINED = -1
 
@@ -38,13 +41,21 @@ class Differential:
         Returns the target of the differential as an ExtClass instance.
         """
         return self.target
+    
+    def get_degree_of_differential(self) -> int:
+        """
+        Returns the degree of the differential as an integer.
+        """
+        return self.degree_of_differential
 
     def is_cycle(self) -> bool:
         """
         Returns if the source of the differential is a cycle, i.e. if the target is ZeroClass.
         """
-        return self.get_target() is ZeroClass
-
+        if self.target == zeroclass_at_degree(self.target.get_degree()):
+            return True
+        return False
+    
     def __hash__(self) -> int:
         return hash((self.get_source(), self.get_target()))
 
