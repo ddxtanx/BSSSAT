@@ -7,11 +7,9 @@ In addition, it should also provide methods to assert and to retrieve
 known differentials that will be used to bootstrap the SAT solver.
 """
 
-import csv
-
 from .ext_class import ExtClass
 from .differential import Differential
-from .find_differential import get_classes()  
+from .Main_code_for_diffls import get_classes
 """from some document import rho-periodic_list, which is a list of rho-periodic elements"""
 """from some document import product_dict, which stores [element1, element2, their product]"""
 
