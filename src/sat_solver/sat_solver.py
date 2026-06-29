@@ -96,7 +96,21 @@ class SATSolver:
                     f"Undefined differential {undefined_differential} not found in literal manager."
                 )
 
-        return [known.name for known in knowns]
+        # Undef -> Zero and Zero -> Undef are false (this is not covered by sum=1 constraints)
+        known_false = []
+        for r in range(1, self.max_differential + 1):
+            zero_undef = Differential(ZeroClass, Undefined, r)
+            zero_undef_atom = self.literal_manager.get_differential_atom(zero_undef)
+            known_false.append(zero_undef_atom)
+#            undef_zero = Differential(Undefined, ZeroClass, r)
+#            undef_zero_atom = self.literal_manager.get_differential_atom(undef_zero)
+#            known_false.append(undef_zero_atom)
+        undef_zero = Differential(Undefined, ZeroClass, 1)
+        undef_zero_atom = self.literal_manager.get_differential_atom(undef_zero)
+        known_false.append(undef_zero_atom)
+        print("known_false = ", known_false)
+        return [known.name for known in knowns] + [-known.name for known in known_false]
+#        return [known.name for known in knowns]
 
     def create_leibniz_differentials(
         self, diff1: Differential, diff2: Differential
@@ -322,7 +336,7 @@ class SATSolver:
                 s.append_formula(card)
             s.append_formula(constraint)
             s.solve(assumptions=known_clauses)
-            for model in s.enum_models():
+            for model in s.enum_models(assumptions=known_clauses):
                 formula_models = Formula.formulas(model, atoms_only=True)
                 only_true = [
                     atom for atom in formula_models if not isinstance(atom, Neg)
