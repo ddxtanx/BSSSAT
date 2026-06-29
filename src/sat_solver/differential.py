@@ -57,7 +57,7 @@ class Differential:
         return self.get_target() == ZeroClass
 
     def __hash__(self) -> int:
-        return hash((self.get_source(), self.get_target()))
+        return hash((self.get_source(), self.get_target(), self.get_degree()))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Differential):
@@ -65,6 +65,7 @@ class Differential:
         return (
             self.get_source() == other.get_source()
             and self.get_target() == other.get_target()
+            and self.get_degree() == other.get_degree()
         )
 
     def __repr__(self) -> str:
