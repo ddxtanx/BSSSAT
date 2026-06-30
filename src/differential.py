@@ -4,6 +4,7 @@ useful interface for working with questions about the values of differentials.
 """
 
 try:
+<<<<<<< HEAD
     from .ext_class import ExtClass, ZeroClass, Undefined
 except ImportError:
     from ext_class import ExtClass, ZeroClass, Undefined
@@ -11,6 +12,17 @@ except ImportError:
 UNDEFINED = -1
 
 
+=======
+    from . import Main_code_for_diffls
+    from ext_class import ExtClass, zeroclass_at_degree
+
+except ImportError:
+    import Main_code_for_diffls
+    from ext_class import ExtClass, zeroclass_at_degree
+
+UNDEFINED = -1
+
+>>>>>>> f1bc84211b4f32560b8bcb06f56cc0daaca7405f
 
 class Differential:
     """
@@ -39,6 +51,7 @@ class Differential:
         Returns the target of the differential as an ExtClass instance.
         """
         return self.target
+<<<<<<< HEAD
 
 
 
@@ -47,23 +60,42 @@ class Differential:
         Returns the degree of the differential as an integer.
         """
         pass
+=======
+    
+    def get_degree_of_differential(self) -> int:
+        """
+        Returns the degree of the differential as an integer.
+        """
+        return self.degree_of_differential
+>>>>>>> f1bc84211b4f32560b8bcb06f56cc0daaca7405f
 
     def is_cycle(self) -> bool:
         """
         Returns if the source of the differential is a cycle, i.e. if the target is ZeroClass.
         """
+<<<<<<< HEAD
         return self.get_target() == ZeroClass
 
+=======
+        if self.target == zeroclass_at_degree(self.target.get_degree()):
+            return True
+        return False
+    
+>>>>>>> f1bc84211b4f32560b8bcb06f56cc0daaca7405f
     def __hash__(self) -> int:
         return hash((self.get_source(), self.get_target()))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Differential):
             return False
+<<<<<<< HEAD
         return (
             self.get_source() == other.get_source()
             and self.get_target() == other.get_target()
         )
+=======
+        return self.get_source() == other.get_source() and self.get_target() == other.get_target()
+>>>>>>> f1bc84211b4f32560b8bcb06f56cc0daaca7405f
 
 
 if __name__ == "__main__":

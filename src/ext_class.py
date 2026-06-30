@@ -76,6 +76,8 @@ class ExtClass:
 
         Args:
             other (ExtClass): The other ExtClass instance to add to this class.
+        Args:
+            other (ExtClass): The other ExtClass instance to add to this class.
 
         Returns:
             ExtClass: A new ExtClass instance that represents the sum of this class and the other
@@ -93,6 +95,7 @@ class ExtClass:
 #         Constructs a new ExtClass instance that represents the product of this class and another class.
 #         This either just returns the naive juxtaposition of the two classes,
 #         or it returns the result of a known product in the Ext algebra.
+<<<<<<< HEAD
 
 #         Args:
 #             other (ExtClass): The other ExtClass instance to multiply with this class.
@@ -109,6 +112,25 @@ class ExtClass:
         Returns the name of the class in LaTeX format as a string.
         """
         return Main_code_for_diffls.convert_to_latex(self.get_name())
+=======
+
+#         Args:
+#             other (ExtClass): The other ExtClass instance to multiply with this class.
+
+#         Returns:
+#             ExtClass: A new ExtClass instance that represents the product of this class and the other
+#         """
+        pass  # Placeholder for the actual implementation of the product operation.
+
+    def get_tau_torsion(self) -> int:
+        pass
+
+    # def get_name_latex(self) -> str:
+    #     """
+    #     Returns the name of the class in LaTeX format as a string.
+    #     """
+    #     return Main_code_for_diffls.convert_to_latex(self.get_name())
+>>>>>>> f1bc84211b4f32560b8bcb06f56cc0daaca7405f
 
     def __hash__(self) -> int:
         return hash((self.tridegree, tuple(self.vector)))
@@ -129,11 +151,10 @@ class ExtClass:
         Returns:
             bool: True if this class and other are in the same tridegree, False otherwise
         """
-        if other == ZeroClass:
-            return True
 
         return self.get_degree() == other.get_degree()
    
+<<<<<<< HEAD
 
 ZeroClass: ExtClass = None
 Undefined: ExtClass = None
@@ -168,3 +189,40 @@ if __name__ == "__main__":
     
 
 
+=======
+def zeroclass_at_degree(tridegree: tuple[int, int, int]) -> ExtClass:
+    """
+    Returns a new ExtClass instance that represents the zero class in a given tridegree.
+    """
+    target_element = Main_code_for_diffls.class_index(tridegree)
+    dimension = len(target_element)
+    if dimension == 0:
+        return ExtClass(tridegree, [])
+    else:
+        return ExtClass(tridegree, [False] * dimension)
+
+
+
+#test
+if __name__ == "__main__":
+    x = ExtClass((0, 0, -1), [1, 0, 0])
+    x = ExtClass((0, 0, -1), [1, 0, 0])
+    print(x.get_name())
+
+    for target in x.get_differential_targets(2):
+        print(target.get_name())
+
+    y = ExtClass((110, 34, 54), [1, 0, 0])
+    z = ExtClass((110, 34, 54), [0, 1, 0])
+    t = ExtClass((110, 34, 54), [1, 0, 0])
+
+    print((t + y).get_name())
+    print((t + z).get_name())
+
+
+    print(x.in_same_tridegree_as(y))
+    print(x.in_same_tridegree_as(z))
+
+
+
+>>>>>>> f1bc84211b4f32560b8bcb06f56cc0daaca7405f
