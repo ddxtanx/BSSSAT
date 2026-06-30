@@ -1,9 +1,14 @@
 import csv
 import json
+from pathlib import Path
+
+
+
+DATA_PATH = Path(__file__).with_name("Adams-motivic-E2-machine.csv")
 
 def get_classes():
     classes = []
-    with open('Adams-motivic-E2-machine.csv', newline='') as csvfile:
+    with DATA_PATH.open(newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             classes.append({"name": row['name'], "stem": int(row['stem']), "Adams filtration": int(row['Adams filtration']), "weight": int(row['weight']), "tautorsion": int(row['tautorsion'])})
@@ -48,7 +53,7 @@ def element_by_degree(a_degree):
                     "weight": a_degree[2],
                     "tautorsion": 0
                 })
-            if int(element["tautorsion"]) > 0 and difference_degree > int(element["tautorsion"]):
+            if int(element["tautorsion"]) > 0 and difference_degree < int(element["tautorsion"]):
                 elements_in_degree.append({
                     "name": f"tau^{difference_degree} {element['name']}",
                     "stem": a_degree[0],
@@ -77,6 +82,68 @@ def class_name_by_index(a_degree, index):
         if element["index"] == index:
             return element["name"]
     return None
+
+
+def vector_by_basis_names(a_degree, names):
+    """
+    Return the F2 bool vector for a linear combination of basis names.
+
+    Repeating a basis name toggles its coefficient, so duplicates cancel.
+    """
+    basis = class_index(a_degree)
+    index_by_name = {element["name"]: element["index"] for element in basis}
+    vector = [False] * len(basis)
+
+    for name in names:
+        if name not in index_by_name:
+            raise ValueError(f"{name!r} is not a basis element in degree {a_degree}")
+        index = index_by_name[name]
+        vector[index] = not vector[index]
+
+    return vector
+
+
+def vector_by_basis_name(a_degree, name):
+    """Return the F2 bool vector for one basis element."""
+    return vector_by_basis_names(a_degree, [name])
+
+
+def basis_names_by_vector(a_degree, vector):
+    """Return the basis names with True coefficients in a bool vector."""
+    basis = class_index(a_degree)
+    if len(vector) != len(basis):
+        raise ValueError(
+            f"Vector length {len(vector)} does not match dimension "
+            f"{len(basis)} in degree {a_degree}"
+        )
+    return [element["name"] for element, coefficient in zip(basis, vector) if coefficient]
+
+
+def tau_torsion_by_vector(a_degree, vector):
+    """
+    Return the tau-torsion determined by the True basis coefficients.
+
+    The convention from the CSV is preserved: 0 means tau-torsion-free. For a
+    nonzero finite-torsion sum, this returns the largest torsion exponent among
+    the selected basis elements.
+    """
+    basis = class_index(a_degree)
+    if len(vector) != len(basis):
+        raise ValueError(
+            f"Vector length {len(vector)} does not match dimension "
+            f"{len(basis)} in degree {a_degree}"
+        )
+
+    selected_torsions = [
+        element["tautorsion"]
+        for element, coefficient in zip(basis, vector)
+        if coefficient
+    ]
+    if not selected_torsions:
+        return 0
+    if 0 in selected_torsions:
+        return 0
+    return max(selected_torsions)
 
 #print(class_name_by_index((110, 34, 58), 0))
 
@@ -108,7 +175,6 @@ def group_by_degree(bounds):
                 if elements:
                     grouped[a_degree] = elements
     return grouped
-
 
 
 
@@ -212,70 +278,3 @@ def finding_sources_with_fixed_number_of_differentials(classes, number):
 #     for degree_key, source_elements in sorted(grouped.items()):
 #         names = [element["name"] for element in source_elements]
 #         writer.writerow([str(degree_key), len(names), json.dumps(names, ensure_ascii=False)])
-
-
-#function_latex_name_by_index = """
-import re
-
-
-def convert_to_latex(name: str) -> str:
-    """Convert an Ext element name string into LaTeX."""
-    token_re = re.compile(
-        r"(?P<body>[A-Za-z][A-Za-z0-9]*(?:,[0-9]+)?)(?P<prime>'+)?"
-        r"(?:_(?P<sub>[A-Za-z0-9,']+))?(?:\^(?P<sup>[A-Za-z0-9+-]+))?"
-    )
-    greek = {
-        "tau": r"\tau",
-        "rho": r"\rho",
-    }
-
-    def format_token(match: re.Match[str]) -> str:
-        body = match.group("body")
-        prime = match.group("prime")
-        sub = match.group("sub")
-        sup = match.group("sup")
-        base = body
-
-        if sub is None:
-            trailing_digits = re.fullmatch(r"([A-Za-z]+)([0-9]+(?:,[0-9]+)?)", body)
-            if trailing_digits:
-                base = trailing_digits.group(1)
-                sub = trailing_digits.group(2)
-
-        latex = greek.get(base, base)
-
-        if sub is not None:
-            latex += f"_{{{sub}}}"
-
-        superscript = ""
-        if prime is not None:
-            superscript += r"\prime" * len(prime)
-        if sup is not None:
-            superscript += sup
-        if superscript:
-            latex += f"^{{{superscript}}}"
-
-        return latex
-
-    pieces = []
-    for piece in re.split(r"(\s*\+\s*)", name.strip()):
-        if "+" in piece:
-            pieces.append(piece)
-            continue
-
-        factors = piece.split()
-        if len(factors) > 1:
-            factors = [factor for factor in factors if factor != "1"]
-            piece = " ".join(factors) if factors else "1"
-        pieces.append(piece)
-    name = "".join(pieces)
-
-    latex_name = token_re.sub(format_token, name)
-    latex_name = re.sub(r"\s*\+\s*", " + ", latex_name)
-    latex_name = re.sub(r"\s+", " ", latex_name)
-    return latex_name.strip()
-
-
-
-
-
