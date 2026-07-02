@@ -1,7 +1,7 @@
-from .ext_class import ZeroClass, Undefined, ExtClass
-from .differential import Differential
-from .ext import Ext
-from .literal_manager import LiteralManager
+from sat_solver.ext_class import ZeroClass, Undefined, ExtClass
+from sat_solver.differential import Differential
+from sat_solver.ext import Ext
+from sat_solver.literal_manager import LiteralManager
 from pysat.solvers import Solver
 from pysat.formula import And, Implies, Neg, Formula
 from pysat.card import CardEnc
@@ -22,6 +22,7 @@ class SATSolver:
         self.max_coweight = max_coweight
         self.max_differential = max_differential
         known_diffs = self.E1_page.get_known_differentials()
+        self.known_differentials = {}
         for differential in known_diffs:
             source = differential.get_source()
             degree = differential.get_degree()
@@ -35,10 +36,18 @@ class SATSolver:
             Undefined,
         ]  # TODO: Verify that these are not already included in the list of classes
         for ext_class in classes:
+            print(
+                f"Creating literals with source {ext_class.tridegree}, {ext_class.vector}"
+            )
             for r in range(1, self.max_differential + 1):
                 target_classes = [ZeroClass, Undefined]
-                target_classes += ext_class.get_differential_targets(r)
+                target_classes += self.E1_page.get_possible_differential_targets(
+                    ext_class, r
+                )
                 for target_class in target_classes:
+                    print(
+                        f"Creating differential literal: ({ext_class.tridegree}, {ext_class.vector})--d{r}--> ({target_class.tridegree}, {target_class.vector})"
+                    )
                     # TODO: Verify this is the interface Pengkun wants for creating a differential
                     differential = Differential(ext_class, target_class, r)
                     self.literal_manager.add_differential(differential)
@@ -55,8 +64,11 @@ class SATSolver:
         """
         knowns = []
         for (source, degree), target in self.known_differentials.items():
+            print(
+                f"Adding known differential: ({source.tridegree}, {source.vector}) --d{degree}--> ({target.tridegree}, {target.vector})"
+            )
             differential = Differential(source, target, degree)
-            atom = self.literal_manager.get_differential_id(differential)
+            atom = self.literal_manager.get_differential_atom(differential)
             if atom is not None:
                 knowns.append(atom)
             else:
@@ -65,7 +77,7 @@ class SATSolver:
                 )
         for r in range(1, self.max_differential + 1):
             zero_differential = Differential(ZeroClass, ZeroClass, r)
-            zero_atom = self.literal_manager.get_differential_id(zero_differential)
+            zero_atom = self.literal_manager.get_differential_atom(zero_differential)
             if zero_atom is not None:
                 knowns.append(zero_atom)
             else:
@@ -74,7 +86,7 @@ class SATSolver:
                 )
 
             undefined_differential = Differential(Undefined, Undefined, r)
-            undefined_atom = self.literal_manager.get_differential_id(
+            undefined_atom = self.literal_manager.get_differential_atom(
                 undefined_differential
             )
             if undefined_atom is not None:
@@ -188,7 +200,9 @@ class SATSolver:
             if other_deg < source_degree:
                 continue
             target_classes = [ZeroClass]
-            target_classes += other_class.get_differential_targets(degree)
+            target_classes += self.E1_page.get_possible_differential_targets(
+                other_class, degree
+            )
             for target_class in target_classes:
                 other_diff = Differential(other_class, target_class, degree)
                 other_antecedent = self.literal_manager.get_differential_atom(
@@ -196,26 +210,35 @@ class SATSolver:
                 )
                 other_consequents = []
 
-                leibniz_diff = self.create_leibniz_differentials(diff, other_diff)
-                diff_source = leibniz_diff.get_source()
-                diff_target = leibniz_diff.get_target()
-                if (
-                    diff_source.get_coweight() <= self.max_coweight
-                    and diff_target.get_coweight() <= self.max_coweight
-                ):
-                    leibniz_consequent = self.literal_manager.get_differential_atom(
-                        leibniz_diff
-                    )
-                    if leibniz_consequent is not None:
-                        other_consequents.append(leibniz_consequent)
-                    else:
-                        raise ValueError(
-                            f"Leibniz differential {leibniz_diff} not found in literal manager."
-                        )
+                # TODO: Implement multiplication and reenable this
+                # leibniz_diff = self.create_leibniz_differentials(diff, other_diff)
+                # diff_source = leibniz_diff.get_source()
+                # diff_target = leibniz_diff.get_target()
+                # if (
+                #     diff_source.get_coweight() <= self.max_coweight
+                #     and diff_target.get_coweight() <= self.max_coweight
+                # ):
+                #     leibniz_consequent = self.literal_manager.get_differential_atom(
+                #         leibniz_diff
+                #     )
+                #     if leibniz_consequent is not None:
+                #         other_consequents.append(leibniz_consequent)
+                #     else:
+                #         raise ValueError(
+                #             f"Leibniz differential {leibniz_diff} not found in literal manager."
+                #         )
 
-                if source.in_same_tridegree_as(other_class) and source != other_class:
+                if (
+                    source.in_same_tridegree_as(other_class)
+                    and source != other_class
+                    and target != Undefined
+                    and target_class != Undefined
+                ):
                     linearity_diff = self.create_linearity_differential(
                         diff, other_diff
+                    )
+                    print(
+                        f"Creating linearity differential: {linearity_diff.get_source().tridegree}, {linearity_diff.get_source().vector} --d{linearity_diff.get_degree()}--> {linearity_diff.get_target().tridegree}, {linearity_diff.get_target().vector}"
                     )
                     linearity_consequent = self.literal_manager.get_differential_atom(
                         linearity_diff
@@ -224,13 +247,14 @@ class SATSolver:
                         other_consequents.append(linearity_consequent)
                     else:
                         raise ValueError(
-                            f"Linearity differential {linearity_diff} not found in literal manager."
+                            f"Linearity differential {linearity_diff.get_source().tridegree}, {linearity_diff.get_source().vector} --d{linearity_diff.get_degree()}--> {linearity_diff.get_target().tridegree}, {linearity_diff.get_target().vector} not found in literal manager."
                         )
 
-                other_consequent = And(*other_consequents)
-                conditional_consequents.append(
-                    Implies(other_antecedent, other_consequent)
-                )
+                if other_consequents:
+                    other_consequent = And(*other_consequents)
+                    conditional_consequents.append(
+                        Implies(other_antecedent, other_consequent)
+                    )
 
         square_zero_diff = Differential(target, ZeroClass, degree)
         square_zero_consequent = self.literal_manager.get_differential_atom(
@@ -259,7 +283,9 @@ class SATSolver:
             for r in range(1, self.max_differential + 1):
                 equals_one_literals = []
                 target_classes = [ZeroClass, Undefined]
-                target_classes += source.get_differential_targets(r)
+                target_classes += self.E1_page.get_possible_differential_targets(
+                    source, r
+                )
                 for target in target_classes:
                     diff = Differential(source, target, r)
                     diff_id = self.literal_manager.get_differential_id(diff)

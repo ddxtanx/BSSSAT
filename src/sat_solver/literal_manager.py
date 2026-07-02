@@ -8,7 +8,7 @@ an Atom representing the question, and for quickly returning
 the differential question associated to the given literal representation.
 """
 
-from .differential import Differential
+from sat_solver.differential import Differential
 from pysat.formula import Atom
 
 
@@ -51,16 +51,20 @@ class LiteralManager:
             self.differentials.append(differential)
             return atom
 
-    def get_differential_id(self, differential: Differential) -> Atom | None:
+    def get_differential_id(self, differential: Differential) -> int | None:
         """
         Retrieves the Atom for a given differential question.
 
         Args:
             differential (Differential): The differential question to look up.
         Returns:
-            Atom | None: The Atom representing the differential question, or None if it doesn't exist
+            int | None: The int representing the differential question, or None if it doesn't exist
         """
-        return self.differentials_to_ids.get(differential, None)
+        atom = self.differentials_to_ids.get(differential, None)
+        if atom is not None:
+            return atom.name
+        else:
+            return None
 
     def get_differential_atom(self, differential: Differential) -> Atom | None:
         """
