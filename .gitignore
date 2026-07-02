@@ -4,3 +4,4 @@ __pycache__
 *.egg_info
 ext_data/*.csv
 .python-version
+uv.lock
