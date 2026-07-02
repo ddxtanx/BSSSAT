@@ -9,16 +9,12 @@ known differentials that will be used to bootstrap the SAT solver.
 
 from .ext_class import ExtClass
 from .differential import Differential
-<<<<<<< HEAD
 from .Main_code_for_diffls import get_classes
 """from some document import rho-periodic_list, which is a list of rho-periodic elements"""
 """from some document import product_dict, which stores [element1, element2, their product]"""
 
 
 classes= get_classes()
-=======
-from .Main_code_for_diffls import get_classes  
->>>>>>> f1bc84211b4f32560b8bcb06f56cc0daaca7405f
 
 class Ext:
     """
@@ -108,8 +104,8 @@ class Ext:
         """
         if ext_class.degree[0] + ext_class.degree[1] - 2 * ext_class.degree[2] == 0:
             return True
-        otherwise:
-            return False
+        else:
+                return False
 
     def get_h1_periodic_elements(self) -> list[ExtClass]:
         """
