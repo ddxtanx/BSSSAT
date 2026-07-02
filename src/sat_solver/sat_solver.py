@@ -336,9 +336,11 @@ class SATSolver:
                 s.append_formula(card)
             s.append_formula(constraint)
             s.solve(assumptions=known_clauses)
+            all_models = []
             for model in s.enum_models(assumptions=known_clauses):
                 formula_models = Formula.formulas(model, atoms_only=True)
                 only_true = [
                     atom for atom in formula_models if not isinstance(atom, Neg)
                 ]
-                print(f"Model: {only_true}")
+                all_models.append(only_true)
+            return all_models
