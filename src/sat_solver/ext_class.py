@@ -8,6 +8,7 @@ Finally there is Undefined which is the ``None" variant of ExtClass,
 used as the ``target" of a differential when the source is not a cycle on the E_r page.
 """
 
+<<<<<<< HEAD:src/sat_solver/ext_class.py
 from sat_solver import Main_code_for_diffls
 from itertools import product
 
@@ -16,6 +17,18 @@ Undefined: ExtClass = None
 #         Returns:
 #             bool: True if this class and other are in the same tridegree, False otherwise
 #         """
+=======
+from __future__ import annotations
+
+from tkinter.font import names
+from itertools import product
+
+try:
+    from . import Main_code_for_diffls
+except ImportError:
+    import Main_code_for_diffls
+
+>>>>>>> 3b3242867b33a0ca731ce68c2663ba0625f3c6b7:src/ext_class.py
 
 class ExtClass:
     """
@@ -30,11 +43,7 @@ class ExtClass:
         """
         Returns the name of the class as a string.
         """
-        classes = Main_code_for_diffls.class_index(self.tridegree)
-        names = []
-        for index, coefficient in enumerate(self.vector):
-            if coefficient:
-                names.append(classes[index]["name"])
+        names = Main_code_for_diffls.basis_names_by_vector(self.tridegree, self.vector)
         if not names:
             return "0"
         return " + ".join(names)
@@ -101,6 +110,7 @@ class ExtClass:
             return ExtClass(self.get_degree(), new_vector)
 
     def __mul__(self, other: ExtClass) -> ExtClass:
+<<<<<<< HEAD:src/sat_solver/ext_class.py
         #         """
         #         Constructs a new ExtClass instance that represents the product of this class and another class.
         #         This either just returns the naive juxtaposition of the two classes,
@@ -111,9 +121,27 @@ class ExtClass:
         #             ExtClass: A new ExtClass instance that represents the product of this class and the other
         #         """
         pass  # Placeholder for the actual implementation of the product operation.
+=======
+#         """
+#         Constructs a new ExtClass instance that represents the product of this class and another class.
+#         This either just returns the naive juxtaposition of the two classes,
+#         or it returns the result of a known product in the Ext algebra.
+
+#         Args:
+#             other (ExtClass): The other ExtClass instance to multiply with this class.
+
+#         Returns:
+#             ExtClass: A new ExtClass instance that represents the product of this class and the other
+#         ""
+          # Placeholder for the actual implementation of the product operation.
+          pass
+>>>>>>> 3b3242867b33a0ca731ce68c2663ba0625f3c6b7:src/ext_class.py
 
     def get_tau_torsion(self) -> int:
-        pass
+        if self == zeroclass_at_degree(self.get_degree()):
+            return 0
+        else:
+            return Main_code_for_diffls.tau_torsion_by_vector(self.tridegree, self.vector)
 
     def get_name_latex(self) -> str:
         """
@@ -165,7 +193,6 @@ class ExtClass:
 
 
 
-
 #test
 if __name__ == "__main__":
     x = ExtClass((0, 0, -1), [1, 0, 0])
@@ -187,5 +214,10 @@ if __name__ == "__main__":
 
     print(x.in_same_tridegree_as(y))
     print(x.in_same_tridegree_as(z))
+<<<<<<< HEAD:src/sat_solver/ext_class.py
     print(x.in_same_tridegree_as(ZeroClass))
     
+=======
+
+
+>>>>>>> 3b3242867b33a0ca731ce68c2663ba0625f3c6b7:src/ext_class.py

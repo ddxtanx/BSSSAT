@@ -1,9 +1,14 @@
 import csv
 import json
+from pathlib import Path
+
+
+
+DATA_PATH = Path(__file__).with_name("Adams-motivic-E2-machine.csv")
 
 def get_classes():
     classes = []
-    with open('Adams-motivic-E2.csv', newline='') as csvfile:
+    with DATA_PATH.open(newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             classes.append({"name": row['name'], "stem": int(row['stem']), "Adams filtration": int(row['Adams filtration']), "weight": int(row['weight']), "tautorsion": int(row['tautorsion'])})
@@ -15,9 +20,11 @@ def degree(element):
 def add_degree(degree1, degree2):
     return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
 
-
 def sfdegree(element):
         return (element["stem"], element["Adams filtration"])
+
+def tautorsion(element):
+    return element["tautorsion"]
 
 group_by_sf = {}
 for element in get_classes():
@@ -38,19 +45,21 @@ def element_by_degree(a_degree):
             elements_in_degree.append(element)
         if degree(element)[2] > a_degree[2]:
             difference_degree = degree(element)[2] - a_degree[2]
-            if element["tautorsion"] == 0:
+            if tautorsion(element) == 0:
                 elements_in_degree.append({
                     "name": f"tau^{difference_degree} {element['name']}",
                     "stem": a_degree[0],
                     "Adams filtration": a_degree[1],
                     "weight": a_degree[2],
+                    "tautorsion": 0
                 })
-            if int(element["tautorsion"]) > 0 and difference_degree > int(element["tautorsion"]):
+            if int(element["tautorsion"]) > 0 and difference_degree < int(element["tautorsion"]):
                 elements_in_degree.append({
                     "name": f"tau^{difference_degree} {element['name']}",
                     "stem": a_degree[0],
                     "Adams filtration": a_degree[1],
                     "weight": a_degree[2],
+                    "tautorsion": tautorsion(element) - difference_degree
                 })
         else:
             continue
@@ -73,6 +82,68 @@ def class_name_by_index(a_degree, index):
         if element["index"] == index:
             return element["name"]
     return None
+
+
+def vector_by_basis_names(a_degree, names):
+    """
+    Return the F2 bool vector for a linear combination of basis names.
+
+    Repeating a basis name toggles its coefficient, so duplicates cancel.
+    """
+    basis = class_index(a_degree)
+    index_by_name = {element["name"]: element["index"] for element in basis}
+    vector = [False] * len(basis)
+
+    for name in names:
+        if name not in index_by_name:
+            raise ValueError(f"{name!r} is not a basis element in degree {a_degree}")
+        index = index_by_name[name]
+        vector[index] = not vector[index]
+
+    return vector
+
+
+def vector_by_basis_name(a_degree, name):
+    """Return the F2 bool vector for one basis element."""
+    return vector_by_basis_names(a_degree, [name])
+
+
+def basis_names_by_vector(a_degree, vector):
+    """Return the basis names with True coefficients in a bool vector."""
+    basis = class_index(a_degree)
+    if len(vector) != len(basis):
+        raise ValueError(
+            f"Vector length {len(vector)} does not match dimension "
+            f"{len(basis)} in degree {a_degree}"
+        )
+    return [element["name"] for element, coefficient in zip(basis, vector) if coefficient]
+
+
+def tau_torsion_by_vector(a_degree, vector):
+    """
+    Return the tau-torsion determined by the True basis coefficients.
+
+    The convention from the CSV is preserved: 0 means tau-torsion-free. For a
+    nonzero finite-torsion sum, this returns the largest torsion exponent among
+    the selected basis elements.
+    """
+    basis = class_index(a_degree)
+    if len(vector) != len(basis):
+        raise ValueError(
+            f"Vector length {len(vector)} does not match dimension "
+            f"{len(basis)} in degree {a_degree}"
+        )
+
+    selected_torsions = [
+        element["tautorsion"]
+        for element, coefficient in zip(basis, vector)
+        if coefficient
+    ]
+    if not selected_torsions:
+        return 0
+    if 0 in selected_torsions:
+        return 0
+    return max(selected_torsions)
 
 #print(class_name_by_index((110, 34, 58), 0))
 
@@ -104,7 +175,6 @@ def group_by_degree(bounds):
                 if elements:
                     grouped[a_degree] = elements
     return grouped
-
 
 
 
@@ -208,6 +278,7 @@ def finding_sources_with_fixed_number_of_differentials(classes, number):
 #     for degree_key, source_elements in sorted(grouped.items()):
 #         names = [element["name"] for element in source_elements]
 #         writer.writerow([str(degree_key), len(names), json.dumps(names, ensure_ascii=False)])
+<<<<<<< HEAD:src/sat_solver/Main_code_for_diffls.py
 
 
 <<<<<<< HEAD
@@ -278,3 +349,5 @@ def convert_to_latex(name: str) -> str:
 
 
 >>>>>>> f1bc84211b4f32560b8bcb06f56cc0daaca7405f
+=======
+>>>>>>> 3b3242867b33a0ca731ce68c2663ba0625f3c6b7:src/Main_code_for_diffls.py

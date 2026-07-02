@@ -1,3 +1,9 @@
+"""
+This file contains utility functions for converting Ext element names to LaTeX format that
+are valid for the Adams-motivic-E2.csv file. It does not translate the machine names.
+"""
+
+
 import re
 
 
