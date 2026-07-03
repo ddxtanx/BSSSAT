@@ -1,6 +1,9 @@
 from sat_solver import Ext, ExtClass, SATSolver, Differential
 import sys
 
+ZeroClass: ExtClass = ExtClass(None, [True])
+Undefined: ExtClass = ExtClass(None, [False])
+
 
 def main():
     a1 = ExtClass((0, 0, 0), [True])
@@ -11,7 +14,7 @@ def main():
     #b2 = ExtClass((0, 1, 1), [False, True])
     #b_sum = b1 + b2
 
-    diff1 = Differential(a1, b1, 1)
+    diff1 = Differential(a1, ZeroClass, 1)
     #diff2 = Differential(a2, b2, 1)
 
     ext = Ext()

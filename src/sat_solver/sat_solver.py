@@ -51,7 +51,9 @@ class SATSolver:
                     differential = Differential(ext_class, target_class, r)
                     self.literal_manager.add_differential(differential)
         for r in range(1, self.max_differential + 1):
+            print(f"Creating differential literal: (None, [True])--d{r}--> (None, [True])")
             self.literal_manager.add_differential(Differential(ZeroClass, ZeroClass, r))
+            print(f"Creating differential literal: (None, [False])--d{r}--> (None, [False])")
             self.literal_manager.add_differential(Differential(Undefined, Undefined, r))
 
 
@@ -338,7 +340,7 @@ class SATSolver:
                 if higher_undef_atoms:
                     implies_clause = Implies(not_zero_clause, And(*higher_undef_atoms))
                     all_clauses.append(implies_clause)
-                
+
                 #this is to ensure that if a class is a cycle on lower pages, then differential on the r-th page is not undefined.
                 if r > 1:
                     lower_zero_diff = Differential(source, ZeroClass, r - 1)
