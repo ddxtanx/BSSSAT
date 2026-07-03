@@ -5,3 +5,4 @@ __pycache__
 ext_data/*.csv
 .python-version
 uv.lock
+src/satsolver.egg-info/*
