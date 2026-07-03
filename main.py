@@ -31,6 +31,12 @@ def main():
     idx2 = int(sys.argv[2])
     print_model_diffs(all_models, idx1, idx2)
 
+    for x in all_models[0]:
+        print(x)
+
+
+
+
 
 def print_model_diffs(all_models, idx1, idx2):
     """ all_models[i] is a list of differentials that are true in model i """

@@ -170,6 +170,35 @@ class Ext:
             return list(self.classes[(target_s, target_f, target_w)])
         else:
             return []
+        
+    def get_possible_nontrivial_differential_sources(
+        self, target_class: ExtClass, r: int
+    ) -> list[ExtClass]:
+        """
+        This method returns a list of ExtClasses that could potentially be the source
+        of a differential of length r ending at a given ExtClass.
+
+        Args:
+            target_class (ExtClass): The ExtClass which is the target of the differential.
+            r (int): The length of the differential.
+
+        Returns:
+            list[ExtClass]: A list of all the ExtClasses that could potentially be the source
+            of a differential of length r ending at the given ExtClass.
+        """
+        if target_class == Undefined or target_class == ZeroClass:
+            return print("The target class is either Undefined or ZeroClass")
+
+        s, f, w = target_class.get_degree()
+        source_s = s - r + 1
+        source_f = f - 1
+        source_w = w - r
+
+        if (source_s, source_f, source_w) in self.classes:
+            return list(self.classes[(source_s, source_f, source_w)])
+        else:
+            return []
+
 
     def get_classes_in_fixed_degree(self, N: int) -> list[ExtClass]:
         """
