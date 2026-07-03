@@ -31,8 +31,11 @@ def main():
     idx2 = int(sys.argv[2])
     print_model_diffs(all_models, idx1, idx2)
 
-    for x in all_models[0]:
-        print(x)
+    if all_models:
+        for x in all_models[0]:
+            print(x)
+    else:
+        print("No models found")
 
 
 

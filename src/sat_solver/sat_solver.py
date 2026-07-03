@@ -340,6 +340,42 @@ class SATSolver:
                     defined_clause = Implies(lower_zero_atom, Neg(undefined_atom))
                     all_clauses.append(defined_clause)
 
+
+        #this is to ensure that each class is either hit by a differential or supports a differential, but not both.
+        for target in self.E1_page.get_classes_up_to_coweight(self.max_coweight):
+            hit_or_support_literals = []
+
+            for r in range(1, self.max_differential + 1):
+                possible_sources = self.E1_page.get_possible_nontrivial_differential_sources(
+                    target, r
+                )
+
+                for source in possible_sources:
+                    diff = Differential(source, target, r)
+                    diff_id = self.literal_manager.get_differential_id(diff)
+
+                    if diff_id is None:
+                        raise ValueError(
+                            f"Differential {diff} not found in literal manager."
+                        )
+
+                    hit_or_support_literals.append(diff_id)
+
+            undefined_diff = Differential(target, Undefined, self.max_differential)
+            undefined_diff_id = self.literal_manager.get_differential_id(undefined_diff)
+
+            if undefined_diff_id is None:
+                raise ValueError(
+                    f"Differential {undefined_diff} not found in literal manager."
+                )
+
+            hit_or_support_literals.append(undefined_diff_id)
+
+            card_constraint = CardEnc.equals(
+                lits=hit_or_support_literals, bound=1, encoding=9
+            )
+            cardinality_constraints.append(card_constraint)       
+
                 
 
         constraint = And(*all_clauses).simplified()
