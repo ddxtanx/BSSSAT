@@ -327,13 +327,16 @@ class SATSolver:
                     all_clauses.append(implies_clause)
 
                 #this is to ensure that if a class is a cycle on lower pages, then differential on the r-th page is not undefined.
-                if r > 1:
+                #also on E_1 page, differential of a class is not undefined.
+                undefined_diff = Differential(source, Undefined, r)
+                undefined_atom = self.literal_manager.get_differential_atom(undefined_diff)
+
+                if r == 1:
+                    all_clauses.append(Neg(undefined_atom))
+                else:
                     lower_zero_diff = Differential(source, ZeroClass, r - 1)
                     lower_zero_atom = self.literal_manager.get_differential_atom(lower_zero_diff)
-                
 
-                    undefined_diff = Differential(source, Undefined, r)
-                    undefined_atom = self.literal_manager.get_differential_atom(undefined_diff)
                     defined_clause = Implies(lower_zero_atom, Neg(undefined_atom))
                     all_clauses.append(defined_clause)
 
