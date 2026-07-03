@@ -31,10 +31,6 @@ class SATSolver:
 
     def create_literals(self):
         classes = self.E1_page.get_classes_up_to_coweight(self.max_coweight)
-        classes += [
-            ZeroClass,
-            Undefined,
-        ]  # TODO: Verify that these are not already included in the list of classes
         for ext_class in classes:
             print(
                 f"Creating literals with source {ext_class.tridegree}, {ext_class.vector}"
@@ -51,6 +47,10 @@ class SATSolver:
                     # TODO: Verify this is the interface Pengkun wants for creating a differential
                     differential = Differential(ext_class, target_class, r)
                     self.literal_manager.add_differential(differential)
+        for r in range(1, self.max_differential + 1):
+            self.literal_manager.add_differential(Differential(ZeroClass, ZeroClass, r))
+            self.literal_manager.add_differential(Differential(Undefined, Undefined, r))
+
 
     def create_known_differential_clauses(self) -> list[int]:
         """
@@ -96,21 +96,7 @@ class SATSolver:
                     f"Undefined differential {undefined_differential} not found in literal manager."
                 )
 
-        # Undef -> Zero and Zero -> Undef are false (this is not covered by sum=1 constraints)
-        known_false = []
-        for r in range(1, self.max_differential + 1):
-            zero_undef = Differential(ZeroClass, Undefined, r)
-            zero_undef_atom = self.literal_manager.get_differential_atom(zero_undef)
-            known_false.append(zero_undef_atom)
-#            undef_zero = Differential(Undefined, ZeroClass, r)
-#            undef_zero_atom = self.literal_manager.get_differential_atom(undef_zero)
-#            known_false.append(undef_zero_atom)
-        undef_zero = Differential(Undefined, ZeroClass, 1)
-        undef_zero_atom = self.literal_manager.get_differential_atom(undef_zero)
-        known_false.append(undef_zero_atom)
-        print("known_false = ", known_false)
-        return [known.name for known in knowns] + [-known.name for known in known_false]
-#        return [known.name for known in knowns]
+        return [known.name for known in knowns]
 
     def create_leibniz_differentials(
         self, diff1: Differential, diff2: Differential
@@ -270,19 +256,24 @@ class SATSolver:
                         Implies(other_antecedent, other_consequent)
                     )
 
-        square_zero_diff = Differential(target, ZeroClass, degree)
-        square_zero_consequent = self.literal_manager.get_differential_atom(
-            square_zero_diff
-        )
-        if square_zero_consequent is not None:
-            conditional_consequents.append(square_zero_consequent)
-        else:
-            raise ValueError(
-                f"Square-zero differential {square_zero_diff} not found in literal manager."
+        if target != Undefined:
+            square_zero_diff = Differential(target, ZeroClass, degree)
+            square_zero_consequent = self.literal_manager.get_differential_atom(
+                square_zero_diff
             )
+            if square_zero_consequent is not None:
+                conditional_consequents.append(square_zero_consequent)
+            else:
+                raise ValueError(
+                    f"Square-zero differential {square_zero_diff} not found in literal manager."
+                )
 
-        consequent = And(*conditional_consequents)
-        return Implies(antecedent, consequent)
+        if len(conditional_consequents) > 0:
+            consequent = And(*conditional_consequents)
+            return Implies(antecedent, consequent)
+        else:
+            return None
+
 
     def run_sat_solver(self):
         """
@@ -308,9 +299,9 @@ class SATSolver:
                             f"Differential {diff} not found in literal manager."
                         )
                     equals_one_literals.append(diff_id)
-                    all_clauses.append(
-                        self.create_clauses_from_assumed_differential(diff)
-                    )
+                    new_clauses = self.create_clauses_from_assumed_differential(diff)
+                    if new_clauses != None:
+                        all_clauses.append(new_clauses)
                 card_constraint = CardEnc.equals(
                     lits=equals_one_literals, bound=1, encoding=9
                 )
