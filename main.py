@@ -19,7 +19,7 @@ def main():
     ext.add_classes([a1, b1])
     ext.add_known_differentials([diff1])
 
-    sat_solver = SATSolver(ext, 10, 10)
+    sat_solver = SATSolver(ext, 2, 2)
 
     all_models = sat_solver.run_sat_solver()
     print("\nnumber of models: ", len(all_models))

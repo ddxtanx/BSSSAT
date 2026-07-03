@@ -33,6 +33,7 @@ class SATSolver:
     #this function creates the variables for the SAT solver. 
     def create_literals(self):
         classes = self.E1_page.get_classes_up_to_coweight(self.max_coweight)
+        classes += [ZeroClass,Undefined,]  # TODO: Verify that these are not already included in the list of classes
         for ext_class in classes:
             print(
                 f"Creating literals with source {ext_class.tridegree}, {ext_class.vector}"
@@ -98,7 +99,21 @@ class SATSolver:
                     f"Undefined differential {undefined_differential} not found in literal manager."
                 )
 
-        return [known.name for known in knowns]
+        # Undef -> Zero and Zero -> Undef are false (this is not covered by sum=1 constraints)
+        known_false = []
+        for r in range(1, self.max_differential + 1):
+            zero_undef = Differential(ZeroClass, Undefined, r)
+            zero_undef_atom = self.literal_manager.get_differential_atom(zero_undef)
+            known_false.append(zero_undef_atom)
+#            undef_zero = Differential(Undefined, ZeroClass, r)
+#            undef_zero_atom = self.literal_manager.get_differential_atom(undef_zero)
+#            known_false.append(undef_zero_atom)
+        undef_zero = Differential(Undefined, ZeroClass, 1)
+        undef_zero_atom = self.literal_manager.get_differential_atom(undef_zero)
+        known_false.append(undef_zero_atom)
+        print("known_false = ", known_false)
+        return [known.name for known in knowns] + [-known.name for known in known_false]
+#        return [known.name for known in knowns]
 
     def create_leibniz_differentials(
         self, diff1: Differential, diff2: Differential
@@ -325,18 +340,17 @@ class SATSolver:
                     all_clauses.append(implies_clause)
                 
                 #this is to ensure that if a class is a cycle on lower pages, then differential on the r-th page is not undefined.
-                lower_zero_atoms = []
-                for lower_r in range(1, r):
-                    lower_zero_diff = Differential(source, ZeroClass, lower_r)
+                if r > 1:
+                    lower_zero_diff = Differential(source, ZeroClass, r - 1)
                     lower_zero_atom = self.literal_manager.get_differential_atom(lower_zero_diff)
-                    lower_zero_atoms.append(lower_zero_atom)
+                
 
-                if lower_zero_atoms:
                     undefined_diff = Differential(source, Undefined, r)
                     undefined_atom = self.literal_manager.get_differential_atom(undefined_diff)
-                    defined_clause = Implies(And(*lower_zero_atoms), Neg(undefined_atom))
+                    defined_clause = Implies(lower_zero_atom, Neg(undefined_atom))
                     all_clauses.append(defined_clause)
 
+                
 
         constraint = And(*all_clauses).simplified()
         with Solver("Gluecard4") as s:
