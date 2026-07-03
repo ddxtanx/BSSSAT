@@ -11,9 +11,6 @@ used as the ``target" of a differential when the source is not a cycle on the E_
 from sat_solver import Main_code_for_diffls
 from itertools import product
 
-ZeroClass: ExtClass = None
-Undefined: ExtClass = None
-
 
 class ExtClass:
     """
@@ -161,6 +158,8 @@ class ExtClass:
 
 
 
+ZeroClass: ExtClass = ExtClass(None, [True])
+Undefined: ExtClass = ExtClass(None, [False])
 
 
 

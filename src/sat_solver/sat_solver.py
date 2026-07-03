@@ -33,10 +33,6 @@ class SATSolver:
     #this function creates the variables for the SAT solver. 
     def create_literals(self):
         classes = self.E1_page.get_classes_up_to_coweight(self.max_coweight)
-<<<<<<< HEAD
-        classes += [ZeroClass,Undefined,]  # TODO: Verify that these are not already included in the list of classes
-=======
->>>>>>> a9debb1b6abb2a4e712f8e0f57c8cd4124cbe1e5
         for ext_class in classes:
             print(
                 f"Creating literals with source {ext_class.tridegree}, {ext_class.vector}"
@@ -102,21 +98,7 @@ class SATSolver:
                     f"Undefined differential {undefined_differential} not found in literal manager."
                 )
 
-        # Undef -> Zero and Zero -> Undef are false (this is not covered by sum=1 constraints)
-        known_false = []
-        for r in range(1, self.max_differential + 1):
-            zero_undef = Differential(ZeroClass, Undefined, r)
-            zero_undef_atom = self.literal_manager.get_differential_atom(zero_undef)
-            known_false.append(zero_undef_atom)
-#            undef_zero = Differential(Undefined, ZeroClass, r)
-#            undef_zero_atom = self.literal_manager.get_differential_atom(undef_zero)
-#            known_false.append(undef_zero_atom)
-        undef_zero = Differential(Undefined, ZeroClass, 1)
-        undef_zero_atom = self.literal_manager.get_differential_atom(undef_zero)
-        known_false.append(undef_zero_atom)
-        print("known_false = ", known_false)
-        return [known.name for known in knowns] + [-known.name for known in known_false]
-#        return [known.name for known in knowns]
+        return [known.name for known in knowns]
 
     def create_leibniz_differentials(
         self, diff1: Differential, diff2: Differential
