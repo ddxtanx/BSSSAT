@@ -8,7 +8,7 @@ Finally there is Undefined which is the ``None" variant of ExtClass,
 used as the ``target" of a differential when the source is not a cycle on the E_r page.
 """
 
-from sat_solver import Main_code_for_diffls
+from sat_solver import E1CsvParser
 from itertools import product
 
 
