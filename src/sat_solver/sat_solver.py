@@ -10,16 +10,12 @@ from pysat.card import CardEnc
 class SATSolver:
     E1_page: Ext
     literal_manager: LiteralManager
-    max_coweight: int
     max_differential: int
     known_differentials: dict[tuple[ExtClass, int], ExtClass]
 
-    def __init__(self, E1_page: Ext, max_coweight: int, max_differential: int):
+    def __init__(self, E1_page: Ext, max_differential: int):
         self.E1_page = E1_page
         self.literal_manager = LiteralManager()
-        if max_coweight < 0:
-            raise ValueError("max_coweight must be non-negative")
-        self.max_coweight = max_coweight
         self.max_differential = max_differential
         known_diffs = self.E1_page.get_known_differentials()
         self.known_differentials = {}
@@ -32,27 +28,26 @@ class SATSolver:
 
     #this function creates the variables for the SAT solver. 
     def create_literals(self):
-        classes = self.E1_page.get_classes_up_to_coweight(self.max_coweight)
+        classes = self.E1_page.get_classes()
         for ext_class in classes:
-            print(
-                f"Creating literals with source {ext_class.tridegree}, {ext_class.vector}"
-            )
+#            print(
+#                f"Creating literals with source {ext_class.get_degree()}, {ext_class.get_vector()}"
+#            )
             for r in range(1, self.max_differential + 1):
                 target_classes = [ZeroClass, Undefined]
                 target_classes += self.E1_page.get_possible_differential_targets(
                     ext_class, r
                 )
                 for target_class in target_classes:
-                    print(
-                        f"Creating differential literal: ({ext_class.tridegree}, {ext_class.vector})--d{r}--> ({target_class.tridegree}, {target_class.vector})"
-                    )
-                    # TODO: Verify this is the interface Pengkun wants for creating a differential
+                    #print(
+                    #    f"Creating differential literal: ({ext_class.tridegree}, {ext_class.vector})--d{r}--> ({target_class.tridegree}, {target_class.vector})"
+                    #)
                     differential = Differential(ext_class, target_class, r)
                     self.literal_manager.add_differential(differential)
         for r in range(1, self.max_differential + 1):
-            print(f"Creating differential literal: (None, [True])--d{r}--> (None, [True])")
+            #print(f"Creating differential literal: (None, [True])--d{r}--> (None, [True])")
             self.literal_manager.add_differential(Differential(ZeroClass, ZeroClass, r))
-            print(f"Creating differential literal: (None, [False])--d{r}--> (None, [False])")
+            #print(f"Creating differential literal: (None, [False])--d{r}--> (None, [False])")
             self.literal_manager.add_differential(Differential(Undefined, Undefined, r))
 
 
@@ -68,9 +63,9 @@ class SATSolver:
         """
         knowns = []
         for (source, degree), target in self.known_differentials.items():
-            print(
-                f"Adding known differential: ({source.tridegree}, {source.vector}) --d{degree}--> ({target.tridegree}, {target.vector})"
-            )
+#            print(
+#                f"Adding known differential: ({source.tridegree}, {source.vector}) --d{degree}--> ({target.tridegree}, {target.vector})"
+#            )
             differential = Differential(source, target, degree)
             atom = self.literal_manager.get_differential_atom(differential)
             if atom is not None:
@@ -198,7 +193,7 @@ class SATSolver:
         degree = diff.get_degree()
         target = diff.get_target()
 
-        for other_class in self.E1_page.get_classes_up_to_coweight(self.max_coweight):
+        for other_class in self.E1_page.get_classes():
             other_deg = other_class.get_degree()
             # Multiplication is commutative, choose only one of a * b, b * a
             if other_deg < source_degree:
@@ -242,9 +237,9 @@ class SATSolver:
                     linearity_diff = self.create_linearity_differential(
                         diff, other_diff
                     )
-                    print(
-                        f"Creating linearity differential: {linearity_diff.get_source().tridegree}, {linearity_diff.get_source().vector} --d{linearity_diff.get_degree()}--> {linearity_diff.get_target().tridegree}, {linearity_diff.get_target().vector}"
-                    )
+#                    print(
+#                        f"Creating linearity differential: {linearity_diff.get_source().tridegree}, {linearity_diff.get_source().vector} --d{linearity_diff.get_degree()}--> {linearity_diff.get_target().tridegree}, {linearity_diff.get_target().vector}"
+#                    )
                     linearity_consequent = self.literal_manager.get_differential_atom(
                         linearity_diff
                     )
@@ -289,7 +284,7 @@ class SATSolver:
         known_clauses = self.create_known_differential_clauses()
         all_clauses = []
         cardinality_constraints = []
-        for source in self.E1_page.get_classes_up_to_coweight(self.max_coweight):
+        for source in self.E1_page.get_classes():
             for r in range(1, self.max_differential + 1):
                 equals_one_literals = []
                 target_classes = [ZeroClass, Undefined]
@@ -342,7 +337,8 @@ class SATSolver:
 
 
         #this is to ensure that each class is either hit by a differential or supports a differential, but not both.
-        for target in self.E1_page.get_classes_up_to_coweight(self.max_coweight):
+        for target in self.E1_page.get_classes():
+
             hit_or_support_literals = []
 
             for r in range(1, self.max_differential + 1):
@@ -374,9 +370,9 @@ class SATSolver:
             card_constraint = CardEnc.equals(
                 lits=hit_or_support_literals, bound=1, encoding=9
             )
-            cardinality_constraints.append(card_constraint)       
+            cardinality_constraints.append(card_constraint)
 
-                
+
 
         constraint = And(*all_clauses).simplified()
         with Solver("Gluecard4") as s:
@@ -388,7 +384,7 @@ class SATSolver:
             for model in s.enum_models(assumptions=known_clauses):
                 formula_models = Formula.formulas(model, atoms_only=True)
                 only_true = [
-                    atom for atom in formula_models if not isinstance(atom, Neg)
+                    atom.object for atom in formula_models if not isinstance(atom, Neg)
                 ]
                 all_models.append(only_true)
             return all_models

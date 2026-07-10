@@ -18,7 +18,7 @@ class Ext:
     This class represents useful pieces of information contained in the cohomology of the C-motivic Steenrod algebra.
     """
 
-    classes: dict[tuple[int, int, int], set[ExtClass]]
+    class_dct: dict[tuple[int, int, int], set[ExtClass]]
     known_differentials: set[Differential]
 
     min_stem: int
@@ -30,7 +30,8 @@ class Ext:
     max_weight: int
 
     def __init__(self):
-        self.classes = {}
+        self.classes = set()
+        self.class_dct = {}
         self.known_differentials = set()
 
         self.max_stem = 0
@@ -50,9 +51,9 @@ class Ext:
         """
         s, f, w = ext_class.get_degree()
 
-        if (s, f, w) not in self.classes:
-            self.classes[(s, f, w)] = set()
-        self.classes[(s, f, w)].add(ext_class)
+        if (s, f, w) not in self.class_dct:
+            self.class_dct[(s, f, w)] = set()
+        self.class_dct[(s, f, w)].add(ext_class)
 
         if s > self.max_stem:
             self.max_stem = s
@@ -124,25 +125,15 @@ class Ext:
         for diff in diffs:
             self.add_known_differential(diff)
 
-    def get_classes_up_to_coweight(self, coweight: int) -> list[ExtClass]:
-        """
-        This method returns a list of ExtClasses whose coweight (s - w) is less that a given maximum,
-        which we will attempt to resolve questions about differentials.
-
-        Args:
-            coweight (int): The maximum coweight s - w of the ExtClasses to retrieve.
-
-        Returns:
-            list[ExtClass]: A list of all the ExtClasses whose coweight is less than the given maximum.
-        """
-        classes = []
-        # s - w <= coweight implies s <= coweight + w
-        for w in range(self.min_weight, self.max_weight + 1):
-            for f in range(self.min_filtration, self.max_filtration + 1):
-                for s in range(self.min_stem, coweight + w + 1):
-                    if (s, f, w) in self.classes:
-                        classes.extend(self.classes[(s, f, w)])
+    def get_classes(self) -> set[ExtClass]:
+        if self.classes != set():
+            return self.classes
+        classes = set()
+        for _, class_set in self.class_dct.items():
+            classes |= class_set
+        self.classes = classes
         return classes
+
 
     def get_possible_differential_targets(
         self, ext_class: ExtClass, r: int
@@ -166,11 +157,11 @@ class Ext:
         target_f = f + 1
         target_w = w + r
 
-        if (target_s, target_f, target_w) in self.classes:
-            return list(self.classes[(target_s, target_f, target_w)])
+        if (target_s, target_f, target_w) in self.class_dct:
+            return list(self.class_dct[(target_s, target_f, target_w)])
         else:
             return []
-        
+
     def get_possible_nontrivial_differential_sources(
         self, target_class: ExtClass, r: int
     ) -> list[ExtClass]:
@@ -194,13 +185,13 @@ class Ext:
         source_f = f - 1
         source_w = w - r
 
-        if (source_s, source_f, source_w) in self.classes:
-            return list(self.classes[(source_s, source_f, source_w)])
+        if (source_s, source_f, source_w) in self.class_dct:
+            return list(self.class_dct[(source_s, source_f, source_w)])
         else:
             return []
 
 
-    def get_classes_in_fixed_degree(self, N: int) -> list[ExtClass]:
+    def get_classes_in_fixed_N(self, N: int) -> list[ExtClass]:
         """
         This method returns a list of ExtClasses whose fixed degree (s + f - w) is equal to a given value N.
 
@@ -214,8 +205,8 @@ class Ext:
         for s in range(self.min_stem, self.max_stem + 1):
             for f in range(self.min_filtration, self.max_filtration + 1):
                 w = s + f - N
-                if (s, f, w) in self.classes:
-                    classes.extend(self.classes[(s, f, w)])
+                if (s, f, w) in self.class_dct:
+                    classes.extend(self.class_dct[(s, f, w)])
         return classes
 
     def get_classes_in_tridegree(
@@ -231,8 +222,8 @@ class Ext:
             list[ExtClass]: A list of all the ExtClasses in the given tridegree.
         """
         s, f, w = tridegree
-        if (s, f, w) in self.classes:
-            return list(self.classes[(s, f, w)])
+        if (s, f, w) in self.class_dct:
+            return list(self.class_dct[(s, f, w)])
         else:
             return []
 
@@ -253,8 +244,8 @@ class Ext:
         for s in range(self.min_stem, self.max_stem + 1):
             for w in range(self.min_weight, self.max_weight + 1):
                 f = 2 * w - s
-                if (s, f, w) in self.classes:
-                    rho_periodic_elts.extend(self.classes[(s, f, w)])
+                if (s, f, w) in self.class_dct:
+                    rho_periodic_elts.extend(self.class_dct[(s, f, w)])
         return rho_periodic_elts
 
     def is_rho_periodic(self, ext_class: ExtClass) -> bool:
