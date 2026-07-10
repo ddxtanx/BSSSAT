@@ -1,4 +1,4 @@
-from sat_solver import Ext, ExtClass, SATSolver, Differential
+from sat_solver import E1CsvParser, Ext, ExtClass, SATSolver, Differential
 import sys
 
 ZeroClass: ExtClass = ExtClass(None, [True])
@@ -6,36 +6,33 @@ Undefined: ExtClass = ExtClass(None, [False])
 
 
 def main():
-    a1 = ExtClass((0, 0, 0), [True])
-    #a2 = ExtClass((0, 0, 0), [False, True])
-    #a_sum = a1 + a2
-
-    b1 = ExtClass((0, 1, 1), [True])
-    #b2 = ExtClass((0, 1, 1), [False, True])
-    #b_sum = b1 + b2
-
-    diff1 = Differential(a1, ZeroClass, 1)
-    #diff2 = Differential(a2, b2, 1)
-
+    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv",  2, only_one_N=True)
+    all_classes = E1.make_all_lin_combs()
+    ext_classes = [ExtClass(*x) for x in all_classes]
+    for x in ext_classes:
+        print(E1.class_name(x.get_degree(), x.get_vector()), x.get_degree())
     ext = Ext()
-    #ext.add_classes([a1, a2, a_sum, b1, b2, b_sum])
-    ext.add_classes([a1, b1])
+    ext.add_classes(ext_classes)
+    t2, t1h0, h02, th1 = ext_classes
+    diff1 = Differential(t2, th1, 2)
+
+
     ext.add_known_differentials([diff1])
 
-    sat_solver = SATSolver(ext, 2, 2)
+    sat_solver = SATSolver(ext, 5, 5)
 
     all_models = sat_solver.run_sat_solver()
     print("\nnumber of models: ", len(all_models))
 
-    idx1 = int(sys.argv[1])
-    idx2 = int(sys.argv[2])
-    print_model_diffs(all_models, idx1, idx2)
+#    idx1 = int(sys.argv[1])
+#    idx2 = int(sys.argv[2])
+#    print_model_diffs(all_models, idx1, idx2)
 
-    if all_models:
-        for x in all_models[0]:
-            print(x)
-    else:
-        print("No models found")
+#    if all_models:
+#        for x in all_models[0]:
+#            print(x)
+#    else:
+#        print("No models found")
 
 
 

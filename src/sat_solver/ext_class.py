@@ -8,7 +8,6 @@ Finally there is Undefined which is the ``None" variant of ExtClass,
 used as the ``target" of a differential when the source is not a cycle on the E_r page.
 """
 
-from sat_solver import E1CsvParser
 from itertools import product
 
 
@@ -21,24 +20,17 @@ class ExtClass:
         self.tridegree = tridegree
         self.vector = vector
 
-    def get_name(self) -> str:
-        """
-        Returns the name of the class as a string.
-        """
-        classes = Main_code_for_diffls.class_index(self.tridegree)
-        names = []
-        for index, coefficient in enumerate(self.vector):
-            if coefficient:
-                names.append(classes[index]["name"])
-        if not names:
-            return "0"
-        return " + ".join(names)
-
     def get_degree(self) -> tuple[int, int, int]:
         """
         Returns the tridegree (s, f, w) of the class as a tuple of three integers.
         """
         return self.tridegree
+
+    def get_vector(self) -> list[bool]:
+        """
+        Returns the F2 vector of the class as a list of booleans.
+        """
+        return self.vector
 
     def get_differential_targets(self, r: int) -> list[ExtClass]:
         """
