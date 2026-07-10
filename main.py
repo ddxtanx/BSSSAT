@@ -6,33 +6,37 @@ Undefined: ExtClass = ExtClass(None, [False])
 
 
 def main():
-    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv",  2, only_one_N=True)
+    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", 2, only_one_N=True)  # s+f-w = 2
     all_classes = E1.make_all_lin_combs()
     ext_classes = [ExtClass(*x) for x in all_classes]
+    print("number of E1 classes: ", len(ext_classes))
     for x in ext_classes:
         print(E1.class_name(x.get_degree(), x.get_vector()), x.get_degree())
     ext = Ext()
     ext.add_classes(ext_classes)
+
+    # comment out these four lines if you want to try a different N = s+f-w
     t2, t1h0, h02, th1 = ext_classes
+    print("\nAdding known differential d_2(t^2) = t h1")
     diff1 = Differential(t2, th1, 2)
-
-
     ext.add_known_differentials([diff1])
 
-    sat_solver = SATSolver(ext, 5, 5)
 
+    sat_solver = SATSolver(ext, 5)
     all_models = sat_solver.run_sat_solver()
-    print("\nnumber of models: ", len(all_models))
+    print("\nnumber of SAT variables: ", len(sat_solver.literal_manager.differentials))
+    print("\nnumber of possible solutions to the system: ", len(all_models))
 
-#    idx1 = int(sys.argv[1])
-#    idx2 = int(sys.argv[2])
-#    print_model_diffs(all_models, idx1, idx2)
 
-#    if all_models:
-#        for x in all_models[0]:
-#            print(x)
-#    else:
-#        print("No models found")
+    if all_models:
+        print("\nPrinting one possible solution")
+        for diff in all_models[0]:
+            r = diff.degree_of_differential
+            source_name = E1.class_name(diff.source.get_degree(), diff.source.get_vector())
+            target_name = E1.class_name(diff.target.get_degree(), diff.target.get_vector())
+            print(f"d_{r}: ", source_name, " -> ", target_name)
+    else:
+        print("The SAT problem is unsatisfiable")
 
 
 
