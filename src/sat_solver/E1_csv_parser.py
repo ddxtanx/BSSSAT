@@ -70,6 +70,10 @@ class E1CsvParser:
 
 
     def make_all_lin_combs(self):
+        """
+        Returns a list of tuples (tridegree, vector) that can be turned into ExtClass(tridegree, vector)
+        and fed into Ext.add_classes
+        """
         assert self.sfw_dict is not None
         classes = []
         for deg in self.sfw_dict:
@@ -82,15 +86,26 @@ class E1CsvParser:
 
 
 
-    #defining the index of an element in a given degree.
-    def class_index(self, a_degree):
+    #returns the name of an element in a given degree.
+    def class_name(self, deg, vector):
+        if deg == None:
+            if vector == [True]:
+                return "0"
+            elif vector == [False]:
+                return "Undef"
+            else:
+                raise ValueError(f"Invalid element (None, {vector})")
+
         assert self.sfw_dict is not None
-        indexed_elements = []
-        for index, element in self.sfw_dict[a_degree].items():
-            indexed_element = element.copy()
-            indexed_element["index"] = index
-            indexed_elements.append(indexed_element)
-        return indexed_elements
+        name_lst = []
+
+        if deg not in self.sfw_dict:
+            raise ValueError(f"Degree {deg} not found in E1CsvParser.sfw_dict")
+        elts = self.sfw_dict[deg]
+        for i in range(len(vector)):
+            if vector[i]:
+                name_lst.append(elts[i]["name"])
+        return (" + ").join(name_lst)
 
 
     def class_name_by_index(a_degree, index):
