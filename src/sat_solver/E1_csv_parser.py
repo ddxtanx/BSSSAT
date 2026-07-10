@@ -11,11 +11,10 @@ class E1CsvParser:
     Ext_AC classes with s+f-w <= max_N.
     """
 
-    def __init__(self, filename: str, max_N):
+    def __init__(self, filename: str, max_N, only_one_N: bool = False):
         self.max_N = max_N
-        print(filename)
         self.csv_classes = self.load_classes(filename)
-        self.sfw_dict = self.make_sfw_grouping() # dictionary (s,f,w) -> list of E1 basis elements
+        self.sfw_dict = self.make_sfw_grouping(only_one_N) # dictionary (s,f,w) -> list of E1 basis elements
 
 
     def load_classes(self, filename: str):
@@ -33,7 +32,7 @@ class E1CsvParser:
 
 
 
-    def make_sfw_grouping(self):
+    def make_sfw_grouping(self, only_one_N):
         elements_in_degree = defaultdict(list)
         assert self.csv_classes is not None
         for element in self.csv_classes:
