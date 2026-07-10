@@ -41,11 +41,19 @@ class E1CsvParser:
             f = element["Adams filtration"]
             w = element["weight"]
             tautorsion = element["tautorsion"]
+
             # need s + f - w + taupower <= self.max_N
             for taupower in range(0, self.max_N - s - f + w + 1):
+                # entirely skip rho-periodic classes, which are exactly the classes with s + f - 2w = 0
+                # (reference: Isaksen "Stable stems", Theorem 2.1.12)
+                if s + f - 2*(w - taupower) == 0:
+                    continue
+
+                if only_one_N and s + f - w + taupower != self.max_N:
+                    continue
                 if tautorsion == 0:
                     elements_in_degree[s, f, w - taupower].append({
-                        "name": f"tau^{tautorsion} {element['name']}",
+                        "name": f"tau^{taupower} {element['name']}",
                         "stem": s,
                         "Adams filtration": f,
                         "weight": w - tautorsion,
@@ -53,7 +61,7 @@ class E1CsvParser:
                     })
                 if int(tautorsion) > 0 and taupower < int(tautorsion):
                     elements_in_degree[s, f, w - taupower].append({
-                        "name": f"tau^{tautorsion} {element['name']}",
+                        "name": f"tau^{taupower} {element['name']}",
                         "stem": s,
                         "Adams filtration": f,
                         "weight": w,
