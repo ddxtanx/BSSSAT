@@ -4,7 +4,7 @@ from itertools import product
 
 class E1CsvParser:
     """
-    This class handles the data contained in the csv file representing Ext over the C-motivic Steenrod algebra.
+    This class handles the data contained in the csv file representing Ext over the C-motivic Steenrod algebra.q
 
     The set of BSS E1 classes with a fixed N = s+f-w degree is closed under rho-BSS differentials.
     Thus to avoid fringe issues we work with N <= max_N, which means we only consider
@@ -108,73 +108,73 @@ class E1CsvParser:
         return (" + ").join(name_lst)
 
 
-    def class_name_by_index(a_degree, index):
-        for element in class_index(a_degree):
-            if element["index"] == index:
-                return element["name"]
-        return None
+    # def class_name_by_index(a_degree, index):
+    #     for element in class_index(a_degree):
+    #         if element["index"] == index:
+    #             return element["name"]
+    #     return None
 
 
-    def vector_by_basis_names(a_degree, names):
-        """
-        Return the F2 bool vector for a linear combination of basis names.
+    # def vector_by_basis_names(a_degree, names):
+    #     """
+    #     Return the F2 bool vector for a linear combination of basis names.
 
-        Repeating a basis name toggles its coefficient, so duplicates cancel.
-        """
-        basis = class_index(a_degree)
-        index_by_name = {element["name"]: element["index"] for element in basis}
-        vector = [False] * len(basis)
+    #     Repeating a basis name toggles its coefficient, so duplicates cancel.
+    #     """
+    #     basis = class_index(a_degree)
+    #     index_by_name = {element["name"]: element["index"] for element in basis}
+    #     vector = [False] * len(basis)
 
-        for name in names:
-            if name not in index_by_name:
-                raise ValueError(f"{name!r} is not a basis element in degree {a_degree}")
-            index = index_by_name[name]
-            vector[index] = not vector[index]
+    #     for name in names:
+    #         if name not in index_by_name:
+    #             raise ValueError(f"{name!r} is not a basis element in degree {a_degree}")
+    #         index = index_by_name[name]
+    #         vector[index] = not vector[index]
 
-        return vector
-
-
-    def vector_by_basis_name(a_degree, name):
-        """Return the F2 bool vector for one basis element."""
-        return vector_by_basis_names(a_degree, [name])
+    #     return vector
 
 
-    def basis_names_by_vector(a_degree, vector):
-        """Return the basis names with True coefficients in a bool vector."""
-        basis = class_index(a_degree)
-        if len(vector) != len(basis):
-            raise ValueError(
-                f"Vector length {len(vector)} does not match dimension "
-                f"{len(basis)} in degree {a_degree}"
-            )
-        return [element["name"] for element, coefficient in zip(basis, vector) if coefficient]
+    # def vector_by_basis_name(a_degree, name):
+    #     """Return the F2 bool vector for one basis element."""
+    #     return vector_by_basis_names(a_degree, [name])
 
 
-    def tau_torsion_by_vector(a_degree, vector):
-        """
-        Return the tau-torsion determined by the True basis coefficients.
+    # def basis_names_by_vector(a_degree, vector):
+    #     """Return the basis names with True coefficients in a bool vector."""
+    #     basis = class_index(a_degree)
+    #     if len(vector) != len(basis):
+    #         raise ValueError(
+    #             f"Vector length {len(vector)} does not match dimension "
+    #             f"{len(basis)} in degree {a_degree}"
+    #         )
+    #     return [element["name"] for element, coefficient in zip(basis, vector) if coefficient]
 
-        The convention from the CSV is preserved: 0 means tau-torsion-free. For a
-        nonzero finite-torsion sum, this returns the largest torsion exponent among
-        the selected basis elements.
-        """
-        basis = class_index(a_degree)
-        if len(vector) != len(basis):
-            raise ValueError(
-                f"Vector length {len(vector)} does not match dimension "
-                f"{len(basis)} in degree {a_degree}"
-            )
 
-        selected_torsions = [
-            element["tautorsion"]
-            for element, coefficient in zip(basis, vector)
-            if coefficient
-        ]
-        if not selected_torsions:
-            return 0
-        if 0 in selected_torsions:
-            return 0
-        return max(selected_torsions)
+    # def tau_torsion_by_vector(a_degree, vector):
+    #     """
+    #     Return the tau-torsion determined by the True basis coefficients.
+
+    #     The convention from the CSV is preserved: 0 means tau-torsion-free. For a
+    #     nonzero finite-torsion sum, this returns the largest torsion exponent among
+    #     the selected basis elements.
+    #     """
+    #     basis = class_index(a_degree)
+    #     if len(vector) != len(basis):
+    #         raise ValueError(
+    #             f"Vector length {len(vector)} does not match dimension "
+    #             f"{len(basis)} in degree {a_degree}"
+    #         )
+
+    #     selected_torsions = [
+    #         element["tautorsion"]
+    #         for element, coefficient in zip(basis, vector)
+    #         if coefficient
+    #     ]
+    #     if not selected_torsions:
+    #         return 0
+    #     if 0 in selected_torsions:
+    #         return 0
+    #     return max(selected_torsions)
 
 
 
@@ -184,93 +184,96 @@ class E1CsvParser:
 
     #then this differential function takes a source degree and a differential degree r and returns the possible differentials.
 
-    def possible_differentials_by_r(source_degree,r):
-        source_elements = elements_by_degree(source_degree)
-        target_degree = add_degree(source_degree, (r-1, 1, r))
-        target_elements = elements_by_degree(target_degree)
-        differentials = {}
-        for source in source_elements:
-            source_name = source['name']
-            if source_name not in differentials:
-                 differentials[source_name] = []
-            for target in target_elements:
-                differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
-        return differentials
+    # def possible_differentials_by_r(source_degree,r):
+    #     source_elements = elements_by_degree(source_degree)
+    #     target_degree = add_degree(source_degree, (r-1, 1, r))
+    #     target_elements = elements_by_degree(target_degree)
+    #     differentials = {}
+    #     for source in source_elements:
+    #         source_name = source['name']
+    #         if source_name not in differentials:
+    #              differentials[source_name] = []
+    #         for target in target_elements:
+    #             differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
+    #     return differentials
 
 
     #returns a dictionary for all the elements in a range.
-    def group_by_degree(bounds):
-        grouped = {}
-        for s in range(bounds[0] + 1):
-            for f in range(bounds[1] + 1):
-                for w in range(-bounds[2], int(bounds[2]) + 1):
-                    a_degree = (s, f, w)
-                    elements = elements_by_degree(a_degree)
-                    if elements:
-                        grouped[a_degree] = elements
-        return grouped
+
+    # def group_by_degree(bounds):
+    #     grouped = {}
+    #     for s in range(bounds[0] + 1):
+    #         for f in range(bounds[1] + 1):
+    #             for w in range(-bounds[2], int(bounds[2]) + 1):
+    #                 a_degree = (s, f, w)
+    #                 elements = elements_by_degree(a_degree)
+    #                 if elements:
+    #                     grouped[a_degree] = elements
+    #     return grouped
 
 
 
 
     #returns a dictionary for all the possible differentials for a range of r.
-    def possible_differentials_in_a_range(bounds,r):
-        grouped = group_by_degree(bounds)
-        differentials = {}
-        degree_list = set(grouped.keys())
-        for source_degree, source_elements in grouped.items():
-            target_degree = add_degree(source_degree, (r-1, 1, r))
-            if target_degree in degree_list:
-                for source in source_elements:
-                    source_name = source['name']
-                    if source_name not in differentials:
-                        differentials[source_name] = []
-                    for target in grouped[target_degree]:
-                        differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
-        return differentials
+
+    # def possible_differentials_in_a_range(bounds,r):
+    #     grouped = group_by_degree(bounds)
+    #     differentials = {}
+    #     degree_list = set(grouped.keys())
+    #     for source_degree, source_elements in grouped.items():
+    #         target_degree = add_degree(source_degree, (r-1, 1, r))
+    #         if target_degree in degree_list:
+    #             for source in source_elements:
+    #                 source_name = source['name']
+    #                 if source_name not in differentials:
+    #                     differentials[source_name] = []
+    #                 for target in grouped[target_degree]:
+    #                     differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
+    #     return differentials
 
 
 
     #returns a dictionary for all the possible differentials for a range of r and a range of source degrees.
-    def possible_differentials_by_source(source_degree, bounds):
-        grouped = group_by_degree(bounds)
-        differentials = {}
-        degree_list = set(grouped.keys())
-        source_elements = grouped.get(source_degree, [])
-        max_r = min(bounds[0] - source_degree[0] + 1, bounds[2] - source_degree[2])
-        if max_r < 1 or not source_elements:
-            return {}
-        for r in range(1, max_r + 1):
-            target_degree = add_degree(source_degree, (r - 1, 1, r))
-            if target_degree in degree_list:
-                for source in source_elements:
-                    source_name = source['name']
-                    if source_name not in differentials:
-                        differentials[source_name] = []
-                    for target in grouped[target_degree]:
-                        differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
-        return differentials
 
-    def possible_differentials_within_bounds(bounds):
-        grouped = group_by_degree(bounds)
-        degree_list = set(grouped.keys())
-        differentials = {}
-        # Single-pass counting: avoid recomputing possible_differentials_by_source
-        # (which rebuilds grouped) for every source degree.
-        for source_degree, source_elements in grouped.items():
-            max_r = min(bounds[0] - source_degree[0] + 1, bounds[2] - source_degree[2])
-            if max_r < 1 or not source_elements:
-                continue
-            for r in range(1, max_r + 1):
-                target_degree = add_degree(source_degree, (r - 1, 1, r))
-                if target_degree in degree_list:
-                     for source in source_elements:
-                         source_name = source['name']
-                if source_name not in differentials:
-                                differentials[source_name] = []
-                                for target in grouped[target_degree]:
-                                   differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
-        return differentials
+    # def possible_differentials_by_source(source_degree, bounds):
+    #     grouped = group_by_degree(bounds)
+    #     differentials = {}
+    #     degree_list = set(grouped.keys())
+    #     source_elements = grouped.get(source_degree, [])
+    #     max_r = min(bounds[0] - source_degree[0] + 1, bounds[2] - source_degree[2])
+    #     if max_r < 1 or not source_elements:
+    #         return {}
+    #     for r in range(1, max_r + 1):
+    #         target_degree = add_degree(source_degree, (r - 1, 1, r))
+    #         if target_degree in degree_list:
+    #             for source in source_elements:
+    #                 source_name = source['name']
+    #                 if source_name not in differentials:
+    #                     differentials[source_name] = []
+    #                 for target in grouped[target_degree]:
+    #                     differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
+    #     return differentials
+
+    # def possible_differentials_within_bounds(bounds):
+    #     grouped = group_by_degree(bounds)
+    #     degree_list = set(grouped.keys())
+    #     differentials = {}
+    #     # Single-pass counting: avoid recomputing possible_differentials_by_source
+    #     # (which rebuilds grouped) for every source degree.
+    #     for source_degree, source_elements in grouped.items():
+    #         max_r = min(bounds[0] - source_degree[0] + 1, bounds[2] - source_degree[2])
+    #         if max_r < 1 or not source_elements:
+    #             continue
+    #         for r in range(1, max_r + 1):
+    #             target_degree = add_degree(source_degree, (r - 1, 1, r))
+    #             if target_degree in degree_list:
+    #                  for source in source_elements:
+    #                      source_name = source['name']
+    #             if source_name not in differentials:
+    #                             differentials[source_name] = []
+    #                             for target in grouped[target_degree]:
+    #                                differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
+    #     return differentials
 
     def counting_values(classes):
         counting = {}
