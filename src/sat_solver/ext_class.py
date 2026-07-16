@@ -32,33 +32,35 @@ class ExtClass:
         """
         return self.vector
 
-    def get_differential_targets(self, r: int) -> list[ExtClass]:
-        """
-        Returns all possible targets y for a differential d_r(x) = rho^r y.
+    #these functions are not used in the SAT solver.
 
-        This includes every linear combination in the target tridegree, and the
-        zero target (all coefficients False).
-        """
-        if r < 1:
-            raise ValueError("r must be at least 1")
-        if self == ZeroClass:
-            return [ZeroClass]
-        if self == Undefined:
-            return [Undefined]
+    # def get_differential_targets(self, r: int) -> list[ExtClass]:
+    #     """
+    #     Returns all possible targets y for a differential d_r(x) = rho^r y.
 
-        source_degree = self.get_degree()
-        target_degree = Main_code_for_diffls.add_degree(source_degree, (r - 1, 1, r))
-        basis = Main_code_for_diffls.class_index(target_degree)
-        dimension = len(basis)
+    #     This includes every linear combination in the target tridegree, and the
+    #     zero target (all coefficients False).
+    #     """
+    #     if r < 1:
+    #         raise ValueError("r must be at least 1")
+    #     if self == ZeroClass:
+    #         return [ZeroClass]
+    #     if self == Undefined:
+    #         return [Undefined]
 
-        # No classes in target degree: only zero is possible.
-        if dimension == 0:
-            return [ExtClass(target_degree, [])]
+    #     source_degree = self.get_degree()
+    #     target_degree = Main_code_for_diffls.add_degree(source_degree, (r - 1, 1, r))
+    #     basis = Main_code_for_diffls.class_index(target_degree)
+    #     dimension = len(basis)
 
-        targets: list[ExtClass] = []
-        for coeffs in product([False, True], repeat=dimension):
-            targets.append(ExtClass(target_degree, list(coeffs)))
-        return targets
+    #     # No classes in target degree: only zero is possible.
+    #     if dimension == 0:
+    #         return [ExtClass(target_degree, [])]
+
+    #     targets: list[ExtClass] = []
+    #     for coeffs in product([False, True], repeat=dimension):
+    #         targets.append(ExtClass(target_degree, list(coeffs)))
+    #     return targets
 
     def __add__(self, other: ExtClass) -> ExtClass:
         """
@@ -102,11 +104,11 @@ class ExtClass:
     def get_tau_torsion(self) -> int:
         pass
 
-    def get_name_latex(self) -> str:
-        """
-        Returns the name of the class in LaTeX format as a string.
-        """
-        return Main_code_for_diffls.convert_to_latex(self.get_name())
+    # def get_name_latex(self) -> str:
+    #     """
+    #     Returns the name of the class in LaTeX format as a string.
+    #     """
+    #     return Main_code_for_diffls.convert_to_latex(self.get_name())
 
     def __hash__(self) -> int:
         return hash((self.tridegree, tuple(self.vector)))
