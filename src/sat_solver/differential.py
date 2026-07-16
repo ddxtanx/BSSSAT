@@ -75,14 +75,14 @@ class Differential:
         return self.__repr__()
 
 
-if __name__ == "__main__":
-    source = ExtClass((110, 34, 54), [1, 0, 0])
-    print("The differentials for " + source.get_name() + ":")
-    for r in range(1, 6):
-        possible_targets = source.get_differential_targets(r)
-        if not possible_targets:  # is this correct way to handle no targets? i don't wanna use zero class because as zero class is different from undefined, and we want to know if there are no targets, not if the target is zero class.
-            continue
+#if __name__ == "__main__":
+    #source = ExtClass((110, 34, 54), [1, 0, 0])
+   # print("The differentials for " + source.get_name() + ":")
+    #for r in range(1, 6):
+        #possible_targets = source.get_differential_targets(r)
+        #if not possible_targets:  # is this correct way to handle no targets? i don't wanna use zero class because as zero class is different from undefined, and we want to know if there are no targets, not if the target is zero class.
+            #continue
 
-        print(f"d_{r} targets:")
-        for target in possible_targets:
-            print(" ", target.get_name())
+       # print(f"d_{r} targets:")
+       # for target in possible_targets:
+        #print(" ", target.get_name())
