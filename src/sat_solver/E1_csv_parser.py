@@ -108,11 +108,13 @@ class E1CsvParser:
         return (" + ").join(name_lst)
 
 
+
     def class_name_by_index(a_degree, index):
         for element in class_index(a_degree):
             if element["index"] == index:
                 return element["name"]
         return None
+
 
 
     def vector_by_basis_names(a_degree, names):
@@ -134,9 +136,11 @@ class E1CsvParser:
         return vector
 
 
+
     def vector_by_basis_name(a_degree, name):
         """Return the F2 bool vector for one basis element."""
         return vector_by_basis_names(a_degree, [name])
+
 
 
     def basis_names_by_vector(a_degree, vector):
@@ -148,6 +152,8 @@ class E1CsvParser:
                 f"{len(basis)} in degree {a_degree}"
             )
         return [element["name"] for element, coefficient in zip(basis, vector) if coefficient]
+
+
 
 
     def tau_torsion_by_vector(a_degree, vector):
@@ -175,7 +181,6 @@ class E1CsvParser:
         if 0 in selected_torsions:
             return 0
         return max(selected_torsions)
-
 
 
     def add_degree(self, degree1, degree2):
