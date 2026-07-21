@@ -47,8 +47,6 @@ class SATSolver:
         for r in range(1, self.max_differential + 1):
             #print(f"Creating differential literal: (None, [True])--d{r}--> (None, [True])")
             self.literal_manager.add_differential(Differential(ZeroClass, ZeroClass, r))
-            #print(f"Creating differential literal: (None, [False])--d{r}--> (None, [False])")
-            self.literal_manager.add_differential(Differential(Undefined, Undefined, r))
 
 
     def create_known_differential_clauses(self) -> list[int]:
@@ -75,7 +73,7 @@ class SATSolver:
                     f"Known differential {differential} not found in literal manager."
                 )
 
-        # d_r(0) = 0, d_r(Undef) = Undef are always true
+        # d_r(0) = 0 always true
         for r in range(1, self.max_differential + 1):
             zero_differential = Differential(ZeroClass, ZeroClass, r)
             zero_atom = self.literal_manager.get_differential_atom(zero_differential)
@@ -85,18 +83,6 @@ class SATSolver:
                 raise ValueError(
                     f"Zero differential {zero_differential} not found in literal manager."
                 )
-
-            undefined_differential = Differential(Undefined, Undefined, r)
-            undefined_atom = self.literal_manager.get_differential_atom(
-                undefined_differential
-            )
-            if undefined_atom is not None:
-                knowns.append(undefined_atom)
-            else:
-                raise ValueError(
-                    f"Undefined differential {undefined_differential} not found in literal manager."
-                )
-
         return [known.name for known in knowns]
 
     def create_leibniz_differentials(
