@@ -7,6 +7,7 @@ In addition, it should also provide methods to assert and to retrieve
 known differentials that will be used to bootstrap the SAT solver.
 """
 
+from collections import defaultdict
 from sat_solver.ext_class import Undefined
 from sat_solver.ext_class import ZeroClass
 from sat_solver.ext_class import ExtClass
@@ -31,7 +32,8 @@ class Ext:
 
     def __init__(self):
         self.classes = set()
-        self.class_dct = {}
+        self.class_dct = defaultdict(set) # classes, organized as (s,f,w) -> list of classes
+        self.degrees_by_N = defaultdict(set) # N -> set of (s,f,w) with nonzero class(es) such that s+f-w = N
         self.known_differentials = set()
 
         self.max_stem = 0
@@ -51,9 +53,8 @@ class Ext:
         """
         s, f, w = ext_class.get_degree()
 
-        if (s, f, w) not in self.class_dct:
-            self.class_dct[(s, f, w)] = set()
         self.class_dct[(s, f, w)].add(ext_class)
+        self.degrees_by_N[s + f - w].add((s, f, w))
 
         if s > self.max_stem:
             self.max_stem = s
@@ -135,11 +136,18 @@ class Ext:
         return classes
 
 
+    def num_nonzero(self, s, f, w):
+        assert self.class_dct is not None
+        return len(self.class_dct[s,f,w])
+
+
+
+
     def get_possible_differential_targets(
         self, ext_class: ExtClass, r: int
     ) -> list[ExtClass]:
         """
-        This method returns a list of ExtClasses that could potentially be the target of a differential of length r starting from a given ExtClass.
+        This method returns a list of ExtClasses that could potentially be the target of a differential of length r starting from a given ExtClass. Does not return 0 or Undef unless the input is 0 or Undef.
 
         Args:
             ext_class (ExtClass): The ExtClass from which the differential starts.
@@ -177,8 +185,7 @@ class Ext:
             list[ExtClass]: A list of all the ExtClasses that could potentially be the source
             of a differential of length r ending at the given ExtClass.
         """
-        if target_class == Undefined or target_class == ZeroClass:
-            return print("The target class is either Undefined or ZeroClass")
+        assert target_class != Undefined and target_class != ZeroClass
 
         s, f, w = target_class.get_degree()
         source_s = s - r + 1
@@ -189,6 +196,29 @@ class Ext:
             return list(self.class_dct[(source_s, source_f, source_w)])
         else:
             return []
+
+
+    def r_with_nonzero_target(self, deg):
+        s, f, w = deg
+        possible_r = []
+        for (target_s, target_f, target_w) in self.degrees_by_N[s + f - w]:
+            if target_f == f + 1:
+                r = target_w - w
+                if r > 0:
+                    possible_r.append(r)
+        return possible_r
+
+
+    def r_with_nonzero_source(self, deg):
+        s, f, w = deg
+        possible_r = []
+        for (source_s, source_f, source_w) in self.degrees_by_N[s + f - w]:
+            if source_f == f - 1:
+                r = w - source_w
+                if r > 0:
+                    possible_r.append(r)
+        return possible_r
+
 
 
     def get_classes_in_fixed_N(self, N: int) -> list[ExtClass]:
@@ -209,7 +239,7 @@ class Ext:
                     classes.extend(self.class_dct[(s, f, w)])
         return classes
 
-    def get_classes_in_tridegree(
+    def get_nonzero_classes_in_tridegree(
         self, tridegree: tuple[int, int, int]
     ) -> list[ExtClass]:
         """
