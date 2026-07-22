@@ -55,7 +55,7 @@ class E1CsvParser:
                         "name": f"tau^{taupower} {element['name']}",
                         "stem": s,
                         "Adams filtration": f,
-                        "weight": w - tautorsion,
+                        "weight": w - taupower,
                         "tautorsion": 0
                     })
                 if int(tautorsion) > 0 and taupower < int(tautorsion):
@@ -63,8 +63,8 @@ class E1CsvParser:
                         "name": f"tau^{taupower} {element['name']}",
                         "stem": s,
                         "Adams filtration": f,
-                        "weight": w,
-                        "tautorsion": taupower
+                        "weight": w - taupower,
+                        "tautorsion": tautorsion - taupower
                     })
         return elements_in_degree
 
