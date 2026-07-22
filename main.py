@@ -1,12 +1,18 @@
-from sat_solver import E1CsvParser, Ext, ExtClass, SATSolver, Differential
 import sys
+from pathlib import Path
+
+# Allow this file to be run directly even when the editable install is unavailable.
+sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
+
+from sat_solver import E1CsvParser, Ext, ExtClass, SATSolver, Differential
 
 ZeroClass: ExtClass = ExtClass(None, [True])
 Undefined: ExtClass = ExtClass(None, [False])
 
 
+
 def main():
-    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", 2, only_one_N=True)  # s+f-w = 2
+    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", 2, only_one_N = True)  # s+f-w = 2
     all_classes = E1.make_all_lin_combs()
     ext_classes = [ExtClass(*x) for x in all_classes]
     print("number of E1 classes: ", len(ext_classes))
@@ -16,10 +22,10 @@ def main():
     ext.add_classes(ext_classes)
 
     # comment out these four lines if you want to try a different N = s+f-w
-    t2, t1h0, h02, th1 = ext_classes
-    print("\nAdding known differential d_2(t^2) = t h1")
-    diff1 = Differential(t2, th1, 2)
-    ext.add_known_differentials([diff1])
+    # t2, t1h0, h02, th1 = N2_classes
+    # print("\nAdding known differential d_2(t^2) = t h1")
+    # diff1 = Differential(t2, th1, 2)
+    # ext.add_known_differentials([diff1])
 
 
     sat_solver = SATSolver(ext, 5)
@@ -37,7 +43,6 @@ def main():
             print(f"d_{r}: ", source_name, " -> ", target_name)
     else:
         print("The SAT problem is unsatisfiable")
-
 
 
 
