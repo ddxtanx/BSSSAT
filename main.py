@@ -12,7 +12,8 @@ Undefined: ExtClass = ExtClass(None, [False])
 
 
 def main():
-    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", 2, only_one_N=True)  # s+f-w = 2
+    max_N = 4
+    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N = False)  # s+f-w = 2
     print(E1.sfw_dict)
     all_classes = E1.make_all_lin_combs()
     ext_classes = [ExtClass(*x) for x in all_classes]
@@ -27,6 +28,24 @@ def main():
     # print("\nAdding known differential d_2(t^2) = t h1")
     # diff1 = Differential(t2, th1, 2)
     # ext.add_known_differentials([diff1])
+
+    # Add Known differential for tau-multiple:
+    k = 0
+    while 2**k <= max_N:
+        r = 2**k
+        source_degree = (0, 0, -r)
+        source_name = f"tau^{r} {{0-0}}"
+        source = ExtClass(source_degree, [True])
+
+        taupower = 0 if k == 0 else 2**(k-1)
+        target_degree = (r-1, 1, 0)
+        target_name = f"tau^{taupower} {{1-{k}}}"
+        target = ExtClass(target_degree, [True])
+        diff2 = Differential(source, target, r)
+        ext.add_known_differentials([diff2])
+        k += 1
+
+  
 
 
     sat_solver = SATSolver(ext, 5)
