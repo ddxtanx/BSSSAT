@@ -115,9 +115,6 @@ class E1CsvParser:
     #     return None
 
 
-    # def vector_by_basis_names(a_degree, names):
-    #     """
-    #     Return the F2 bool vector for a linear combination of basis names.
 
     #     Repeating a basis name toggles its coefficient, so duplicates cancel.
     #     """
@@ -134,9 +131,19 @@ class E1CsvParser:
     #     return vector
 
 
-    # def vector_by_basis_name(a_degree, name):
-    #     """Return the F2 bool vector for one basis element."""
-    #     return vector_by_basis_names(a_degree, [name])
+    def vector_by_basis_name(self, degree, name):
+        """Return the F2 bool vector for one basis element."""
+        basis = self.sfw_dict.get(degree)
+        vector = [False] * len(basis)
+
+        for i, element in enumerate(basis):
+            if element["name"] == name:
+                vector[i] = True
+                return vector
+        raise ValueError(
+            f"{name!r} is not a basis element in degree {degree}"
+                         )
+
 
 
     # def basis_names_by_vector(a_degree, vector):
