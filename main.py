@@ -9,11 +9,11 @@ from sat_solver import E1CsvParser, Ext, ExtClass, SATSolver, Differential
 ZeroClass: ExtClass = ExtClass(None, [True])
 Undefined: ExtClass = ExtClass(None, [False])
 
+max_N = 4
+max_differential_degree = 5
 
 
 def main():
-    max_N = 4
-    max_differential_degree = 5
     E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N = False)  # s+f-w = 2
     print(E1.sfw_dict)
     all_classes = E1.make_all_lin_combs()
