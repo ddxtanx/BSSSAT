@@ -21,6 +21,24 @@ def main():
 #    diff1 = Differential(t2, th1, 2)
 #    ext.add_known_differentials([diff1])
 
+    # Add Known differential for tau-multiple:
+    k = 0
+    while 2**k <= max_N:
+        r = 2**k
+        source_degree = (0, 0, -r)
+        source_name = f"tau^{r} {{0-0}}"
+        source = ExtClass(source_degree, [True])
+
+        taupower = 0 if k == 0 else 2**(k-1)
+        target_degree = (r-1, 1, 0)
+        target_name = f"tau^{taupower} {{1-{k}}}"
+        target = ExtClass(target_degree, [True])
+        diff2 = Differential(source, target, r)
+        ext.add_known_differentials([diff2])
+        k += 1
+
+  
+
 
     sat_solver = SATSolver(ext, 5)
     all_models = sat_solver.run_sat_solver()
