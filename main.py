@@ -13,6 +13,7 @@ Undefined: ExtClass = ExtClass(None, [False])
 
 def main():
     max_N = 4
+    max_differential_degree = 5
     E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N = False)  # s+f-w = 2
     print(E1.sfw_dict)
     all_classes = E1.make_all_lin_combs()
@@ -40,7 +41,8 @@ def main():
         taupower = 0 if k == 0 else 2**(k-1)
         target_degree = (r-1, 1, 0)
         target_name = f"tau^{taupower} {{1-{k}}}"
-        target = ExtClass(target_degree, [True])
+        target_vector = E1.vector_by_basis_name(target_degree, target_name)
+        target = ExtClass(target_degree, target_vector)
         diff2 = Differential(source, target, r)
         ext.add_known_differentials([diff2])
         k += 1
@@ -48,7 +50,7 @@ def main():
   
 
 
-    sat_solver = SATSolver(ext, 5)
+    sat_solver = SATSolver(ext, max_differential_degree)
     all_models = sat_solver.run_sat_solver()
     print("\nnumber of SAT variables: ", len(sat_solver.literal_manager.differentials))
     print("\nnumber of possible solutions to the system: ", len(all_models))
