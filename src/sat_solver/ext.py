@@ -12,6 +12,7 @@ from sat_solver.ext_class import Undefined
 from sat_solver.ext_class import ZeroClass
 from sat_solver.ext_class import ExtClass
 from sat_solver.differential import Differential
+from sat_solver.E1_csv_parser import E1CsvParser
 
 
 class Ext:
@@ -30,11 +31,12 @@ class Ext:
     max_filtration: int
     max_weight: int
 
-    def __init__(self):
+    def __init__(self, E1: E1CsvParser=None):
         self.classes = set()
         self.class_dct = defaultdict(set) # classes, organized as (s,f,w) -> list of classes
         self.degrees_by_N = defaultdict(set) # N -> set of (s,f,w) with nonzero class(es) such that s+f-w = N
         self.known_differentials = set()
+        self.E1 = E1
 
         self.max_stem = 0
         self.max_filtration = 0
@@ -43,6 +45,13 @@ class Ext:
         self.min_stem = 0
         self.min_filtration = 0
         self.min_weight = 0
+
+        if E1 is not None:
+            all_classes = E1.make_all_lin_combs()
+            ext_classes = [ExtClass(*x) for x in all_classes]
+            self.add_classes(ext_classes)
+
+
 
     def add_class(self, ext_class: ExtClass) -> None:
         """

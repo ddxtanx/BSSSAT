@@ -10,14 +10,12 @@ max_differential_degree = 5
 
 def main():
     E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N=False)
-    print(E1.sfw_dict)
     all_classes = E1.make_all_lin_combs()
     ext_classes = [ExtClass(*x) for x in all_classes]
     print("number of E1 classes: ", len(ext_classes))
     for x in ext_classes:
         print(E1.class_name(x.get_degree(), x.get_vector()), x.get_degree())
-    ext = Ext()
-    ext.add_classes(ext_classes)
+    ext = Ext(E1)
 
     # comment out these four lines if you want to try a different N = s+f-w
     # t2, t1h0, h02, th1 = ext_classes

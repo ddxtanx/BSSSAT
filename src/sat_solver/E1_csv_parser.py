@@ -53,6 +53,8 @@ class E1CsvParser:
                 if tautorsion == 0:
                     elements_in_degree[s, f, w - taupower].append({
                         "name": f"tau^{taupower} {element['name']}",
+                        "base_name": element["name"],
+                        "taupower": taupower,
                         "stem": s,
                         "Adams filtration": f,
                         "weight": w - tautorsion,
@@ -61,6 +63,8 @@ class E1CsvParser:
                 if int(tautorsion) > 0 and taupower < int(tautorsion):
                     elements_in_degree[s, f, w - taupower].append({
                         "name": f"tau^{taupower} {element['name']}",
+                        "base_name": element["name"],
+                        "taupower": taupower,
                         "stem": s,
                         "Adams filtration": f,
                         "weight": w,
