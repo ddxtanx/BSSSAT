@@ -4,9 +4,12 @@ import sys
 ZeroClass: ExtClass = ExtClass(None, [True])
 Undefined: ExtClass = ExtClass(None, [False])
 
+max_N = 2
+max_differential_degree = 5
+
 
 def main():
-    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", 2, only_one_N=True)  # s+f-w = 2
+    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N=False)
     print(E1.sfw_dict)
     all_classes = E1.make_all_lin_combs()
     ext_classes = [ExtClass(*x) for x in all_classes]
