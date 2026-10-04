@@ -105,12 +105,8 @@ class E1CsvParser:
         return classes
 
 
-<<<<<<< HEAD
-    #returns the name of an element in a given degree.
-=======
 
     # Check if we need it, maybe in the end to print the real names.
->>>>>>> 8db1cd975b64164dba01f21d270f682b5671c32f
     def class_name(self, deg, vector):
         """
         Returns the name of an element in a given degree based on its vector representation.
@@ -150,8 +146,6 @@ class E1CsvParser:
 
 
 
-<<<<<<< HEAD
-=======
     #     Repeating a basis name toggles its coefficient, so duplicates cancel.
     #     """
     #     basis = class_index(a_degree)
@@ -167,7 +161,6 @@ class E1CsvParser:
     #     return vector
 
     # Check if we need it. I suspect it will be needed when writing multiplication function.
->>>>>>> 8db1cd975b64164dba01f21d270f682b5671c32f
     def vector_by_basis_name(self, degree, name):
         """
         Returns the F2 bool vector for a given basis element name in a specified degree.
