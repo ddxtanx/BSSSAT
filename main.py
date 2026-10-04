@@ -12,7 +12,6 @@ Undefined: ExtClass = ExtClass(None, [False])
 max_N = 4
 max_differential_degree = 5
 
-
 def main():
     E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N = False)  # s+f-w = 2
     print(E1.sfw_dict)
