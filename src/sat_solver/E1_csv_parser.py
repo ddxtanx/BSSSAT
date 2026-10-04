@@ -53,6 +53,8 @@ class E1CsvParser:
                 if tautorsion == 0:
                     elements_in_degree[s, f, w - taupower].append({
                         "name": f"tau^{taupower} {element['name']}",
+                        "base_name": element["name"],
+                        "taupower": taupower,
                         "stem": s,
                         "Adams filtration": f,
                         "weight": w - taupower,
@@ -61,6 +63,8 @@ class E1CsvParser:
                 if int(tautorsion) > 0 and taupower < int(tautorsion):
                     elements_in_degree[s, f, w - taupower].append({
                         "name": f"tau^{taupower} {element['name']}",
+                        "base_name": element["name"],
+                        "taupower": taupower,
                         "stem": s,
                         "Adams filtration": f,
                         "weight": w - taupower,
@@ -108,27 +112,12 @@ class E1CsvParser:
         return (" + ").join(name_lst)
 
 
-    # def class_name_by_index(a_degree, index):
-    #     for element in class_index(a_degree):
-    #         if element["index"] == index:
-    #             return element["name"]
-    #     return None
+    def class_name_by_index(a_degree, index):
+        for element in class_index(a_degree):
+            if element["index"] == index:
+                return element["name"]
+        return None
 
-
-
-    #     Repeating a basis name toggles its coefficient, so duplicates cancel.
-    #     """
-    #     basis = class_index(a_degree)
-    #     index_by_name = {element["name"]: element["index"] for element in basis}
-    #     vector = [False] * len(basis)
-
-    #     for name in names:
-    #         if name not in index_by_name:
-    #             raise ValueError(f"{name!r} is not a basis element in degree {a_degree}")
-    #         index = index_by_name[name]
-    #         vector[index] = not vector[index]
-
-    #     return vector
 
 
     def vector_by_basis_name(self, degree, name):
@@ -145,7 +134,6 @@ class E1CsvParser:
                          )
 
 
-
     # def basis_names_by_vector(a_degree, vector):
     #     """Return the basis names with True coefficients in a bool vector."""
     #     basis = class_index(a_degree)
@@ -157,20 +145,21 @@ class E1CsvParser:
     #     return [element["name"] for element, coefficient in zip(basis, vector) if coefficient]
 
 
-    # def tau_torsion_by_vector(a_degree, vector):
-    #     """
-    #     Return the tau-torsion determined by the True basis coefficients.
 
-    #     The convention from the CSV is preserved: 0 means tau-torsion-free. For a
-    #     nonzero finite-torsion sum, this returns the largest torsion exponent among
-    #     the selected basis elements.
-    #     """
-    #     basis = class_index(a_degree)
-    #     if len(vector) != len(basis):
-    #         raise ValueError(
-    #             f"Vector length {len(vector)} does not match dimension "
-    #             f"{len(basis)} in degree {a_degree}"
-    #         )
+    def tau_torsion_by_vector(a_degree, vector):
+        """
+        Return the tau-torsion determined by the True basis coefficients.
+
+        The convention from the CSV is preserved: 0 means tau-torsion-free. For a
+        nonzero finite-torsion sum, this returns the largest torsion exponent among
+        the selected basis elements.
+        """
+        basis = class_index(a_degree)
+        if len(vector) != len(basis):
+            raise ValueError(
+                f"Vector length {len(vector)} does not match dimension "
+                f"{len(basis)} in degree {a_degree}"
+            )
 
     #     selected_torsions = [
     #         element["tautorsion"]

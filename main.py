@@ -4,27 +4,42 @@ import sys
 ZeroClass: ExtClass = ExtClass(None, [True])
 Undefined: ExtClass = ExtClass(None, [False])
 
-max_N = 4
+max_N = 2
 max_differential_degree = 5
 
+
 def main():
-    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N=False)  # s+f-w = 2
-    #print(E1.sfw_dict)
+    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N=False)
     all_classes = E1.make_all_lin_combs()
     ext_classes = [ExtClass(*x) for x in all_classes]
     print("number of E1 classes: ", len(ext_classes))
     for x in ext_classes:
         print(E1.class_name(x.get_degree(), x.get_vector()), x.get_degree())
-    ext = Ext()
-    ext.add_classes(ext_classes)
-
-
+    ext = Ext(E1)
 
     # comment out these four lines if you want to try a different N = s+f-w
     # t2, t1h0, h02, th1 = ext_classes
     # print("\nAdding known differential d_2(t^2) = t h1")
     # diff1 = Differential(t2, th1, 2)
     # ext.add_known_differentials([diff1])
+
+    # Add Known differential for tau-multiple:
+    k = 0
+    while 2**k <= max_N:
+        r = 2**k
+        source_degree = (0, 0, -r)
+        source_name = f"tau^{r} {{0-0}}"
+        source = ExtClass(source_degree, [True])
+
+        taupower = 0 if k == 0 else 2**(k-1)
+        target_degree = (r-1, 1, 0)
+        target_name = f"tau^{taupower} {{1-{k}}}"
+        target = ExtClass(target_degree, [True])
+        diff2 = Differential(source, target, r)
+        ext.add_known_differentials([diff2])
+        k += 1
+
+  
 
 ##adding known differentials on tau powers.
 
