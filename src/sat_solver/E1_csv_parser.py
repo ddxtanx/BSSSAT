@@ -17,7 +17,14 @@ class E1CsvParser:
         self.sfw_dict = self.make_sfw_grouping(only_one_N) # dictionary (s,f,w) -> list of E1 basis elements
 
 
+
     def load_classes(self, filename: str):
+        """
+        Loads the E1 basis elements from a CSV file.
+
+        Returns:
+        list: A list of dictionaries representing the E1 basis elements, each containing keys 'name', 'stem', 'Adams filtration', 'weight', and 'tautorsion'.
+        """
         classes = []
         with open(filename, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
@@ -33,6 +40,15 @@ class E1CsvParser:
 
 
     def make_sfw_grouping(self, only_one_N):
+        """
+        Groups the E1 basis elements by their (s, f, w) degrees, taking into account tau multiples.
+
+        Parameters:
+        only_one_N (bool): If True, only include elements with s + f - w + taupower == max_N.
+
+        Returns:
+        dict: A dictionary mapping (s, f, w) to a list of E1 basis elements in that degree.
+        """
         elements_in_degree = defaultdict(list)
         assert self.csv_classes is not None
         for element in self.csv_classes:
@@ -86,8 +102,18 @@ class E1CsvParser:
 
 
 
-    #returns the name of an element in a given degree.
+    # Check if we need it, maybe in the end to print the real names.
     def class_name(self, deg, vector):
+        """
+        Returns the name of an element in a given degree based on its vector representation.
+
+        Parameters:
+        deg (tuple): The tridegree (s, f, w) of the element.
+        vector (list): The F2 bool vector representing the element in the given degree.
+
+        Returns:
+        str: The name of the element.
+        """
         if deg == None:
             if vector == [True]:
                 return "0"
@@ -130,9 +156,18 @@ class E1CsvParser:
 
     #     return vector
 
-
+    # Check if we need it. I suspect it will be needed when writing multiplication function.
     def vector_by_basis_name(self, degree, name):
-        """Return the F2 bool vector for one basis element."""
+        """
+        Returns the F2 bool vector for a given basis element name in a specified degree.
+
+        Parameters:
+        degree (tuple): The tridegree (s, f, w) of the element.
+        name (str): The name of the basis element.
+
+        Returns:
+        list: The F2 bool vector representing the basis element in the given degree.
+        """
         basis = self.sfw_dict.get(degree)
         vector = [False] * len(basis)
 
@@ -143,6 +178,25 @@ class E1CsvParser:
         raise ValueError(
             f"{name!r} is not a basis element in degree {degree}"
                          )
+
+    
+   # Check if the following functions are needed for further computations.
+    def add_degree(self, degree1, degree2):
+            return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
+
+
+    def counting_values(classes):
+            counting = {}
+            for element, values in classes.items():
+                counting[element] = len(values)
+            return counting
+    
+    def finding_sources_with_fixed_number_of_differentials(classes, number):
+            sources = []
+            for element, values in classes.items():
+                if len(values) == number:
+                    sources.append(element)
+            return sources
 
 
 
@@ -182,11 +236,6 @@ class E1CsvParser:
     #     if 0 in selected_torsions:
     #         return 0
     #     return max(selected_torsions)
-
-
-    def add_degree(self, degree1, degree2):
-        return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
-
 
     #then this differential function takes a source degree and a differential degree r and returns the possible differentials.
 
@@ -281,18 +330,7 @@ class E1CsvParser:
     #                                differentials[source_name].append(f"d_{r}({source_name})=rho^{r} {target['name']}")
     #     return differentials
 
-    def counting_values(classes):
-        counting = {}
-        for element, values in classes.items():
-            counting[element] = len(values)
-        return counting
 
-    def finding_sources_with_fixed_number_of_differentials(classes, number):
-        sources = []
-        for element, values in classes.items():
-            if len(values) == number:
-                sources.append(element)
-        return sources
 
     # group the elements by degree and write to a CSV file
     # elements = get_classes()
