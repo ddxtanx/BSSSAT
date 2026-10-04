@@ -1,3 +1,5 @@
+# This is the second file.
+
 """
 This module defines the ExtClass class, which provides a
 useful abstraction for working with classes in the
@@ -32,6 +34,145 @@ class ExtClass:
         """
         return self.vector
 
+
+    def __add__(self, other: ExtClass) -> ExtClass:
+        """
+        adds two ExtClass 
+        """
+        if self == ZeroClass:
+            return other
+        if other == ZeroClass:
+            return self
+        if self.get_degree() != other.get_degree():
+            raise ValueError("Can only add Ext classes in the same tridegree")
+        if len(self.vector) != len(other.vector):
+            raise ValueError("Can only add Ext classes with the same vector length")
+        else:
+            new_vector = [a ^ b for a, b in zip(self.vector, other.vector)]
+            is_nonzero = any(new_vector)
+            if not is_nonzero:
+                return ZeroClass
+            return ExtClass(self.get_degree(), new_vector)
+
+
+    #we need to add a function to multiply two ExtClasses.
+    def __mul__(self, other: ExtClass) -> ExtClass:
+        #         """
+        #         Constructs a new ExtClass instance that represents the product of this class and another class.
+        #         This either just returns the naive juxtaposition of the two classes,
+        #         or it returns the result of a known product in the Ext algebra.
+        #         Args:
+        #             other (ExtClass): The other ExtClass instance to multiply with this class.
+        #         Returns:
+        #             ExtClass: A new ExtClass instance that represents the product of this class and the other
+        #         """
+        pass  # Placeholder for the actual implementation of the product operation.
+
+
+#this function is wrong, change it to take a degree and a vector and return the tau torsion as the max for all the classes in the sum.
+    def get_tau_torsion(self) -> int:
+        """
+        Returns the tau-torsion of the class as an integer.
+        """
+        if self == ZeroClass:
+            return 0
+        if self == Undefined:
+            return 0
+        s, f, w = self.get_degree()
+        return f - w
+
+    # def tau_torsion_by_vector(a_degree, vector):
+    #     """
+    #     Return the tau-torsion determined by the True basis coefficients.
+
+    #     The convention from the CSV is preserved: 0 means tau-torsion-free. For a
+    #     nonzero finite-torsion sum, this returns the largest torsion exponent among
+    #     the selected basis elements.
+    #     """
+    #     basis = class_index(a_degree)
+    #     if len(vector) != len(basis):
+    #         raise ValueError(
+    #             f"Vector length {len(vector)} does not match dimension "
+    #             f"{len(basis)} in degree {a_degree}"
+    #         )
+    #      selected_torsions = [
+    #         element["tautorsion"]
+    #         for element, coefficient in zip(basis, vector)
+    #         if coefficient
+    #     ]
+    #     if not selected_torsions:
+    #         return 0
+    #     if 0 in selected_torsions:
+    #         return 0
+    #     return max(selected_torsions)
+
+
+
+    # def get_name_latex(self) -> str:
+    #     """
+    #     Returns the name of the class in LaTeX format as a string.
+    #     """
+    #     return Main_code_for_diffls.convert_to_latex(self.get_name())
+
+#check whether this function is used anywhere, if not delete it.
+    def __hash__(self) -> int:
+        return hash((self.tridegree, tuple(self.vector)))
+
+
+#check whether this function is used anywhere, if not delete it.
+    def __eq__(self, other: object) -> bool:
+        """
+        Determines whether this class and other are equal.
+        """
+        if not isinstance(other, ExtClass):
+            return False
+        return self.tridegree == other.tridegree and self.vector == other.vector
+
+#check whether this function is used anywhere, if not delete it.
+    def in_same_tridegree_as(self, other: ExtClass) -> bool:
+        """
+        Determines whether this class and other are in the same tridegree.
+
+        Args:
+            other (ExtClass): The other ExtClass instance to compare with this class.
+
+        Returns:
+            bool: True if this class and other are in the same tridegree, False otherwise
+        """
+        if other == ZeroClass:
+            return True
+        if other == Undefined:
+            return False
+
+        return self.get_degree() == other.get_degree()
+
+#check whether this function is used anywhere, if not delete it.
+    def get_coweight(self) -> int:
+        """
+        Returns the coweight s - w of the class as an integer.
+        """
+        s, f, w = self.get_degree()
+        return s - w
+
+    def __repr__(self) -> str:
+        """
+        Returns a string representation of the ExtClass instance.
+        """
+        return f"ExtClass(tridegree={self.tridegree}, vector={self.vector})"
+
+    def __str__(self) -> str:
+        """
+        uses the __repr__ method to return a string representation of the ExtClass instance.
+        """
+        return self.__repr__()
+
+ZeroClass: ExtClass = ExtClass(None, [True])
+Undefined: ExtClass = ExtClass(None, [False])
+
+
+
+
+
     #these functions are not used in the SAT solver.
 
     # def get_differential_targets(self, r: int) -> list[ExtClass]:
@@ -62,123 +203,28 @@ class ExtClass:
     #         targets.append(ExtClass(target_degree, list(coeffs)))
     #     return targets
 
-    def __add__(self, other: ExtClass) -> ExtClass:
-        """
-        Constructs a new ExtClass instance that represents the sum of this class and another class.
-
-        Args:
-            other (ExtClass): The other ExtClass instance to add to this class.
-        Args:
-            other (ExtClass): The other ExtClass instance to add to this class.
-
-        Returns:
-            ExtClass: A new ExtClass instance that represents the sum of this class and the other
-        """
-        if self == ZeroClass:
-            return other
-        if other == ZeroClass:
-            return self
-        if self.get_degree() != other.get_degree():
-            raise ValueError("Can only add Ext classes in the same tridegree")
-        if len(self.vector) != len(other.vector):
-            raise ValueError("Can only add Ext classes with the same vector length")
-        else:
-            new_vector = [a ^ b for a, b in zip(self.vector, other.vector)]
-            is_nonzero = any(new_vector)
-            if not is_nonzero:
-                return ZeroClass
-            return ExtClass(self.get_degree(), new_vector)
-
-    def __mul__(self, other: ExtClass) -> ExtClass:
-        #         """
-        #         Constructs a new ExtClass instance that represents the product of this class and another class.
-        #         This either just returns the naive juxtaposition of the two classes,
-        #         or it returns the result of a known product in the Ext algebra.
-        #         Args:
-        #             other (ExtClass): The other ExtClass instance to multiply with this class.
-        #         Returns:
-        #             ExtClass: A new ExtClass instance that represents the product of this class and the other
-        #         """
-        pass  # Placeholder for the actual implementation of the product operation.
-
-    def get_tau_torsion(self) -> int:
-        pass
-
-    # def get_name_latex(self) -> str:
-    #     """
-    #     Returns the name of the class in LaTeX format as a string.
-    #     """
-    #     return Main_code_for_diffls.convert_to_latex(self.get_name())
-
-    def __hash__(self) -> int:
-        return hash((self.tridegree, tuple(self.vector)))
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, ExtClass):
-            return False
-        return self.tridegree == other.tridegree and self.vector == other.vector
-
-    def in_same_tridegree_as(self, other: ExtClass) -> bool:
-        """
-        Determines whether this class and other are in the same tridegree.
-
-        Args:
-            other (ExtClass): The other ExtClass instance to compare with this class.
-
-        Returns:
-            bool: True if this class and other are in the same tridegree, False otherwise
-        """
-        if other == ZeroClass:
-            return True
-        if other == Undefined:
-            return False
-
-        return self.get_degree() == other.get_degree()
-#         Returns:
-#             bool: True if this class and other are in the same tridegree, False otherwise
-#         """
-    def get_coweight(self) -> int:
-        """
-        Returns the coweight s - w of the class as an integer.
-        """
-        s, f, w = self.get_degree()
-        return s - w
-
-    def __repr__(self) -> str:
-        return f"ExtClass(tridegree={self.tridegree}, vector={self.vector})"
-
-    def __str__(self) -> str:
-        return self.__repr__()
-
-
-
-ZeroClass: ExtClass = ExtClass(None, [True])
-Undefined: ExtClass = ExtClass(None, [False])
-
-
-
 
 
 #test
-if __name__ == "__main__":
-    x = ExtClass((0, 0, -1), [1, 0, 0])
-    print(x.get_name())
+# if __name__ == "__main__":
+#     x = ExtClass((0, 0, -1), [1, 0, 0])
+#     print(x.get_name())
 
-    for target in x.get_differential_targets(2):
-        print(target.get_name())
+#     for target in x.get_differential_targets(2):
+#         print(target.get_name())
 
-    y = ExtClass((110, 34, 54), [1, 0, 0])
-    z = ExtClass((110, 34, 54), [0, 1, 0])
-    t = ExtClass((110, 34, 54), [1, 0, 0])
+#     y = ExtClass((110, 34, 54), [1, 0, 0])
+#     z = ExtClass((110, 34, 54), [0, 1, 0])
+#     t = ExtClass((110, 34, 54), [1, 0, 0])
 
-    print((t + y).get_name())
-    print((t + z).get_name())
+#     print((t + y).get_name())
+#     print((t + z).get_name())
 
-    m = ExtClass((110, 27, 58), [1, 1, 0])
-    print(m.get_name())
-    print(m.get_name_latex())
+#     m = ExtClass((110, 27, 58), [1, 1, 0])
+#     print(m.get_name())
+#     print(m.get_name_latex())
 
-    print(x.in_same_tridegree_as(y))
-    print(x.in_same_tridegree_as(z))
-    print(x.in_same_tridegree_as(ZeroClass))
+#     print(x.in_same_tridegree_as(y))
+#     print(x.in_same_tridegree_as(z))
+#     print(x.in_same_tridegree_as(ZeroClass))
     

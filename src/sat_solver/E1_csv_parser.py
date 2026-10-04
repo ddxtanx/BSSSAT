@@ -1,3 +1,5 @@
+# This is the first file.
+
 import csv
 from collections import defaultdict
 from itertools import product
@@ -105,8 +107,8 @@ class E1CsvParser:
         return classes
 
 
-
-    # Check if we need it, maybe in the end to print the real names.
+#move it to ext class
+# Check if we need it, maybe in the end to print the real names.
     def class_name(self, deg, vector):
         """
         Returns the name of an element in a given degree based on its vector representation.
@@ -138,29 +140,17 @@ class E1CsvParser:
         return (" + ").join(name_lst)
 
 
-    def class_name_by_index(a_degree, index):
-        for element in class_index(a_degree):
-            if element["index"] == index:
-                return element["name"]
-        return None
+    # def class_name_by_index(a_degree, index):
+    #     for element in class_index(a_degree):
+    #         if element["index"] == index:
+    #             return element["name"]
+    #     return None
 
 
 
-    #     Repeating a basis name toggles its coefficient, so duplicates cancel.
-    #     """
-    #     basis = class_index(a_degree)
-    #     index_by_name = {element["name"]: element["index"] for element in basis}
-    #     vector = [False] * len(basis)
 
-    #     for name in names:
-    #         if name not in index_by_name:
-    #             raise ValueError(f"{name!r} is not a basis element in degree {a_degree}")
-    #         index = index_by_name[name]
-    #         vector[index] = not vector[index]
-
-    #     return vector
-
-    # Check if we need it. I suspect it will be needed when writing multiplication function.
+# move it to ext class
+ # Check if we need it. I suspect it will be needed when writing multiplication function.
     def vector_by_basis_name(self, degree, name):
         """
         Returns the F2 bool vector for a given basis element name in a specified degree.
@@ -183,8 +173,8 @@ class E1CsvParser:
             f"{name!r} is not a basis element in degree {degree}"
                          )
 
-    
-   # Check if the following functions are needed for further computations.
+#strong feeling we don't need these functions.   
+# Check if the following functions are needed for further computations.
     def add_degree(self, degree1, degree2):
             return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
 
@@ -194,7 +184,8 @@ class E1CsvParser:
             for element, values in classes.items():
                 counting[element] = len(values)
             return counting
-    
+
+#maybe go into differential.py
     def finding_sources_with_fixed_number_of_differentials(classes, number):
             sources = []
             for element, values in classes.items():
@@ -212,34 +203,30 @@ class E1CsvParser:
     #             f"{len(basis)} in degree {a_degree}"
     #         )
     #     return [element["name"] for element, coefficient in zip(basis, vector) if coefficient]
+    # def tau_torsion_by_vector(a_degree, vector):
+        #     """
+        #     Return the tau-torsion determined by the True basis coefficients.
 
-
-
-    def tau_torsion_by_vector(a_degree, vector):
-        """
-        Return the tau-torsion determined by the True basis coefficients.
-
-        The convention from the CSV is preserved: 0 means tau-torsion-free. For a
-        nonzero finite-torsion sum, this returns the largest torsion exponent among
-        the selected basis elements.
-        """
-        basis = class_index(a_degree)
-        if len(vector) != len(basis):
-            raise ValueError(
-                f"Vector length {len(vector)} does not match dimension "
-                f"{len(basis)} in degree {a_degree}"
-            )
-
-    #     selected_torsions = [
-    #         element["tautorsion"]
-    #         for element, coefficient in zip(basis, vector)
-    #         if coefficient
-    #     ]
-    #     if not selected_torsions:
-    #         return 0
-    #     if 0 in selected_torsions:
-    #         return 0
-    #     return max(selected_torsions)
+        #     The convention from the CSV is preserved: 0 means tau-torsion-free. For a
+        #     nonzero finite-torsion sum, this returns the largest torsion exponent among
+        #     the selected basis elements.
+        #     """
+        #     basis = class_index(a_degree)
+        #     if len(vector) != len(basis):
+        #         raise ValueError(
+        #             f"Vector length {len(vector)} does not match dimension "
+        #             f"{len(basis)} in degree {a_degree}"
+        #         )
+        #      selected_torsions = [
+        #         element["tautorsion"]
+        #         for element, coefficient in zip(basis, vector)
+        #         if coefficient
+        #     ]
+        #     if not selected_torsions:
+        #         return 0
+        #     if 0 in selected_torsions:
+        #         return 0
+        #     return max(selected_torsions)
 
     #then this differential function takes a source degree and a differential degree r and returns the possible differentials.
 
@@ -349,3 +336,16 @@ class E1CsvParser:
     #     for degree_key, source_elements in sorted(grouped.items()):
     #         names = [element["name"] for element in source_elements]
     #         writer.writerow([str(degree_key), len(names), json.dumps(names, ensure_ascii=False)])
+    #     Repeating a basis name toggles its coefficient, so duplicates cancel.
+    #     """
+    #     basis = class_index(a_degree)
+    #     index_by_name = {element["name"]: element["index"] for element in basis}
+    #     vector = [False] * len(basis)
+
+    #     for name in names:
+    #         if name not in index_by_name:
+    #             raise ValueError(f"{name!r} is not a basis element in degree {a_degree}")
+    #         index = index_by_name[name]
+    #         vector[index] = not vector[index]
+
+    #     return vector
