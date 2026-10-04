@@ -89,7 +89,6 @@ class E1CsvParser:
         return classes
 
 
-
     #returns the name of an element in a given degree.
     def class_name(self, deg, vector):
         if deg == None:
