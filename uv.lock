@@ -3,90 +3,6 @@ revision = 3
 requires-python = ">=3.14"
 
 [[package]]
-name = "attrs"
-version = "26.1.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/9a/8e/82a0fe20a541c03148528be8cac2408564a6c9a0cc7e9171802bc1d26985/attrs-26.1.0.tar.gz", hash = "sha256:d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32", size = 952055, upload-time = "2026-03-19T14:22:25.026Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl", hash = "sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309", size = 67548, upload-time = "2026-03-19T14:22:23.645Z" },
-]
-
-[[package]]
-name = "bidict"
-version = "0.22.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f2/be/b31e6ea9c94096a323e7a0e2c61480db01f07610bb7e7ea72a06fd1a23a8/bidict-0.22.1.tar.gz", hash = "sha256:1e0f7f74e4860e6d0943a05d4134c63a2fad86f3d4732fb265bd79e4e856d81d", size = 31660, upload-time = "2023-01-01T01:54:15.241Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/b5/82/ce0b6380f35f49d3fe687979a324c342cfa3588380232f3801db9dd62f9e/bidict-0.22.1-py3-none-any.whl", hash = "sha256:6ef212238eb884b664f28da76f33f1d28b260f665fc737b413b287d5487d1e7b", size = 35978, upload-time = "2023-01-01T01:54:13.937Z" },
-]
-
-[[package]]
-name = "funcy"
-version = "1.18"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/92/1c/b297c18a9e66e683b7777fbc965e5393bcf167406d1499cde69ca9e6b8e7/funcy-1.18.tar.gz", hash = "sha256:15448d19a8ebcc7a585afe7a384a19186d0bd67cbf56fb42cd1fd0f76313f9b2", size = 277530, upload-time = "2023-01-27T05:45:03.604Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e6/c1/8f2c327498b9a15bd7ba426d539760c5ad60b1c1ee8e372bbf43d36f7023/funcy-1.18-py2.py3-none-any.whl", hash = "sha256:00ce91afc850357a131dc54f0db2ad8a1110d5087f1fa4480d7ea3ba0249f89d", size = 33238, upload-time = "2023-01-27T05:45:00.695Z" },
-]
-
-[[package]]
-name = "py-aiger"
-version = "6.2.3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "attrs" },
-    { name = "bidict" },
-    { name = "funcy" },
-    { name = "pyrsistent" },
-    { name = "sortedcontainers" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/19/d2/3c8ab1d4e9d1aef91a17a3ec10c2849f51e03184f5d08fca5db97fcca0b5/py_aiger-6.2.3.tar.gz", hash = "sha256:9d3c599bfa043047f465804137047f227a77ec8850b26e4a2c3a00107b1c8902", size = 19597, upload-time = "2024-03-16T19:45:39.374Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/6f/65/c1c79bee5e59335b827ba353834429613b5342027e438264c7d69e940e0d/py_aiger-6.2.3-py3-none-any.whl", hash = "sha256:837bcd9f49b5a945e5877126f3238e08731d32d545fab05b2146c776dca9c45c", size = 19152, upload-time = "2024-03-16T19:45:37.089Z" },
-]
-
-[[package]]
-name = "py-aiger-cnf"
-version = "5.0.8"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "bidict" },
-    { name = "funcy" },
-    { name = "py-aiger" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/0a/b1/a752728fae9365bfffb4f07aef287a2d843f6257d8742f12e3b443185c62/py_aiger_cnf-5.0.8.tar.gz", hash = "sha256:727a3a615016b1ce8ebc840ee37f73791d755e5be2883ba209db6d2c61de12a7", size = 4318, upload-time = "2024-03-16T20:12:16.205Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/0c/95/aa9738d1f2d7a4dd7e91554bdbe149f965d64740867ba3ca2fb50cc88273/py_aiger_cnf-5.0.8-py3-none-any.whl", hash = "sha256:ccda9b726d001e485b0c40f47024a601332cb6e37a45f8fbe69306c853a64eac", size = 5136, upload-time = "2024-03-16T20:12:14.346Z" },
-]
-
-[[package]]
-name = "pyapproxmc"
-version = "4.1.24"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/5c/36/b4ce5193672c31af53bcdc35361ec59c8ba2db76cabe41bd96e5b11f1bfb/pyapproxmc-4.1.24.tar.gz", hash = "sha256:e592aeaf614c2a9d8d5b23b84e007c60ceb85c5cb42be035bb1ab0fa75551e44", size = 457533, upload-time = "2024-02-08T21:20:01.919Z" }
-
-[[package]]
-name = "pycryptosat"
-version = "5.11.21"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/18/34/6568c0feda88a83f638bd1a79c924eb6f9a19d697b9dd444fa6e19fca744/pycryptosat-5.11.21.tar.gz", hash = "sha256:8ddc5a265bfcf0c63233f036e63c623c492b03327ced51c8bec372d950601501", size = 426785, upload-time = "2024-02-08T22:00:41.113Z" }
-
-[[package]]
-name = "pypblib"
-version = "0.0.4"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/fb/f6/967cc8b9ea80c2a8e00913225de46d435ef441243ad1dd0a57935cc1d863/pypblib-0.0.4.tar.gz", hash = "sha256:71dd930bf177ca38d6eeb473702d05df07e11f20382db0c766465297eaf49062", size = 74033, upload-time = "2019-05-01T11:11:59.026Z" }
-
-[[package]]
-name = "pyrsistent"
-version = "0.19.3"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/bf/90/445a7dbd275c654c268f47fa9452152709134f61f09605cf776407055a89/pyrsistent-0.19.3.tar.gz", hash = "sha256:1a2994773706bbb4995c31a97bc94f1418314923bd1048c6d964837040376440", size = 102640, upload-time = "2022-12-29T08:00:25.034Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/64/de/375aa14daaee107f987da76ca32f7a907fea00fa8b8afb67dc09bec0de91/pyrsistent-0.19.3-py3-none-any.whl", hash = "sha256:ccf0d6bd208f8111179f0c26fdf84ed7c3891982f2edaeae7422575f47e66b64", size = 57505, upload-time = "2022-12-29T08:00:23.284Z" },
-]
-
-[[package]]
 name = "python-sat"
 version = "1.9.dev5"
 source = { registry = "https://pypi.org/simple" }
@@ -108,20 +24,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/8b/06/67e771646ead454ddc3aa17f653037fc9f9c36898261023e6f76e11a8c9d/python_sat-1.9.dev5-cp314-cp314t-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:27ae4eadefe238fa41f2b86f600a88d3a37acbb9ef4e697972a216460811bb8c", size = 3977586, upload-time = "2026-06-10T01:28:06.964Z" },
     { url = "https://files.pythonhosted.org/packages/1c/b9/8a50be80e7fdcdd1b93f4b012c6541539fe4d055821ed2fe42623cd43f18/python_sat-1.9.dev5-cp314-cp314t-musllinux_1_2_aarch64.whl", hash = "sha256:d1d2ad23b786fc60bb7e764cc06cb7b7ad13fef09cd33357f5202b439750c596", size = 4816708, upload-time = "2026-06-10T01:28:08.685Z" },
     { url = "https://files.pythonhosted.org/packages/91/48/bf3d5bbb7078ccba5c071ee5b99f35fc2b04cd3d31aef60e1b682a6042b9/python_sat-1.9.dev5-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:34d1019ad70f3c1febc542746669cc7566eae381bbe80ce489bdcb77fc855236", size = 4982257, upload-time = "2026-06-10T01:28:10.249Z" },
-]
-
-[package.optional-dependencies]
-aiger = [
-    { name = "py-aiger-cnf" },
-]
-approxmc = [
-    { name = "pyapproxmc" },
-]
-cryptosat = [
-    { name = "pycryptosat" },
-]
-pblib = [
-    { name = "pypblib" },
 ]
 
 [[package]]
@@ -154,7 +56,7 @@ name = "satsolver"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "python-sat", extra = ["aiger", "approxmc", "cryptosat", "pblib"] },
+    { name = "python-sat" },
 ]
 
 [package.dev-dependencies]
@@ -163,7 +65,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "python-sat", extras = ["aiger", "approxmc", "cryptosat", "pblib"], specifier = "~=1.0" }]
+requires-dist = [{ name = "python-sat", specifier = "~=1.0" }]
 
 [package.metadata.requires-dev]
 dev = [{ name = "ruff", specifier = ">=0.15.20" }]
@@ -175,13 +77,4 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
-]
-
-[[package]]
-name = "sortedcontainers"
-version = "2.4.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e8/c4/ba2f8066cceb6f23394729afe52f3bf7adec04bf9ed2c820b39e19299111/sortedcontainers-2.4.0.tar.gz", hash = "sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88", size = 30594, upload-time = "2021-05-16T22:03:42.897Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/32/46/9cb0e58b2deb7f82b84065f37f3bffeb12413f947f9388e4cac22c4621ce/sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0", size = 29575, upload-time = "2021-05-16T22:03:41.177Z" },
 ]
