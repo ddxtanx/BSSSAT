@@ -106,72 +106,12 @@ class E1CsvParser:
                 classes.append((deg, list(vector)))
         return classes
 
-
-#move it to ext class
-# Check if we need it, maybe in the end to print the real names.
-    def class_name(self, deg, vector):
-        """
-        Returns the name of an element in a given degree based on its vector representation.
-
-        Parameters:
-        deg (tuple): The tridegree (s, f, w) of the element.
-        vector (list): The F2 bool vector representing the element in the given degree.
-
-        Returns:
-        str: The name of the element.
-        """
-        if deg == None:
-            if vector == [True]:
-                return "0"
-            elif vector == [False]:
-                return "Undef"
-            else:
-                raise ValueError(f"Invalid element (None, {vector})")
-
-        assert self.sfw_dict is not None
-        name_lst = []
-
-        if deg not in self.sfw_dict:
-            raise ValueError(f"Degree {deg} not found in E1CsvParser.sfw_dict")
-        elts = self.sfw_dict[deg]
-        for i in range(len(vector)):
-            if vector[i]:
-                name_lst.append(elts[i]["name"])
-        return (" + ").join(name_lst)
-
-
     # def class_name_by_index(a_degree, index):
     #     for element in class_index(a_degree):
     #         if element["index"] == index:
     #             return element["name"]
     #     return None
 
-
-
-
-# move it to ext class
- # Check if we need it. I suspect it will be needed when writing multiplication function.
-    def vector_by_basis_name(self, degree, name):
-        """
-        Returns the F2 bool vector for a given basis element name in a specified degree.
-
-        Parameters:
-        degree (tuple): The tridegree (s, f, w) of the element.
-        name (str): The name of the basis element.
-
-        Returns:
-        list: The F2 bool vector representing the basis element in the given degree.
-        """
-        basis = self.sfw_dict.get(degree)
-        vector = [False] * len(basis)
-
-        for i, element in enumerate(basis):
-            if element["name"] == name:
-                vector[i] = True
-                return vector
-        raise ValueError(
-            f"{name!r} is not a basis element in degree {degree}"
-                         )
 
 #strong feeling we don't need these functions.   
 # Check if the following functions are needed for further computations.
