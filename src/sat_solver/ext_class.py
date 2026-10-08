@@ -11,7 +11,8 @@ used as the ``target" of a differential when the source is not a cycle on the E_
 """
 
 from itertools import product
-
+from __future__ import annotations
+from sat_solver.E1_csv_parser import E1CsvParser
 
 class ExtClass:
     """
@@ -69,6 +70,44 @@ class ExtClass:
         pass  # Placeholder for the actual implementation of the product operation.
 
 
+# Check if we need it, maybe in the end to print the real names.
+    def class_name(self, E1: "E1CsvParser") -> str:
+        """
+        Returns the name of this ExtClass element based on its vector representation.
+        """
+        deg = self.get_degree()
+        vector = self.get_vector()
+        if deg == None:
+            if vector == [True]:
+                return "0"
+            elif vector == [False]:
+                return "Undef"
+            else:
+                raise ValueError(f"Invalid element (None, {vector})")
+        basis = E1.sfw_dict.get(deg)
+        if basis is None:
+             raise ValueError(f"Degree {deg} not found in E1.sfw_dict")
+        return " + ".join(b["name"] for b, on in zip(basis, vector) if on)
+
+
+
+
+ # Check if we need it. I suspect it will be needed when writing multiplication function.
+    @staticmethod
+    def create_class_from_basis_name(E1:"E1CsvParser", degree, name) -> "ExtClass":
+        basis = E1.sfw_dict.get(degree)
+        if basis is None:
+            raise ValueError(f"Degree {degree} not found in E1.sfw_dict")
+        vector = [False] * len(basis)
+        for i, element in enumerate(basis):
+            if element["name"] == name:
+                vector[i] = True
+                return ExtClass(degree, vector)
+        raise ValueError(
+            f"{name!r} is not a basis element in degree {degree}"
+        )
+
+
 #this function is wrong, change it to take a degree and a vector and return the tau torsion as the max for all the classes in the sum.
     def get_tau_torsion(self) -> int:
         """
@@ -81,7 +120,7 @@ class ExtClass:
         s, f, w = self.get_degree()
         return f - w
 
-    # def tau_torsion_by_vector(a_degree, vector):
+# def tau_torsion_by_vector(a_degree, vector):
     #     """
     #     Return the tau-torsion determined by the True basis coefficients.
 

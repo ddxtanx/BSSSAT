@@ -19,7 +19,7 @@ def main():
     ext_classes = [ExtClass(*x) for x in all_classes]
     print("number of E1 classes: ", len(ext_classes))
     for x in ext_classes:
-        print(E1.class_name(x.get_degree(), x.get_vector()), x.get_degree())
+        print(x.class_name(E1), x.get_degree())
     ext = Ext(E1)
 
     # comment out these four lines if you want to try a different N = s+f-w
@@ -39,8 +39,7 @@ def main():
         taupower = 0 if k == 0 else 2**(k-1)
         target_degree = (r-1, 1, 0)
         target_name = f"tau^{taupower} {{1-{k}}}"
-        target_vector = E1.vector_by_basis_name(target_degree, target_name)
-        target = ExtClass(target_degree, target_vector)
+        target= ExtClass.create_class_from_basis_name(E1, target_degree, target_name)
         diff2 = Differential(source, target, r)
         ext.add_known_differentials([diff2])
         k += 1
@@ -58,8 +57,8 @@ def main():
         print("\nPrinting one possible solution")
         for diff in all_models[0]:
             r = diff.degree_of_differential
-            source_name = E1.class_name(diff.source.get_degree(), diff.source.get_vector())
-            target_name = E1.class_name(diff.target.get_degree(), diff.target.get_vector())
+            source_name = diff.source.class_name(E1)
+            target_name = diff.target.class_name(E1)
             print(f"d_{r}: ", source_name, " -> ", target_name)
     else:
         print("The SAT problem is unsatisfiable")

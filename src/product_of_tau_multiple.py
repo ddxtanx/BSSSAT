@@ -119,11 +119,6 @@ def product_of_tau_multiple(
 ) -> tuple[tuple[int, int, int], list[str]]:
     """
     Multiply two possibly tau-multiplied module generators.
-
-    For example, this reduces (tau^2 x) * (tau^3 y) to
-    tau^5 * product(x, y). The return value is (degree, names), ready to pass
-    into vector_by_basis_names(degree, names). If the result is zero, names is
-    the empty list.
     """
     element1_tau_exponent = tau_exponent(element1)
     element2_tau_exponent = tau_exponent(element2)
