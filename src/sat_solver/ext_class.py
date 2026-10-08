@@ -9,9 +9,8 @@ which is an instance of ExtClass that represents the zero class.
 Finally there is Undefined which is the ``None" variant of ExtClass,
 used as the ``target" of a differential when the source is not a cycle on the E_r page.
 """
-
-from itertools import product
 from __future__ import annotations
+from itertools import product
 from sat_solver.E1_csv_parser import E1CsvParser
 
 class ExtClass:
@@ -108,43 +107,32 @@ class ExtClass:
         )
 
 
-#this function is wrong, change it to take a degree and a vector and return the tau torsion as the max for all the classes in the sum.
-    def get_tau_torsion(self) -> int:
-        """
-        Returns the tau-torsion of the class as an integer.
-        """
-        if self == ZeroClass:
+    def get_tau_torsion(self, E1: "E1CsvParser") -> int:
+        """ Return the tau-torsion of this class. """
+        if self == ZeroClass or self == Undefined:
             return 0
-        if self == Undefined:
+        basis = E1.sfw_dict.get(self.get_degree())
+        if basis is None:
+            raise ValueError(
+                f"Degree {self.get_degree()} not found in E1.sfw_dict"
+            )
+        vector = self.get_vector()
+        if len(vector) != len(basis):
+            raise ValueError(
+                f"Vector length {len(vector)} does not match dimension "
+                f"{len(basis)} in degree {self.get_degree()}"
+            )
+        selected_torsions = [
+            element["tautorsion"]
+            for element, coefficient in zip(basis, vector)
+            if coefficient
+        ]
+        if not selected_torsions:
             return 0
-        s, f, w = self.get_degree()
-        return f - w
-
-# def tau_torsion_by_vector(a_degree, vector):
-    #     """
-    #     Return the tau-torsion determined by the True basis coefficients.
-
-    #     The convention from the CSV is preserved: 0 means tau-torsion-free. For a
-    #     nonzero finite-torsion sum, this returns the largest torsion exponent among
-    #     the selected basis elements.
-    #     """
-    #     basis = class_index(a_degree)
-    #     if len(vector) != len(basis):
-    #         raise ValueError(
-    #             f"Vector length {len(vector)} does not match dimension "
-    #             f"{len(basis)} in degree {a_degree}"
-    #         )
-    #      selected_torsions = [
-    #         element["tautorsion"]
-    #         for element, coefficient in zip(basis, vector)
-    #         if coefficient
-    #     ]
-    #     if not selected_torsions:
-    #         return 0
-    #     if 0 in selected_torsions:
-    #         return 0
-    #     return max(selected_torsions)
-
+    #is it possible that x and y are both nonzero and torsion-free, but x+y is torsion? in our range!
+        if 0 in selected_torsions:
+            return 0
+        return max(selected_torsions)
 
 
     # def get_name_latex(self) -> str:
@@ -208,7 +196,7 @@ class ExtClass:
 ZeroClass: ExtClass = ExtClass(None, [True])
 Undefined: ExtClass = ExtClass(None, [False])
 
-
+#we need to be careful about zero class and 0 in each degree. Should we make a function that treats 0 in each degree as a zero class? 
 
 
 
