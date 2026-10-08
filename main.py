@@ -9,21 +9,12 @@ from sat_solver import E1CsvParser, Ext, ExtClass, SATSolver, Differential
 ZeroClass: ExtClass = ExtClass(None, [True])
 Undefined: ExtClass = ExtClass(None, [False])
 
-<<<<<<< HEAD
-max_N = 2
-max_differential_degree = 5
-
-
-def main():
-    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N=False)
-=======
 max_N = 4
 max_differential_degree = 5
 
 def main():
     E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N = False)  # s+f-w = 2
     print(E1.sfw_dict)
->>>>>>> 8db1cd975b64164dba01f21d270f682b5671c32f
     all_classes = E1.make_all_lin_combs()
     ext_classes = [ExtClass(*x) for x in all_classes]
     print("number of E1 classes: ", len(ext_classes))
@@ -48,63 +39,14 @@ def main():
         taupower = 0 if k == 0 else 2**(k-1)
         target_degree = (r-1, 1, 0)
         target_name = f"tau^{taupower} {{1-{k}}}"
-<<<<<<< HEAD
-        target = ExtClass(target_degree, [True])
-=======
         target_vector = E1.vector_by_basis_name(target_degree, target_name)
         target = ExtClass(target_degree, target_vector)
->>>>>>> 8db1cd975b64164dba01f21d270f682b5671c32f
         diff2 = Differential(source, target, r)
         ext.add_known_differentials([diff2])
         k += 1
 
   
 
-<<<<<<< HEAD
-##adding known differentials on tau powers.
-
-    k = 0
-
-    while 2**k <= max_N:
-        r = 2**k
-        if r == 1:
-            target_tau_power = 0
-        else:
-            target_tau_power = 2 ** (k - 1)
-
-        source_degree = (0, 0, -r)
-        target_degree = (r - 1, 1, 0)
-
-        # Skip differentials whose classes are not on the loaded E1 page. (we don't really need)
-        if (
-            source_degree not in E1.sfw_dict
-            or target_degree not in E1.sfw_dict
-        ):
-            k += 1
-            continue
-
-        source_name = f"tau^{r} {{0-0}}"
-        target_name = f"tau^{target_tau_power} {{1-{k}}}"
-
-        source = ExtClass(source_degree,[True])
-
-        target = ExtClass(target_degree, E1.vector_by_basis_name(target_degree, target_name),)
-
-        ext.add_known_differential(Differential(source, target, r))
-
-        k += 1
-
-
-
- 
-    # print("\nKnown differentials:")
-    # for diff in ext.known_differentials:
-    #     r = diff.degree_of_differential
-    #     source_name = E1.class_name(diff.source.get_degree(), diff.source.get_vector())
-    #     target_name = E1.class_name(diff.target.get_degree(), diff.target.get_vector())
-    #     print(f"d_{r}: ", source_name, " -> ", target_name) 
-=======
->>>>>>> 8db1cd975b64164dba01f21d270f682b5671c32f
 
     sat_solver = SATSolver(ext, max_differential_degree)
     all_models = sat_solver.run_sat_solver()
