@@ -24,14 +24,15 @@ class Differential:
             and source != Undefined
         ):
             difference = (
-                target.get_degree()[0] - source.get_degree()[0],
-                target.get_degree()[1] - source.get_degree()[1],
-                target.get_degree()[2] - source.get_degree()[2],
+                target.get_classdegree()[0] - source.get_classdegree()[0],
+                target.get_classdegree()[1] - source.get_classdegree()[1],
+                target.get_classdegree()[2] - source.get_classdegree()[2],
             )
             if difference != (degree - 1, 1, degree):
                 raise ValueError(
                     "Invalid differential: target degree must be source degree + (r-1, 1, r) for some r >= 1"
                 )
+            
 
     def get_source(self) -> ExtClass:
         """

@@ -1,5 +1,3 @@
-# This is the first file.
-
 import csv
 from collections import defaultdict
 from itertools import product
@@ -40,7 +38,7 @@ class E1CsvParser:
         return classes
 
 
-
+#
     def make_sfw_grouping(self, only_one_N):
         """
         Groups the E1 basis elements by their (s, f, w) degrees, taking into account tau multiples.
@@ -90,7 +88,7 @@ class E1CsvParser:
                     })
         return elements_in_degree
 
-
+#
     def make_all_lin_combs(self):
         """
         Returns a list of tuples (tridegree, vector) that can be turned into ExtClass(tridegree, vector)

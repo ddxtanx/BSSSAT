@@ -1,4 +1,3 @@
-# This is the fourth file.
 """
 This module defines the Ext class which serves as the interface to
 interact with the entire cohomology of the C-motivic Steenrod Algebra
@@ -61,7 +60,7 @@ class Ext:
         Args:
             ext_class (ExtClass): The ExtClass to add to the Ext algebra.
         """
-        s, f, w = ext_class.get_degree()
+        s, f, w = ext_class.get_classdegree()
 
         self.class_dct[(s, f, w)].add(ext_class)
         self.degrees_by_N[s + f - w].add((s, f, w))
@@ -79,6 +78,7 @@ class Ext:
         if w < self.min_weight:
             self.min_weight = w
 
+#generalize previous function.
     def add_classes(self, ext_classes: list[ExtClass]) -> None:
         """
         This method adds a list of ExtClasses to the Ext algebra.
@@ -86,56 +86,10 @@ class Ext:
         Args:
             ext_classes (list[ExtClass]): The list of ExtClasses to add to the Ext algebra.
         """
-        max_stem = self.max_stem
-        max_filtration = self.max_filtration
-        max_weight = self.max_weight
-        min_stem = self.min_stem
-        min_filtration = self.min_filtration
-        min_weight = self.min_weight
-
         for ext_class in ext_classes:
             self.add_class(ext_class)
 
-            s, f, w = ext_class.get_degree()
-            if s > max_stem:
-                max_stem = s
-            if s < min_stem:
-                min_stem = s
-            if f > max_filtration:
-                max_filtration = f
-            if f < min_filtration:
-                min_filtration = f
-            if w > max_weight:
-                max_weight = w
-            if w < min_weight:
-                min_weight = w
-
-        self.max_stem = max_stem
-        self.max_filtration = max_filtration
-        self.max_weight = max_weight
-        self.min_stem = min_stem
-        self.min_filtration = min_filtration
-        self.min_weight = min_weight
-
-    def add_known_differential(self, diff: Differential) -> None:
-        """
-        This method adds a known differential to the list of known differentials in the rho-Bockstein spectral sequence.
-
-        Args:
-            diff (Differential): The Differential to add to the list of known differentials.
-        """
-        self.known_differentials.add(diff)
-
-    def add_known_differentials(self, diffs: list[Differential]) -> None:
-        """
-        This method adds a list of known differentials to the list of known differentials in the rho-Bockstein spectral sequence.
-
-        Args:
-            diffs (list[Differential]): The list of Differentials to add to the list of known differentials.
-        """
-        for diff in diffs:
-            self.add_known_differential(diff)
-
+#
     def get_classes(self) -> set[ExtClass]:
         if self.classes != set():
             return self.classes
@@ -149,87 +103,6 @@ class Ext:
     def num_nonzero(self, s, f, w):
         assert self.class_dct is not None
         return len(self.class_dct[s,f,w])
-
-
-
-
-    def get_possible_differential_targets(
-        self, ext_class: ExtClass, r: int
-    ) -> list[ExtClass]:
-        """
-        This method returns a list of ExtClasses that could potentially be the target of a differential of length r starting from a given ExtClass. Does not return 0 or Undef unless the input is 0 or Undef.
-
-        Args:
-            ext_class (ExtClass): The ExtClass from which the differential starts.
-            r (int): The length of the differential.
-
-        Returns:
-            list[ExtClass]: A list of all the ExtClasses that could potentially be the target of a differential of length r starting from the given ExtClass.
-        """
-        if ext_class == ZeroClass:
-            return [ZeroClass]
-        if ext_class == Undefined:
-            return [Undefined]
-        s, f, w = ext_class.get_degree()
-        target_s = s + r - 1
-        target_f = f + 1
-        target_w = w + r
-
-        if (target_s, target_f, target_w) in self.class_dct:
-            return list(self.class_dct[(target_s, target_f, target_w)])
-        else:
-            return []
-
-    def get_possible_nontrivial_differential_sources(
-        self, target_class: ExtClass, r: int
-    ) -> list[ExtClass]:
-        """
-        This method returns a list of ExtClasses that could potentially be the source
-        of a differential of length r ending at a given ExtClass.
-
-        Args:
-            target_class (ExtClass): The ExtClass which is the target of the differential.
-            r (int): The length of the differential.
-
-        Returns:
-            list[ExtClass]: A list of all the ExtClasses that could potentially be the source
-            of a differential of length r ending at the given ExtClass.
-        """
-        assert target_class != Undefined and target_class != ZeroClass
-
-        s, f, w = target_class.get_degree()
-        source_s = s - r + 1
-        source_f = f - 1
-        source_w = w - r
-
-        if (source_s, source_f, source_w) in self.class_dct:
-            return list(self.class_dct[(source_s, source_f, source_w)])
-        else:
-            return []
-
-
-    def r_with_nonzero_target(self, deg):
-        s, f, w = deg
-        possible_r = []
-        for (target_s, target_f, target_w) in self.degrees_by_N[s + f - w]:
-            if target_f == f + 1:
-                r = target_w - w
-                if r > 0:
-                    possible_r.append(r)
-        return possible_r
-
-
-    def r_with_nonzero_source(self, deg):
-        s, f, w = deg
-        possible_r = []
-        for (source_s, source_f, source_w) in self.degrees_by_N[s + f - w]:
-            if source_f == f - 1:
-                r = w - source_w
-                if r > 0:
-                    possible_r.append(r)
-        return possible_r
-
-
 
     def get_classes_in_fixed_N(self, N: int) -> list[ExtClass]:
         """
@@ -248,7 +121,7 @@ class Ext:
                 if (s, f, w) in self.class_dct:
                     classes.extend(self.class_dct[(s, f, w)])
         return classes
-
+#
     def get_nonzero_classes_in_tridegree(
         self, tridegree: tuple[int, int, int]
     ) -> list[ExtClass]:
@@ -298,9 +171,115 @@ class Ext:
         Returns:
             bool: True if the ExtClass is known to be rho periodic, False otherwise.
         """
-        s, f, w = ext_class.get_degree()
+        s, f, w = ext_class.get_classdegree()
         return s - f == 2 * (w - f)
 
+
+
+    #The following functions are for finding possible sources and targets of differentials.
+#
+    def get_possible_differential_targets(
+        self, ext_class: ExtClass, r: int
+    ) -> list[ExtClass]:
+        """
+        This method returns a list of ExtClasses that could potentially be the target of a differential of length r starting from a given ExtClass. Does not return 0 or Undef unless the input is 0 or Undef.
+
+        Args:
+            ext_class (ExtClass): The ExtClass from which the differential starts.
+            r (int): The length of the differential.
+
+        Returns:
+            list[ExtClass]: A list of all the ExtClasses that could potentially be the target of a differential of length r starting from the given ExtClass.
+        """
+        if ext_class == ZeroClass:
+            return [ZeroClass]
+        if ext_class == Undefined:
+            return [Undefined]
+        s, f, w = ext_class.get_classdegree()
+        target_s = s + r - 1
+        target_f = f + 1
+        target_w = w + r
+
+        if (target_s, target_f, target_w) in self.class_dct:
+            return list(self.class_dct[(target_s, target_f, target_w)])
+        else:
+            return []
+#
+    def get_possible_nontrivial_differential_sources(
+        self, target_class: ExtClass, r: int
+    ) -> list[ExtClass]:
+        """
+        This method returns a list of ExtClasses that could potentially be the source
+        of a differential of length r ending at a given ExtClass.
+
+        Args:
+            target_class (ExtClass): The ExtClass which is the target of the differential.
+            r (int): The length of the differential.
+
+        Returns:
+            list[ExtClass]: A list of all the ExtClasses that could potentially be the source
+            of a differential of length r ending at the given ExtClass.
+        """
+        assert target_class != Undefined and target_class != ZeroClass
+
+        s, f, w = target_class.get_classdegree()
+        source_s = s - r + 1
+        source_f = f - 1
+        source_w = w - r
+
+        if (source_s, source_f, source_w) in self.class_dct:
+            return list(self.class_dct[(source_s, source_f, source_w)])
+        else:
+            return []
+
+#
+    def r_with_nonzero_target(self, deg):
+        s, f, w = deg
+        possible_r = []
+        for (target_s, target_f, target_w) in self.degrees_by_N[s + f - w]:
+            if target_f == f + 1:
+                r = target_w - w
+                if r > 0:
+                    possible_r.append(r)
+        return possible_r
+
+#check whether this function is used anywhere, if not delete it.
+#
+    def r_with_nonzero_source(self, deg):
+        s, f, w = deg
+        possible_r = []
+        for (source_s, source_f, source_w) in self.degrees_by_N[s + f - w]:
+            if source_f == f - 1:
+                r = w - source_w
+                if r > 0:
+                    possible_r.append(r)
+        return possible_r
+
+
+
+
+   #functions below are for keeping track of known differentials. 
+    
+    def add_known_differential(self, diff: Differential) -> None:
+        """
+        This method adds a known differential to the list of known differentials in the rho-Bockstein spectral sequence.
+
+        Args:
+            diff (Differential): The Differential to add to the list of known differentials.
+        """
+        self.known_differentials.add(diff)
+
+    def add_known_differentials(self, diffs: list[Differential]) -> None:
+        """
+        This method adds a list of known differentials to the list of known differentials in the rho-Bockstein spectral sequence.
+
+        Args:
+            diffs (list[Differential]): The list of Differentials to add to the list of known differentials.
+        """
+        for diff in diffs:
+            self.add_known_differential(diff)
+
+#
     def get_known_differentials(self) -> list[Differential]:
         """
         This method returns a list of known differentials in the rho-Bockstein spectral sequence.

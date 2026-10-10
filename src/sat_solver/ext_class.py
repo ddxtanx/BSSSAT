@@ -1,5 +1,3 @@
-# This is the second file.
-
 """
 This module defines the ExtClass class, which provides a
 useful abstraction for working with classes in the
@@ -15,26 +13,27 @@ from sat_solver.E1_csv_parser import E1CsvParser
 
 class ExtClass:
     """
+    
     This class represents a class in the cohomology of the C-motivic steenrod algebra.
     """
 
     def __init__(self, tridegree: tuple[int, int, int], vector: list[bool]) -> None:
         self.tridegree = tridegree
         self.vector = vector
-
-    def get_degree(self) -> tuple[int, int, int]:
+#
+    def get_classdegree(self) -> tuple[int, int, int]:
         """
         Returns the tridegree (s, f, w) of the class as a tuple of three integers.
         """
         return self.tridegree
-
+#
     def get_vector(self) -> list[bool]:
         """
         Returns the F2 vector of the class as a list of booleans.
         """
         return self.vector
 
-
+#
     def __add__(self, other: ExtClass) -> ExtClass:
         """
         adds two ExtClass 
@@ -43,7 +42,7 @@ class ExtClass:
             return other
         if other == ZeroClass:
             return self
-        if self.get_degree() != other.get_degree():
+        if self.get_classdegree() != other.get_classdegree():
             raise ValueError("Can only add Ext classes in the same tridegree")
         if len(self.vector) != len(other.vector):
             raise ValueError("Can only add Ext classes with the same vector length")
@@ -52,7 +51,7 @@ class ExtClass:
             is_nonzero = any(new_vector)
             if not is_nonzero:
                 return ZeroClass
-            return ExtClass(self.get_degree(), new_vector)
+            return ExtClass(self.get_classdegree(), new_vector)
 
 
     #we need to add a function to multiply two ExtClasses.
@@ -74,7 +73,7 @@ class ExtClass:
         """
         Returns the name of this ExtClass element based on its vector representation.
         """
-        deg = self.get_degree()
+        deg = self.get_classdegree()
         vector = self.get_vector()
         if deg == None:
             if vector == [True]:
@@ -111,16 +110,16 @@ class ExtClass:
         """ Return the tau-torsion of this class. """
         if self == ZeroClass or self == Undefined:
             return 0
-        basis = E1.sfw_dict.get(self.get_degree())
+        basis = E1.sfw_dict.get(self.get_classdegree())
         if basis is None:
             raise ValueError(
-                f"Degree {self.get_degree()} not found in E1.sfw_dict"
+                f"Degree {self.get_classdegree()} not found in E1.sfw_dict"
             )
         vector = self.get_vector()
         if len(vector) != len(basis):
             raise ValueError(
                 f"Vector length {len(vector)} does not match dimension "
-                f"{len(basis)} in degree {self.get_degree()}"
+                f"{len(basis)} in degree {self.get_classdegree()}"
             )
         selected_torsions = [
             element["tautorsion"]
@@ -171,14 +170,15 @@ class ExtClass:
         if other == Undefined:
             return False
 
-        return self.get_degree() == other.get_degree()
+        return self.get_classdegree() == other.get_classdegree()
 
-#check whether this function is used anywhere, if not delete it.
+
+#
     def get_coweight(self) -> int:
         """
         Returns the coweight s - w of the class as an integer.
         """
-        s, f, w = self.get_degree()
+        s, f, w = self.get_classdegree()
         return s - w
 
     def __repr__(self) -> str:
@@ -200,58 +200,4 @@ Undefined: ExtClass = ExtClass(None, [False])
 
 
 
-    #these functions are not used in the SAT solver.
-
-    # def get_differential_targets(self, r: int) -> list[ExtClass]:
-    #     """
-    #     Returns all possible targets y for a differential d_r(x) = rho^r y.
-
-    #     This includes every linear combination in the target tridegree, and the
-    #     zero target (all coefficients False).
-    #     """
-    #     if r < 1:
-    #         raise ValueError("r must be at least 1")
-    #     if self == ZeroClass:
-    #         return [ZeroClass]
-    #     if self == Undefined:
-    #         return [Undefined]
-
-    #     source_degree = self.get_degree()
-    #     target_degree = Main_code_for_diffls.add_degree(source_degree, (r - 1, 1, r))
-    #     basis = Main_code_for_diffls.class_index(target_degree)
-    #     dimension = len(basis)
-
-    #     # No classes in target degree: only zero is possible.
-    #     if dimension == 0:
-    #         return [ExtClass(target_degree, [])]
-
-    #     targets: list[ExtClass] = []
-    #     for coeffs in product([False, True], repeat=dimension):
-    #         targets.append(ExtClass(target_degree, list(coeffs)))
-    #     return targets
-
-
-
-#test
-# if __name__ == "__main__":
-#     x = ExtClass((0, 0, -1), [1, 0, 0])
-#     print(x.get_name())
-
-#     for target in x.get_differential_targets(2):
-#         print(target.get_name())
-
-#     y = ExtClass((110, 34, 54), [1, 0, 0])
-#     z = ExtClass((110, 34, 54), [0, 1, 0])
-#     t = ExtClass((110, 34, 54), [1, 0, 0])
-
-#     print((t + y).get_name())
-#     print((t + z).get_name())
-
-#     m = ExtClass((110, 27, 58), [1, 1, 0])
-#     print(m.get_name())
-#     print(m.get_name_latex())
-
-#     print(x.in_same_tridegree_as(y))
-#     print(x.in_same_tridegree_as(z))
-#     print(x.in_same_tridegree_as(ZeroClass))
-    
+ 

@@ -31,9 +31,9 @@ class SATSolver:
         classes = self.E1_page.get_classes()
         for ext_class in classes:
             print(
-                f"Creating literals with source {ext_class.get_degree()}, {ext_class.get_vector()}"
+                f"Creating literals with source {ext_class.get_classdegree()}, {ext_class.get_vector()}"
             )
-            for r in self.E1_page.r_with_nonzero_target(ext_class.get_degree()):
+            for r in self.E1_page.r_with_nonzero_target(ext_class.get_classdegree()):
                 target_classes = [ZeroClass, Undefined]
                 target_classes += self.E1_page.get_possible_differential_targets(
                     ext_class, r
@@ -43,10 +43,10 @@ class SATSolver:
                     #    f"Creating differential literal: ({ext_class.tridegree}, {ext_class.vector})--d{r}--> ({target_class.tridegree}, {target_class.vector})"
                     #)
                     differential = Differential(ext_class, target_class, r)
-                    self.literal_manager.add_differential(differential)
+                    self.literal_manager.add_differential_literal(differential)
         for r in range(1, self.max_differential + 1):
             #print(f"Creating differential literal: (None, [True])--d{r}--> (None, [True])")
-            self.literal_manager.add_differential(Differential(ZeroClass, ZeroClass, r))
+            self.literal_manager.add_differential_literal(Differential(ZeroClass, ZeroClass, r))
 
 
     def create_known_differential_clauses(self) -> list[int]:
@@ -182,12 +182,12 @@ class SATSolver:
 #        conditional_consequents = []
 
 #        source = diff.get_source()
-#        source_degree = source.get_degree()
+#        source_degree = source.get_classdegree()
 #        degree = diff.get_degree()
 #        target = diff.get_target()
 
 #        for other_class in self.E1_page.get_classes():
-#            other_deg = other_class.get_degree()
+#            other_deg = other_class.get_classdegree()
 #            # Multiplication is commutative, choose only one of a * b, b * a
 #            if other_deg < source_degree:
 #                continue
@@ -287,13 +287,14 @@ class SATSolver:
         conditional_consequents = []
 
         source = diff.get_source()
-        source_degree = source.get_degree()
+        source_degree = source.get_classdegree()
         degree = diff.get_degree()
         target = diff.get_target()
         if target == Undefined:
             return None
 
-        # FIXME: this double-counts pairs of differentials to add
+# FIXME: this double-counts pairs of differentials to add
+#for example, if we have three differentials d_r(x) = y, d_r(z) = w, and d_r(x + z) = y + w, then we will add the linearity clause for both (d_r(x), d_r(z)) and (d_r(z), d_r(x)), which is redundant. We should fix this to only add one of these clauses.
         for other_class in self.E1_page.get_nonzero_classes_in_tridegree(source_degree):
             if other_class == source:
                 continue
@@ -327,7 +328,7 @@ class SATSolver:
 
         if target != ZeroClass:
             # if d_r(x) = y then d_{r'}(y) = 0 for all r'
-            for r1 in self.E1_page.r_with_nonzero_target(target.get_degree()):
+            for r1 in self.E1_page.r_with_nonzero_target(target.get_classdegree()):
                 square_zero_diff = Differential(target, ZeroClass, r1)
                 square_zero_consequent = self.literal_manager.get_differential_atom(
                     square_zero_diff
@@ -338,13 +339,16 @@ class SATSolver:
                     raise ValueError(
                         f"Square-zero differential {square_zero_diff} not found in literal manager."
                     )
+            # NEW CLAUSE:    
+            # a class is a target of at most one differential. 
             # if d_r(x) = y then d_{r'}(z) != y for any r' > r
-            for r1 in self.E1_page.r_with_nonzero_source(target.get_degree()):
+#Question: what happens if y is zero class?
+            for r1 in self.E1_page.r_with_nonzero_source(target.get_classdegree()):
                 if r1 <= degree:
                     continue
                 for z in self.E1_page.get_possible_nontrivial_differential_sources(target, r1):
-                    w_src = z.get_degree()[2]
-                    w_tgt = target.get_degree()[2]
+                    w_src = z.get_classdegree()[2]
+                    w_tgt = target.get_classdegree()[2]
                     r1 = w_tgt - w_src
                     higher_diff = Differential(z, target, r1)
                     higher_diff_atom = self.literal_manager.get_differential_atom(higher_diff)
@@ -358,6 +362,7 @@ class SATSolver:
             return None
 
 
+#why do we have the following constriants in the sat solver? why not put them outside?
     def run_sat_solver(self):
         """
         This method constructs literals and constraints for the SAT solver based on the E1 page, known differentials, and the Leibniz, linearity, and square-zero rules.
@@ -368,7 +373,7 @@ class SATSolver:
         all_clauses = []
         cardinality_constraints = []
         for source in self.E1_page.get_classes():
-            for r in self.E1_page.r_with_nonzero_target(source.get_degree()):
+            for r in self.E1_page.r_with_nonzero_target(source.get_classdegree()):
                 target_classes = [ZeroClass, Undefined]
                 target_classes += self.E1_page.get_possible_differential_targets(
                     source, r
@@ -393,12 +398,13 @@ class SATSolver:
                 )
                 cardinality_constraints.append(card_constraint)
 
+                # NEW CLAUSE: if a class is a source only for one differential.
                 # if d_r(x) != 0 then d_{r+i}(x) = Undef for i > 0
                 zero_diff = Differential(source, ZeroClass, r)
                 zero_diff_atom = self.literal_manager.get_differential_atom(zero_diff)
                 not_zero_clause = Neg(zero_diff_atom)
                 higher_undef_atoms = []
-                higher_r_list = [r1 for r1 in self.E1_page.r_with_nonzero_target(source.get_degree())
+                higher_r_list = [r1 for r1 in self.E1_page.r_with_nonzero_target(source.get_classdegree())
                                  if r1 > r]
                 for higher_r in higher_r_list:
                     higher_diff = Differential(source, Undefined, higher_r)
@@ -415,7 +421,7 @@ class SATSolver:
                 undefined_diff = Differential(source, Undefined, r)
                 undefined_atom = self.literal_manager.get_differential_atom(undefined_diff)
 
-                r_lower_list = [rl for rl in self.E1_page.r_with_nonzero_target(source.get_degree())
+                r_lower_list = [rl for rl in self.E1_page.r_with_nonzero_target(source.get_classdegree())
                                 if rl < r]
                 if r_lower_list == []:
                     all_clauses.append(Neg(undefined_atom))
@@ -432,12 +438,15 @@ class SATSolver:
         # But it's possible for d_r(a) = c, d_r(b) = 0 => d_r(a+b) = c.
         # So we impose here every class is involved in *at least* one differential, and the
         # other direction is taken care of by the "square zero" constraints.
+
+#Question: How is this different then the previous cardinality constraints? The previous ones are for each source class and each r, while this is for each class overall. So this is a more global constraint, while the previous ones are more local constraints. This is to ensure that every class participates in at least one differential, while the previous ones are to ensure that each source class has exactly one target for each r.
+
         for cls in self.E1_page.get_classes():
 
             hit_or_support_literals = []
 #            print("tracing", cls)
 
-            for r in self.E1_page.r_with_nonzero_source(cls.get_degree()):
+            for r in self.E1_page.r_with_nonzero_source(cls.get_classdegree()):
                 possible_sources = self.E1_page.get_possible_nontrivial_differential_sources(
                     cls, r
                 )
@@ -454,7 +463,7 @@ class SATSolver:
 
                     hit_or_support_literals.append(diff_id)
 
-            for r in self.E1_page.r_with_nonzero_target(cls.get_degree()):
+            for r in self.E1_page.r_with_nonzero_target(cls.get_classdegree()):
                 possible_targets = self.E1_page.get_possible_differential_targets(
                     cls, r
                 )

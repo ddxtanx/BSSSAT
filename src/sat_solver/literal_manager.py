@@ -25,7 +25,8 @@ class LiteralManager:
         self.differentials_to_ids = {}
         self.differentials = []
 
-    def add_differential(self, differential: Differential) -> Atom:
+#
+    def add_differential_literal(self, differential: Differential) -> Atom:
         """
         Adds a new differential question to the manager and returns its unique ID.
         If the differential already exists, returns its existing ID.
@@ -66,6 +67,8 @@ class LiteralManager:
         else:
             return None
 
+    #This function is different from get_differential_id in that it returns the Atom object, not just the int.
+#
     def get_differential_atom(self, differential: Differential) -> Atom | None:
         """
         Retrieves the Atom for a given differential question.

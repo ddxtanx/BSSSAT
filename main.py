@@ -19,7 +19,7 @@ def main():
     ext_classes = [ExtClass(*x) for x in all_classes]
     print("number of E1 classes: ", len(ext_classes))
     for x in ext_classes:
-        print(x.class_name(E1), x.get_degree())
+        print(x.class_name(E1), x.get_classdegree())
     ext = Ext(E1)
 
     # comment out these four lines if you want to try a different N = s+f-w
