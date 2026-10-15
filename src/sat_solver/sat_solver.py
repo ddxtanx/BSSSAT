@@ -13,6 +13,11 @@ class SATSolver:
     max_differential: int
     known_differentials: dict[tuple[ExtClass, int], ExtClass]
 
+   #This implements the differential into a dictionary from a list of differential classes. I wonder
+   #why we need this way. It is only used in create_known_differential_clauses(). And I do not see how different it is
+   # with directly using list of classes.
+   #Also, If we have d_r(x)=y and d_r(x)=z, the functions will
+   #overwrite d_r(x)=y to d_r(x)=z instead of creating two differentials
     def __init__(self, E1_page: Ext, max_differential: int):
         self.E1_page = E1_page
         self.literal_manager = LiteralManager()
@@ -24,9 +29,12 @@ class SATSolver:
             degree = differential.get_degree()
             target = differential.get_target()
             self.known_differentials[(source, degree)] = target
+    
 
 
-    #this function creates the variables for the SAT solver.
+    
+    # Because we use "for r in self.E1_page.r_with_nonzero_target(ext_class.get_classdegree())", if d_r(x)=0 for degree reason,
+    # it will not create a differential literal for it. But maybe we do not need it for speed reason?
     def create_literals(self):
         classes = self.E1_page.get_classes()
         for ext_class in classes:
@@ -48,7 +56,8 @@ class SATSolver:
             #print(f"Creating differential literal: (None, [True])--d{r}--> (None, [True])")
             self.literal_manager.add_differential_literal(Differential(ZeroClass, ZeroClass, r))
 
-
+# A known zero differential whose literal wasn’t created because of the degree check in create_literals
+#  will still raise ValueError.
     def create_known_differential_clauses(self) -> list[int]:
         """
         This creates the composite clause that enforces the known differentials in the SAT solver.
@@ -294,7 +303,9 @@ class SATSolver:
             return None
 
 # FIXME: this double-counts pairs of differentials to add
-#for example, if we have three differentials d_r(x) = y, d_r(z) = w, and d_r(x + z) = y + w, then we will add the linearity clause for both (d_r(x), d_r(z)) and (d_r(z), d_r(x)), which is redundant. We should fix this to only add one of these clauses.
+#for example, if we have three differentials d_r(x) = y, d_r(z) = w, and d_r(x + z) = y + w, 
+# then we will add the linearity clause for both (d_r(x), d_r(z)) and (d_r(z), d_r(x)), which is redundant. 
+# We should fix this to only add one of these clauses. 
         for other_class in self.E1_page.get_nonzero_classes_in_tridegree(source_degree):
             if other_class == source:
                 continue
@@ -342,7 +353,7 @@ class SATSolver:
             # NEW CLAUSE:    
             # a class is a target of at most one differential. 
             # if d_r(x) = y then d_{r'}(z) != y for any r' > r
-#Question: what happens if y is zero class?
+#Question: what happens if y is zero class? (This is fixed by the check for nonzero target degrees in the loops above)
             for r1 in self.E1_page.r_with_nonzero_source(target.get_classdegree()):
                 if r1 <= degree:
                     continue
@@ -438,7 +449,7 @@ class SATSolver:
         # But it's possible for d_r(a) = c, d_r(b) = 0 => d_r(a+b) = c.
         # So we impose here every class is involved in *at least* one differential, and the
         # other direction is taken care of by the "square zero" constraints.
-
+        # So it is solved
 #Question: How is this different then the previous cardinality constraints? The previous ones are for each source class and each r, while this is for each class overall. So this is a more global constraint, while the previous ones are more local constraints. This is to ensure that every class participates in at least one differential, while the previous ones are to ensure that each source class has exactly one target for each r.
 
         for cls in self.E1_page.get_classes():
@@ -479,6 +490,7 @@ class SATSolver:
                         )
 
                     hit_or_support_literals.append(diff_id)
+
 
 
             card_constraint = CardEnc.atleast(

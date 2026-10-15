@@ -81,6 +81,7 @@ class LiteralManager:
         """
         return self.differentials_to_ids.get(differential, None)
 
+# not used
     def get_differential_by_id(self, id: int) -> Differential | None:
         """
         Retrieves the differential question associated with a given ID.

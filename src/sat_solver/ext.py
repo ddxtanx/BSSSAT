@@ -52,7 +52,7 @@ class Ext:
             self.add_classes(ext_classes)
 
 
-
+#
     def add_class(self, ext_class: ExtClass) -> None:
         """
         This method adds an ExtClass to the Ext algebra.
@@ -78,7 +78,7 @@ class Ext:
         if w < self.min_weight:
             self.min_weight = w
 
-#generalize previous function.
+#
     def add_classes(self, ext_classes: list[ExtClass]) -> None:
         """
         This method adds a list of ExtClasses to the Ext algebra.
@@ -99,11 +99,12 @@ class Ext:
         self.classes = classes
         return classes
 
-
+# not used
     def num_nonzero(self, s, f, w):
         assert self.class_dct is not None
         return len(self.class_dct[s,f,w])
 
+# not used
     def get_classes_in_fixed_N(self, N: int) -> list[ExtClass]:
         """
         This method returns a list of ExtClasses whose fixed degree (s + f - w) is equal to a given value N.
@@ -121,6 +122,7 @@ class Ext:
                 if (s, f, w) in self.class_dct:
                     classes.extend(self.class_dct[(s, f, w)])
         return classes
+    
 #
     def get_nonzero_classes_in_tridegree(
         self, tridegree: tuple[int, int, int]
@@ -140,6 +142,7 @@ class Ext:
         else:
             return []
 
+# not used
     def get_rho_periodic_elements(self) -> list[ExtClass]:
         """
         This method returns a list of ExtClasses that are known to be permanent cycles from the E1 page,
@@ -161,6 +164,7 @@ class Ext:
                     rho_periodic_elts.extend(self.class_dct[(s, f, w)])
         return rho_periodic_elts
 
+# not used, maybe in ext_class?
     def is_rho_periodic(self, ext_class: ExtClass) -> bool:
         """
         This method returns whether a given ExtClass is known to be rho periodic.
@@ -243,7 +247,6 @@ class Ext:
                     possible_r.append(r)
         return possible_r
 
-#check whether this function is used anywhere, if not delete it.
 #
     def r_with_nonzero_source(self, deg):
         s, f, w = deg

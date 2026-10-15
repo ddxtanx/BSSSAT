@@ -68,7 +68,7 @@ class ExtClass:
         pass  # Placeholder for the actual implementation of the product operation.
 
 
-# Check if we need it, maybe in the end to print the real names.
+# 
     def class_name(self, E1: "E1CsvParser") -> str:
         """
         Returns the name of this ExtClass element based on its vector representation.
@@ -90,7 +90,7 @@ class ExtClass:
 
 
 
- # Check if we need it. I suspect it will be needed when writing multiplication function.
+ # 
     @staticmethod
     def create_class_from_basis_name(E1:"E1CsvParser", degree, name) -> "ExtClass":
         basis = E1.sfw_dict.get(degree)
@@ -105,7 +105,7 @@ class ExtClass:
             f"{name!r} is not a basis element in degree {degree}"
         )
 
-
+# not used
     def get_tau_torsion(self, E1: "E1CsvParser") -> int:
         """ Return the tau-torsion of this class. """
         if self == ZeroClass or self == Undefined:
@@ -145,7 +145,7 @@ class ExtClass:
         return hash((self.tridegree, tuple(self.vector)))
 
 
-#check whether this function is used anywhere, if not delete it.
+#
     def __eq__(self, other: object) -> bool:
         """
         Determines whether this class and other are equal.
@@ -154,7 +154,7 @@ class ExtClass:
             return False
         return self.tridegree == other.tridegree and self.vector == other.vector
 
-#check whether this function is used anywhere, if not delete it.
+#
     def in_same_tridegree_as(self, other: ExtClass) -> bool:
         """
         Determines whether this class and other are in the same tridegree.
@@ -173,20 +173,20 @@ class ExtClass:
         return self.get_classdegree() == other.get_classdegree()
 
 
-#
+# not used
     def get_coweight(self) -> int:
         """
         Returns the coweight s - w of the class as an integer.
         """
         s, f, w = self.get_classdegree()
         return s - w
-
+#
     def __repr__(self) -> str:
         """
         Returns a string representation of the ExtClass instance.
         """
         return f"ExtClass(tridegree={self.tridegree}, vector={self.vector})"
-
+#
     def __str__(self) -> str:
         """
         uses the __repr__ method to return a string representation of the ExtClass instance.

@@ -111,8 +111,7 @@ class E1CsvParser:
     #     return None
 
 
-#strong feeling we don't need these functions.   
-# Check if the following functions are needed for further computations.
+# The following three are not used
     def add_degree(self, degree1, degree2):
             return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
 
