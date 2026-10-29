@@ -89,7 +89,7 @@ class Ext:
         for ext_class in ext_classes:
             self.add_class(ext_class)
 
-#
+
     def get_classes(self) -> set[ExtClass]:
         if self.classes != set():
             return self.classes
@@ -121,7 +121,7 @@ class Ext:
                 if (s, f, w) in self.class_dct:
                     classes.extend(self.class_dct[(s, f, w)])
         return classes
-#
+
     def get_nonzero_classes_in_tridegree(
         self, tridegree: tuple[int, int, int]
     ) -> list[ExtClass]:
@@ -176,8 +176,8 @@ class Ext:
 
 
 
-    #The following functions are for finding possible sources and targets of differentials.
-#
+#   The following functions are for finding possible sources and targets of differentials.
+
     def get_possible_differential_targets(
         self, ext_class: ExtClass, r: int
     ) -> list[ExtClass]:
@@ -204,7 +204,7 @@ class Ext:
             return list(self.class_dct[(target_s, target_f, target_w)])
         else:
             return []
-#
+
     def get_possible_nontrivial_differential_sources(
         self, target_class: ExtClass, r: int
     ) -> list[ExtClass]:
@@ -232,7 +232,7 @@ class Ext:
         else:
             return []
 
-#
+
     def r_with_nonzero_target(self, deg):
         s, f, w = deg
         possible_r = []
@@ -243,7 +243,6 @@ class Ext:
                     possible_r.append(r)
         return possible_r
 
-#check whether this function is used anywhere, if not delete it.
 #
     def r_with_nonzero_source(self, deg):
         s, f, w = deg
@@ -254,11 +253,8 @@ class Ext:
                 if r > 0:
                     possible_r.append(r)
         return possible_r
-
-
-
-
-   #functions below are for keeping track of known differentials. 
+    
+#   functions below are for keeping track of known differentials. 
     
     def add_known_differential(self, diff: Differential) -> None:
         """
@@ -279,7 +275,7 @@ class Ext:
         for diff in diffs:
             self.add_known_differential(diff)
 
-#
+
     def get_known_differentials(self) -> list[Differential]:
         """
         This method returns a list of known differentials in the rho-Bockstein spectral sequence.

@@ -38,7 +38,7 @@ class E1CsvParser:
         return classes
 
 
-#
+
     def make_sfw_grouping(self, only_one_N):
         """
         Groups the E1 basis elements by their (s, f, w) degrees, taking into account tau multiples.
@@ -88,7 +88,7 @@ class E1CsvParser:
                     })
         return elements_in_degree
 
-#
+
     def make_all_lin_combs(self):
         """
         Returns a list of tuples (tridegree, vector) that can be turned into ExtClass(tridegree, vector)
@@ -103,6 +103,24 @@ class E1CsvParser:
                     continue
                 classes.append((deg, list(vector)))
         return classes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     # def class_name_by_index(a_degree, index):
     #     for element in class_index(a_degree):

@@ -20,20 +20,20 @@ class ExtClass:
     def __init__(self, tridegree: tuple[int, int, int], vector: list[bool]) -> None:
         self.tridegree = tridegree
         self.vector = vector
-#
+
     def get_classdegree(self) -> tuple[int, int, int]:
         """
         Returns the tridegree (s, f, w) of the class as a tuple of three integers.
         """
         return self.tridegree
-#
+
     def get_vector(self) -> list[bool]:
         """
         Returns the F2 vector of the class as a list of booleans.
         """
         return self.vector
 
-#
+
     def __add__(self, other: ExtClass) -> ExtClass:
         """
         adds two ExtClass 
@@ -68,7 +68,7 @@ class ExtClass:
         pass  # Placeholder for the actual implementation of the product operation.
 
 
-# Check if we need it, maybe in the end to print the real names.
+
     def class_name(self, E1: "E1CsvParser") -> str:
         """
         Returns the name of this ExtClass element based on its vector representation.
@@ -90,7 +90,7 @@ class ExtClass:
 
 
 
- # Check if we need it. I suspect it will be needed when writing multiplication function.
+ 
     @staticmethod
     def create_class_from_basis_name(E1:"E1CsvParser", degree, name) -> "ExtClass":
         basis = E1.sfw_dict.get(degree)
@@ -140,12 +140,12 @@ class ExtClass:
     #     """
     #     return Main_code_for_diffls.convert_to_latex(self.get_name())
 
-#check whether this function is used anywhere, if not delete it.
+
     def __hash__(self) -> int:
         return hash((self.tridegree, tuple(self.vector)))
 
 
-#check whether this function is used anywhere, if not delete it.
+
     def __eq__(self, other: object) -> bool:
         """
         Determines whether this class and other are equal.
@@ -154,7 +154,7 @@ class ExtClass:
             return False
         return self.tridegree == other.tridegree and self.vector == other.vector
 
-#check whether this function is used anywhere, if not delete it.
+
     def in_same_tridegree_as(self, other: ExtClass) -> bool:
         """
         Determines whether this class and other are in the same tridegree.
@@ -173,7 +173,7 @@ class ExtClass:
         return self.get_classdegree() == other.get_classdegree()
 
 
-#
+
     def get_coweight(self) -> int:
         """
         Returns the coweight s - w of the class as an integer.
