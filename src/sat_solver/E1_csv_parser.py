@@ -111,25 +111,24 @@ class E1CsvParser:
     #     return None
 
 
-#strong feeling we don't need these functions.   
-# Check if the following functions are needed for further computations.
-    def add_degree(self, degree1, degree2):
-            return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
+#the following functions are not needed for further computations.
+    # def add_degree(self, degree1, degree2):
+    #         return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
 
 
-    def counting_values(classes):
-            counting = {}
-            for element, values in classes.items():
-                counting[element] = len(values)
-            return counting
+    # def counting_values(classes):
+    #         counting = {}
+    #         for element, values in classes.items():
+    #             counting[element] = len(values)
+    #         return counting
 
 #maybe go into differential.py
-    def finding_sources_with_fixed_number_of_differentials(classes, number):
-            sources = []
-            for element, values in classes.items():
-                if len(values) == number:
-                    sources.append(element)
-            return sources
+    # def finding_sources_with_fixed_number_of_differentials(classes, number):
+    #         sources = []
+    #         for element, values in classes.items():
+    #             if len(values) == number:
+    #                 sources.append(element)
+    #         return sources
 
 
     # def basis_names_by_vector(a_degree, vector):
