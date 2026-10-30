@@ -140,6 +140,144 @@ class Ext:
         else:
             return []
 
+#we still need to write base_product function, #recieves names with no tau powers, looks up the #yoneda product and returns base names of the product.
+
+    def multiply_classes(
+        self,
+        left: ExtClass,
+        right: ExtClass,
+        base_product,
+    ) -> ExtClass:
+        """
+        Multiply two ExtClass objects.
+
+        The base_product function computes the ordinary Yoneda product
+        after tau-powers have been removed.
+
+        This method uses:
+
+            (tau^a x)(tau^b y) = tau^(a+b)(xy)
+
+        Multiplication is extended over sums using bilinearity.
+        """
+        if self.E1 is None:
+            raise ValueError(
+                "Ext multiplication requires an E1CsvParser object"
+            )
+
+        if left == Undefined or right == Undefined:
+            return Undefined
+
+        if left == ZeroClass or right == ZeroClass:
+            return ZeroClass
+
+        left_degree = left.get_classdegree()
+        right_degree = right.get_classdegree()
+
+        product_degree = tuple(
+            left_coordinate + right_coordinate
+            for left_coordinate, right_coordinate
+            in zip(left_degree, right_degree)
+        )
+
+        left_basis = self.E1.sfw_dict.get(left_degree)
+        right_basis = self.E1.sfw_dict.get(right_degree)
+
+#these are just for checks! not required though.
+        if left_basis is None:
+            raise ValueError(
+                f"No E1 basis found in degree {left_degree}"
+            )
+
+        if right_basis is None:
+            raise ValueError(
+                f"No E1 basis found in degree {right_degree}"
+            )
+
+        left_vector = left.get_vector()
+        right_vector = right.get_vector()
+
+        if len(left_vector) != len(left_basis):
+            raise ValueError(
+                f"Left vector has length {len(left_vector)}, "
+                f"but degree {left_degree} has "
+                f"{len(left_basis)} basis elements"
+            )
+
+        if len(right_vector) != len(right_basis):
+            raise ValueError(
+                f"Right vector has length {len(right_vector)}, "
+                f"but degree {right_degree} has "
+                f"{len(right_basis)} basis elements"
+            )
+
+        product_basis = self.E1.sfw_dict.get(product_degree, [])
+
+        product_indices = {
+            element["name"]: index
+            for index, element in enumerate(product_basis)
+        }
+# Initialize the product as zero in the basis of the product degree.
+# As product terms are computed, toggle their coefficients in this vector.
+        result_vector = [False] * len(product_basis)
+
+        selected_left_terms = [
+            element
+            for element, coefficient
+            in zip(left_basis, left_vector)
+            if coefficient
+        ]
+
+        selected_right_terms = [
+            element
+            for element, coefficient
+            in zip(right_basis, right_vector)
+            if coefficient
+        ]
+#this does the bilinearity.
+        for left_term in selected_left_terms:
+            for right_term in selected_right_terms:
+                left_base_name = left_term["base_name"]
+                right_base_name = right_term["base_name"]
+#(tau^a x)(tau^b y) = tau^(a+b)(xy)
+                left_taupower = left_term["taupower"]
+                right_taupower = right_term["taupower"]
+
+                total_taupower = (
+                    left_taupower + right_taupower
+                )
+#FIX ME: we still need to write base_product function.
+                base_product_names = base_product(
+                    left_base_name,
+                    right_base_name,
+                )
+
+                for base_product_name in base_product_names:
+                    if base_product_name == "0":
+                        continue
+
+                    result_name = (
+                        f"tau^{total_taupower} "
+                        f"{base_product_name}"
+                    )
+
+                    result_index = product_indices.get(result_name)
+
+                    if result_index is None:
+                        # This tau-multiple is not present on the E1
+                        # page. It may have been killed by tau-torsion.
+                        continue
+
+                    # Coefficients are in F_2, so adding a term
+                    # means toggling its coefficient.
+                    result_vector[result_index] ^= True
+
+        if not any(result_vector):
+            return ZeroClass
+
+        return ExtClass(product_degree, result_vector)
+
+
     def get_rho_periodic_elements(self) -> list[ExtClass]:
         """
         This method returns a list of ExtClasses that are known to be permanent cycles from the E1 page,

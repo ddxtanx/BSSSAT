@@ -5,11 +5,11 @@ import re
 from pathlib import Path
 from typing import Callable
 
-
-DATA_PATH = Path(__file__).with_name("Adams-motivic-E2-machine.csv")
+#we don't need to reread the csv file. we can just move this product_of_tau_multiple function after ext_class.py.
+DATA_PATH = Path(__file__).parent.parent / "ext_data" / "Adams-motivic-E2-machine.csv"
 TAU_PREFIX_RE = re.compile(r"^\s*tau(?:\^(\d+))?\s+(.+?)\s*$")
 
-
+#this function extracts the exponent of tau.
 def tau_exponent(name: str) -> int:
     """Return the exponent n from a name like 'tau^n x'."""
     match = TAU_PREFIX_RE.match(name)
@@ -34,7 +34,7 @@ def _name_with_tau(name: str, exponent: int) -> str:
         return name
     return f"tau^{exponent} {name}"
 
-
+#we might not need this function, if we use product function after ext class.
 def _load_classes_by_name() -> dict[str, dict[str, int | str]]:
     classes_by_name: dict[str, dict[str, int | str]] = {}
     with DATA_PATH.open(newline="") as csvfile:
@@ -52,6 +52,7 @@ def _load_classes_by_name() -> dict[str, dict[str, int | str]]:
 
 CLASSES_BY_NAME = _load_classes_by_name()
 
+#this function adds zero element in each degree. I don't think we need code to remember tri degree of zero element.
 
 def zero_element(stem: int, adams_filtration: int, weight: int) -> dict[str, int | str]:
     return {
@@ -99,7 +100,7 @@ def look_up_element_by_machine_name(machine_name: str) -> dict[str, int | str]:
         "tautorsion": remaining_tautorsion,
     }
 
-
+#need to add yoneda product of two ExtClasses. 
 def product(element1: str, element2: str) -> list[str]:
     """
     Placeholder for the ordinary product of module generators.

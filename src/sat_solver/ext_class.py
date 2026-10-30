@@ -54,7 +54,8 @@ class ExtClass:
             return ExtClass(self.get_classdegree(), new_vector)
 
 
-    #we need to add a function to multiply two ExtClasses.
+    #we need to add a function to multiply two ExtClasses. I have already created a function in ext.py called multiply_classes. 
+    #delete the following function after removing it from main.py.
     def __mul__(self, other: ExtClass) -> ExtClass:
         #         """
         #         Constructs a new ExtClass instance that represents the product of this class and another class.
@@ -128,7 +129,7 @@ class ExtClass:
         ]
         if not selected_torsions:
             return 0
-    #is it possible that x and y are both nonzero and torsion-free, but x+y is torsion? in our range!
+#is it possible that x and y are both nonzero and torsion-free, but x+y is torsion? in our range!
         if 0 in selected_torsions:
             return 0
         return max(selected_torsions)
@@ -195,9 +196,3 @@ class ExtClass:
 
 ZeroClass: ExtClass = ExtClass(None, [True])
 Undefined: ExtClass = ExtClass(None, [False])
-
-#we need to be careful about zero class and 0 in each degree. Should we make a function that treats 0 in each degree as a zero class? 
-
-
-
- 
