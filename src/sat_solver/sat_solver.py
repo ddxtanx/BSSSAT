@@ -11,13 +11,12 @@ from pysat.card import CardEnc
 class SATSolver:
     E1_page: Ext
     literal_manager: LiteralManager
-    max_differential: int
     known_differentials: dict[tuple[ExtClass, int], ExtClass]
 
-    def __init__(self, E1_page: Ext, max_differential: int):
+    def __init__(self, E1_page: Ext):
         self.E1_page = E1_page
         self.literal_manager = LiteralManager()
-        self.max_differential = max_differential
+        self.pages = set()
         known_diffs = self.E1_page.get_known_differentials()
         self.known_differentials = {}
         for differential in known_diffs:
@@ -35,6 +34,7 @@ class SATSolver:
                 f"Creating literals with source {ext_class.get_classdegree()}, {ext_class.get_vector()}"
             )
             for r in self.E1_page.r_with_nonzero_target(ext_class.get_classdegree()):
+                self.pages.add(r)
                 target_classes = [ZeroClass, Undefined]
                 target_classes += self.E1_page.get_possible_differential_targets(
                     ext_class, r
@@ -45,8 +45,7 @@ class SATSolver:
                     #)
                     differential = Differential(ext_class, target_class, r)
                     self.literal_manager.add_differential_literal(differential)
-        for r in range(1, self.max_differential + 1):
-            #print(f"Creating differential literal: (None, [True])--d{r}--> (None, [True])")
+        for r in sorted(self.pages):
             self.literal_manager.add_differential_literal(Differential(ZeroClass, ZeroClass, r))
 
 
@@ -105,7 +104,7 @@ class SATSolver:
                 )
 
         # d_r(0) = 0 always true
-        for r in range(1, self.max_differential + 1):
+        for r in sorted(self.pages):
             zero_differential = Differential(ZeroClass, ZeroClass, r)
             zero_atom = self.literal_manager.get_differential_atom(zero_differential)
             if zero_atom is not None:

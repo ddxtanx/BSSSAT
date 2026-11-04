@@ -11,7 +11,6 @@ ZeroClass: ExtClass = ExtClass(None, [True])
 Undefined: ExtClass = ExtClass(None, [False])
 
 max_N = 4
-max_differential_degree = 5
 
 def main():
     E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N = False)  # s+f-w = 2
@@ -48,7 +47,7 @@ def main():
   
 
 
-    sat_solver = SATSolver(ext, max_differential_degree)
+    sat_solver = SATSolver(ext)
     backbone = sat_solver.find_backbone()
     forced = sat_solver.find_forced_differentials(backbone)
     unknown = sat_solver.find_unknown_differentials(backbone)
