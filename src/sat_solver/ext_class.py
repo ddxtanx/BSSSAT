@@ -13,7 +13,6 @@ from sat_solver.E1_csv_parser import E1CsvParser
 
 class ExtClass:
     """
-    
     This class represents a class in the cohomology of the C-motivic steenrod algebra.
     """
 
@@ -36,7 +35,7 @@ class ExtClass:
 
     def __add__(self, other: ExtClass) -> ExtClass:
         """
-        adds two ExtClass 
+        adds two ExtClass
         """
         if self == ZeroClass:
             return other
@@ -90,8 +89,6 @@ class ExtClass:
 
 
 
-
- 
     @staticmethod
     def create_class_from_basis_name(E1:"E1CsvParser", degree, name) -> "ExtClass":
         basis = E1.sfw_dict.get(degree)

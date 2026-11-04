@@ -9,6 +9,8 @@ the differential question associated to the given literal representation.
 """
 
 from sat_solver.differential import Differential
+from sat_solver.hitbefore import HitBefore
+from sat_solver.ext_class import ExtClass
 from pysat.formula import Atom
 
 
@@ -16,14 +18,18 @@ class LiteralManager:
     """
     A class to manage the translation between differential questions
     and boolean literals for a SAT solver.
+
+    There are two types of variables:
+    * Differential objects (a boolean representing whether d_r(x)=y is true)
+    * Dummy variables that represent, for a class x and an integer r, whether x is hit by a differential of length < r
     """
 
-    differentials_to_ids: dict[Differential, Atom]
-    differentials: list[Differential]
+    variables_to_ids: dict[Differential | HitBefore, Atom]
+    variables: list[Differential | HitBefore]
 
     def __init__(self):
-        self.differentials_to_ids = {}
-        self.differentials = []
+        self.variables_to_ids = {}
+        self.variables = []
 
 
     def add_differential_literal(self, differential: Differential) -> Atom:
@@ -38,18 +44,18 @@ class LiteralManager:
         Raises:
             ValueError: If the assigned ID does not match the expected value.
         """
-        if differential in self.differentials_to_ids:
-            return self.differentials_to_ids[differential]
+        if differential in self.variables_to_ids:
+            return self.variables_to_ids[differential]
         else:
             atom = Atom(differential)
             atom.clausify()
-            self.differentials_to_ids[differential] = atom
+            self.variables_to_ids[differential] = atom
             ident = atom.name
-            if ident != len(self.differentials) + 1:
+            if ident != len(self.variables) + 1:
                 raise ValueError(
-                    f"Unexpected literal ID {ident} for differential {differential}. Expected {len(self.differentials) + 1}."
+                    f"Unexpected literal ID {ident} for differential {differential}. Expected {len(self.variables) + 1}."
                 )
-            self.differentials.append(differential)
+            self.variables.append(differential)
             return atom
 
     def get_differential_id(self, differential: Differential) -> int | None:
@@ -61,7 +67,7 @@ class LiteralManager:
         Returns:
             int | None: The int representing the differential question, or None if it doesn't exist
         """
-        atom = self.differentials_to_ids.get(differential, None)
+        atom = self.variables_to_ids.get(differential, None)
         if atom is not None:
             return atom.name
         else:
@@ -79,7 +85,7 @@ class LiteralManager:
         Returns:
             Atom | None: The Atom representing the differential question, or None if it doesn't exist
         """
-        return self.differentials_to_ids.get(differential, None)
+        return self.variables_to_ids.get(differential, None)
 
     def get_differential_by_id(self, id: int) -> Differential | None:
         """
@@ -92,7 +98,49 @@ class LiteralManager:
             Differential | None: The differential question associated with the ID, or None if it doesn't exist
         """
         id = abs(id)
-        if 1 <= id <= len(self.differentials):
-            return self.differentials[id - 1]
+        if 1 <= id <= len(self.variables):
+            return self.variables[id - 1]
         else:
             return None
+
+    def add_hitbefore_literal(self, hitbefore: HitBefore) -> Atom:
+        """
+        Adds a new dummy variable: hitbefore(x, r) means x is the target of a differential of length < r.
+
+        Args: hitbefore (HitBefore): an object representing the variable "x is the target of a differential of length < r"
+
+        Returns:
+            int: The unique ID assigned to this variable
+        Raises:
+            ValueError: If the assigned ID does not match the expected value.
+        """
+        if hitbefore in self.variables_to_ids:
+            return self.variables_to_ids[hitbefore]
+        else:
+            atom = Atom(hitbefore)
+            atom.clausify()
+            self.variables_to_ids[hitbefore] = atom
+            ident = atom.name
+            if ident != len(self.variables) + 1:
+                raise ValueError(
+                    f"Unexpected literal ID {ident} for hitbefore {hitbefore}. Expected {len(self.variables) + 1}."
+                )
+            self.variables.append(hitbefore)
+            return atom
+
+
+    def get_hitbefore_id(self, hitbefore: HitBefore) -> int | None:
+        """
+        Retrieves the Atom for a given "hit before" dummy variable
+
+        Args:
+            hitbefore (HitBefore): The dummy variable to look up
+        Returns:
+            int | None: The int representing the differential question, or None if it doesn't exist
+        """
+        atom = self.variables_to_ids.get(hitbefore, None)
+        if atom is not None:
+            return atom.name
+        else:
+            return None
+
