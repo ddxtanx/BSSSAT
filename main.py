@@ -1,4 +1,5 @@
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 # Allow this file to be run directly even when the editable install is unavailable.
@@ -48,20 +49,24 @@ def main():
 
 
     sat_solver = SATSolver(ext, max_differential_degree)
-    all_models = sat_solver.run_sat_solver()
-    print("\nnumber of SAT variables: ", len(sat_solver.literal_manager.differentials))
-    print("\nnumber of possible solutions to the system: ", len(all_models))
+    backbone = sat_solver.find_backbone()
+    forced = sat_solver.find_forced_differentials(backbone)
+    unknown = sat_solver.find_unknown_differentials(backbone)
+    print("\nnumber of SAT variables: ", len(sat_solver.literal_manager.variables))
 
+    print("\nForced differentials:")
+    forced = [d for d in forced if d.source != ZeroClass]
+    for diff in sorted(forced, key=lambda d: (d.degree_of_differential, d.source.get_classdegree())):
+        r = diff.degree_of_differential
+        print(f"d_{r}: ", diff.source.class_name(E1), " -> ", diff.target.class_name(E1))
 
-    if all_models:
-        print("\nPrinting one possible solution")
-        for diff in all_models[0]:
-            r = diff.degree_of_differential
-            source_name = diff.source.class_name(E1)
-            target_name = diff.target.class_name(E1)
-            print(f"d_{r}: ", source_name, " -> ", target_name)
-    else:
-        print("The SAT problem is unsatisfiable")
+    print("\nnumber of unknown differentials: ", len(unknown))
+    unknown_by_page = defaultdict(list)
+    for source, r in unknown:
+        unknown_by_page[r].append(source)
+    for r in sorted(unknown_by_page):
+        sources = sorted(unknown_by_page[r], key=lambda x: x.get_classdegree())
+        print(f"d_{r}: {len(sources)} unknown, e.g.", ", ".join(x.class_name(E1) for x in sources[:5]))
 
 
 

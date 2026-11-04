@@ -481,67 +481,88 @@ class SATSolver:
 #Question: How is this different then the previous cardinality constraints? The previous ones are for each source class and each r, while this is for each class overall. So this is a more global constraint, while the previous ones are more local constraints. This is to ensure that every class participates in at least one differential, while the previous ones are to ensure that each source class has exactly one target for each r.
 
         for cls in self.E1_page.get_classes():
-
             hit_or_support_literals = []
-#            print("tracing", cls)
-
-            for r in self.E1_page.r_with_nonzero_source(cls.get_classdegree()):
-                possible_sources = self.E1_page.get_possible_nontrivial_differential_sources(
-                    cls, r
+            pages = self.E1_page.r_with_nonzero_source(cls.get_classdegree())
+            if pages:
+                hit_or_support_literals.append(
+                    self.literal_manager.get_hitbefore_id(HitBefore(cls, max(pages) + 1))
                 )
-#                print("possible sources", r, possible_sources)
-
-                for source in possible_sources:
-                    diff = Differential(source, cls, r)
-                    diff_id = self.literal_manager.get_differential_id(diff)
-
-                    if diff_id is None:
-                        raise ValueError(
-                            f"Differential {diff} not found in literal manager."
-                        )
-
-                    hit_or_support_literals.append(diff_id)
-
             for r in self.E1_page.r_with_nonzero_target(cls.get_classdegree()):
-                possible_targets = self.E1_page.get_possible_differential_targets(
-                    cls, r
-                )
-#                print("possible targets", r,  possible_targets)
-
-                for target in possible_targets:
-                    diff = Differential(cls, target, r)
-                    diff_id = self.literal_manager.get_differential_id(diff)
-
-                    if diff_id is None:
-                        raise ValueError(
-                            f"Differential {diff} not found in literal manager."
-                        )
-
-                    hit_or_support_literals.append(diff_id)
-
-
-            card_constraint = CardEnc.atleast(
-                lits=hit_or_support_literals, bound=1, encoding=9
-            )
-            cardinality_constraints.append(card_constraint)
+                zero_id = self.literal_manager.get_differential_id(Differential(cls, ZeroClass, r))
+                hit_or_support_literals.append(-zero_id)
+            cardinality_constraints.append([hit_or_support_literals])
 
 
 
         constraint = And(*all_clauses).simplified()
-        print("len(variables) = ", len(self.literal_manager.differentials))
+        print("len(variables) = ", len(self.literal_manager.variables))
         print("len(all_clauses) = ", len(all_clauses))
         print("len(cardinality_constraints) = ", len(cardinality_constraints))
         print("len(known_clauses) = ", len(known_clauses))
-        with Solver("Gluecard4") as s:
-            for card in cardinality_constraints:
-                s.append_formula(card)
-            s.append_formula(constraint)
-            s.solve(assumptions=known_clauses)
+        s = Solver("Gluecard4")
+        for card in cardinality_constraints:
+            s.append_formula(card)
+        s.append_formula(constraint)
+        return s, known_clauses
+
+    def run_sat_solver(self) -> list[list[Differential]]:
+        """
+        Enumerates all models. Each model is the list of differentials that are true in it.
+        """
+        s, known_clauses = self.build_solver()
+        with s:
             all_models = []
             for model in s.enum_models(assumptions=known_clauses):
                 formula_models = Formula.formulas(model, atoms_only=True)
                 only_true = [
                     atom.object for atom in formula_models if not isinstance(atom, Neg)
+                                                              and isinstance(atom.object, Differential)
                 ]
                 all_models.append(only_true)
             return all_models
+
+    def find_backbone(self) -> set[int]:
+        """
+        Returns the differential literals with the same value in every model:
+        +id if that d_r(x) = y is true in every model, -id if it is false in every model.
+        Starts from one model, then tests each remaining candidate by asking for a model where it fails;
+        any model found that way also rules out every other candidate that fails in it.
+
+        Raises:
+            ValueError: If there is no model.
+        """
+        s, known_clauses = self.build_solver()
+        with s:
+            if not s.solve(assumptions=known_clauses):
+                raise ValueError("No spectral sequence satisfies the constraints.")
+            candidates = {
+                lit for lit in s.get_model()
+                if isinstance(self.literal_manager.get_differential_by_id(lit), Differential)
+            }
+            backbone = set()
+            while candidates:
+                lit = candidates.pop()
+                if s.solve(assumptions=known_clauses + [-lit]):
+                    candidates &= set(s.get_model())
+                else:
+                    backbone.add(lit)
+            return backbone
+
+    def find_forced_differentials(self, backbone: set[int]) -> list[Differential]:
+        """
+        Returns the differentials d_r(x) = y that are true in every model.
+        """
+        return [self.literal_manager.get_differential_by_id(lit) for lit in backbone if lit > 0]
+
+    def find_unknown_differentials(self, backbone: set[int]) -> list[tuple[ExtClass, int]]:
+        """
+        Returns the pairs (x, r) for which the value of d_r(x) is not the same in every model.
+        """
+        unknown = []
+        for source in self.E1_page.get_classes():
+            for r in self.E1_page.r_with_nonzero_target(source.get_classdegree()):
+                values = [ZeroClass, Undefined] + self.E1_page.get_possible_differential_targets(source, r)
+                ids = [self.literal_manager.get_differential_id(Differential(source, y, r)) for y in values]
+                if any(i not in backbone and -i not in backbone for i in ids):
+                    unknown.append((source, r))
+        return unknown
