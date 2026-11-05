@@ -22,7 +22,7 @@ class Ext:
 
     class_dct: dict[tuple[int, int, int], set[ExtClass]]
     known_differentials: set[Differential]
-    product_table: dict[tuple[str], ExtClass]
+    product_table: dict[tuple[str], dict]
 
     min_stem: int
     min_filtration: int
@@ -426,12 +426,12 @@ class Ext:
         return list(self.known_differentials)
 
 
-    def parse_products(self, filename: str) -> dict[tuple[str], ExtClass]:
+    def parse_products(self, filename: str) -> dict[tuple[str], dict]:
         """
         Parses the products from the csv file
 
         Returns:
-        dict whose keys are pairs of names (e.g. ("{1-1}", "{1-0}")) and values are ExtClass objects representing the product
+        dict whose keys are pairs of names (e.g. ("{1-1}", "{1-0}")) and values are dicts like the ones in self.E1.sfw_dict
         """
         pass
 
