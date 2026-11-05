@@ -22,6 +22,7 @@ class Ext:
 
     class_dct: dict[tuple[int, int, int], set[ExtClass]]
     known_differentials: set[Differential]
+    product_table: dict[tuple[str], ExtClass]
 
     min_stem: int
     min_filtration: int
@@ -31,12 +32,13 @@ class Ext:
     max_filtration: int
     max_weight: int
 
-    def __init__(self, E1: E1CsvParser=None):
+    def __init__(self, E1: E1CsvParser=None, product_filename: str=None):
         self.classes = set()
         self.class_dct = defaultdict(set) # classes, organized as (s,f,w) -> list of classes
         self.degrees_by_N = defaultdict(set) # N -> set of (s,f,w) with nonzero class(es) such that s+f-w = N
         self.known_differentials = set()
         self.E1 = E1
+        self.product_table = self.parse_products(product_filename)
 
         self.max_stem = 0
         self.max_filtration = 0
@@ -422,3 +424,16 @@ class Ext:
             list[Differential]: A list of all the known differentials in the rho-Bockstein spectral sequence.
         """
         return list(self.known_differentials)
+
+
+    def parse_products(self, filename: str) -> dict[tuple[str], ExtClass]:
+        """
+        Parses the products from the csv file
+
+        Returns:
+        dict whose keys are pairs of names (e.g. ("{1-1}", "{1-0}")) and values are ExtClass objects representing the product
+        """
+        pass
+
+
+
