@@ -132,13 +132,6 @@ class ExtClass:
         return max(selected_torsions)
 
 
-    # def get_name_latex(self) -> str:
-    #     """
-    #     Returns the name of the class in LaTeX format as a string.
-    #     """
-    #     return Main_code_for_diffls.convert_to_latex(self.get_name())
-
-
     def __hash__(self) -> int:
         return hash((self.tridegree, tuple(self.vector)))
 

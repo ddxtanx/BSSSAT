@@ -24,13 +24,6 @@ class Ext:
     known_differentials: set[Differential]
     product_table: dict[tuple[str], dict]
 
-    min_stem: int
-    min_filtration: int
-    min_weight: int
-
-    max_stem: int
-    max_filtration: int
-    max_weight: int
 
     def __init__(self, E1: E1CsvParser=None, product_filename: str=None):
         self.classes = set()
@@ -40,13 +33,6 @@ class Ext:
         self.E1 = E1
         self.product_table = self.parse_products(product_filename)
 
-        self.max_stem = 0
-        self.max_filtration = 0
-        self.max_weight = 0
-
-        self.min_stem = 0
-        self.min_filtration = 0
-        self.min_weight = 0
 
         if E1 is not None:
             all_classes = E1.make_all_lin_combs()
@@ -67,18 +53,6 @@ class Ext:
         self.class_dct[(s, f, w)].add(ext_class)
         self.degrees_by_N[s + f - w].add((s, f, w))
 
-        if s > self.max_stem:
-            self.max_stem = s
-        if s < self.min_stem:
-            self.min_stem = s
-        if f > self.max_filtration:
-            self.max_filtration = f
-        if f < self.min_filtration:
-            self.min_filtration = f
-        if w > self.max_weight:
-            self.max_weight = w
-        if w < self.min_weight:
-            self.min_weight = w
 
 #generalize previous function.
     def add_classes(self, ext_classes: list[ExtClass]) -> None:
@@ -102,27 +76,6 @@ class Ext:
         return classes
 
 
-    def num_nonzero(self, s, f, w):
-        assert self.class_dct is not None
-        return len(self.class_dct[s,f,w])
-
-    def get_classes_in_fixed_N(self, N: int) -> list[ExtClass]:
-        """
-        This method returns a list of ExtClasses whose fixed degree (s + f - w) is equal to a given value N.
-
-        Args:
-            N (int): The fixed degree s + f - w of the ExtClasses to retrieve
-
-        Returns:
-            list[ExtClass]: A list of all the ExtClasses whose fixed degree is equal to N.
-        """
-        classes = []
-        for s in range(self.min_stem, self.max_stem + 1):
-            for f in range(self.min_filtration, self.max_filtration + 1):
-                w = s + f - N
-                if (s, f, w) in self.class_dct:
-                    classes.extend(self.class_dct[(s, f, w)])
-        return classes
 
     def get_nonzero_classes_in_tridegree(
         self, tridegree: tuple[int, int, int]
@@ -279,40 +232,6 @@ class Ext:
 
         return ExtClass(product_degree, result_vector)
 
-
-    def get_rho_periodic_elements(self) -> list[ExtClass]:
-        """
-        This method returns a list of ExtClasses that are known to be permanent cycles from the E1 page,
-        equivalently elements in the R-motivic Ext after inverting rho.
-        Since these are known to be permanent cycles, we can enforce that their differentials are zero in the SAT solver
-        which will help to bootstrap the solver and reduce the search space.
-
-        Returns:
-            list[ExtClass]: A list of all the ExtClasses that are known to be rho periodic.
-        """
-        # rho periodic elements are in degree (2s + f, f, s + f)
-        # (2s + f, f, s + f) = (s', f', w') implies (f' = 2w' - s')
-        rho_periodic_elts = []
-
-        for s in range(self.min_stem, self.max_stem + 1):
-            for w in range(self.min_weight, self.max_weight + 1):
-                f = 2 * w - s
-                if (s, f, w) in self.class_dct:
-                    rho_periodic_elts.extend(self.class_dct[(s, f, w)])
-        return rho_periodic_elts
-
-    def is_rho_periodic(self, ext_class: ExtClass) -> bool:
-        """
-        This method returns whether a given ExtClass is known to be rho periodic.
-
-        Args:
-            ext_class (ExtClass): The ExtClass to check for rho periodicity.
-
-        Returns:
-            bool: True if the ExtClass is known to be rho periodic, False otherwise.
-        """
-        s, f, w = ext_class.get_classdegree()
-        return s - f == 2 * (w - f)
 
 
 
