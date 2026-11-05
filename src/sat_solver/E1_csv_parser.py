@@ -38,7 +38,7 @@ class E1CsvParser:
         return classes
 
 
-#
+
     def make_sfw_grouping(self, only_one_N):
         """
         Groups the E1 basis elements by their (s, f, w) degrees, taking into account tau multiples.
@@ -88,7 +88,7 @@ class E1CsvParser:
                     })
         return elements_in_degree
 
-#
+
     def make_all_lin_combs(self):
         """
         Returns a list of tuples (tridegree, vector) that can be turned into ExtClass(tridegree, vector)
@@ -104,6 +104,24 @@ class E1CsvParser:
                 classes.append((deg, list(vector)))
         return classes
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # def class_name_by_index(a_degree, index):
     #     for element in class_index(a_degree):
     #         if element["index"] == index:
@@ -111,24 +129,24 @@ class E1CsvParser:
     #     return None
 
 
-# The following three are not used
-    def add_degree(self, degree1, degree2):
-            return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
+#the following functions are not needed for further computations.
+    # def add_degree(self, degree1, degree2):
+    #         return (degree1[0] + degree2[0], degree1[1] + degree2[1], degree1[2] + degree2[2])
 
 
-    def counting_values(classes):
-            counting = {}
-            for element, values in classes.items():
-                counting[element] = len(values)
-            return counting
+    # def counting_values(classes):
+    #         counting = {}
+    #         for element, values in classes.items():
+    #             counting[element] = len(values)
+    #         return counting
 
 #maybe go into differential.py
-    def finding_sources_with_fixed_number_of_differentials(classes, number):
-            sources = []
-            for element, values in classes.items():
-                if len(values) == number:
-                    sources.append(element)
-            return sources
+    # def finding_sources_with_fixed_number_of_differentials(classes, number):
+    #         sources = []
+    #         for element, values in classes.items():
+    #             if len(values) == number:
+    #                 sources.append(element)
+    #         return sources
 
 
     # def basis_names_by_vector(a_degree, vector):

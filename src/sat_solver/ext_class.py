@@ -20,20 +20,20 @@ class ExtClass:
     def __init__(self, tridegree: tuple[int, int, int], vector: list[bool]) -> None:
         self.tridegree = tridegree
         self.vector = vector
-#
+
     def get_classdegree(self) -> tuple[int, int, int]:
         """
         Returns the tridegree (s, f, w) of the class as a tuple of three integers.
         """
         return self.tridegree
-#
+
     def get_vector(self) -> list[bool]:
         """
         Returns the F2 vector of the class as a list of booleans.
         """
         return self.vector
 
-#
+
     def __add__(self, other: ExtClass) -> ExtClass:
         """
         adds two ExtClass 
@@ -54,7 +54,8 @@ class ExtClass:
             return ExtClass(self.get_classdegree(), new_vector)
 
 
-    #we need to add a function to multiply two ExtClasses.
+    #we need to add a function to multiply two ExtClasses. I have already created a function in ext.py called multiply_classes. 
+    #delete the following function after removing it from main.py.
     def __mul__(self, other: ExtClass) -> ExtClass:
         #         """
         #         Constructs a new ExtClass instance that represents the product of this class and another class.
@@ -68,7 +69,7 @@ class ExtClass:
         pass  # Placeholder for the actual implementation of the product operation.
 
 
-# 
+
     def class_name(self, E1: "E1CsvParser") -> str:
         """
         Returns the name of this ExtClass element based on its vector representation.
@@ -90,7 +91,7 @@ class ExtClass:
 
 
 
- # 
+ 
     @staticmethod
     def create_class_from_basis_name(E1:"E1CsvParser", degree, name) -> "ExtClass":
         basis = E1.sfw_dict.get(degree)
@@ -128,7 +129,7 @@ class ExtClass:
         ]
         if not selected_torsions:
             return 0
-    #is it possible that x and y are both nonzero and torsion-free, but x+y is torsion? in our range!
+#is it possible that x and y are both nonzero and torsion-free, but x+y is torsion? in our range!
         if 0 in selected_torsions:
             return 0
         return max(selected_torsions)
@@ -140,12 +141,12 @@ class ExtClass:
     #     """
     #     return Main_code_for_diffls.convert_to_latex(self.get_name())
 
-#check whether this function is used anywhere, if not delete it.
+
     def __hash__(self) -> int:
         return hash((self.tridegree, tuple(self.vector)))
 
 
-#
+
     def __eq__(self, other: object) -> bool:
         """
         Determines whether this class and other are equal.
@@ -154,7 +155,7 @@ class ExtClass:
             return False
         return self.tridegree == other.tridegree and self.vector == other.vector
 
-#
+
     def in_same_tridegree_as(self, other: ExtClass) -> bool:
         """
         Determines whether this class and other are in the same tridegree.
@@ -173,7 +174,7 @@ class ExtClass:
         return self.get_classdegree() == other.get_classdegree()
 
 
-# not used
+
     def get_coweight(self) -> int:
         """
         Returns the coweight s - w of the class as an integer.
@@ -195,9 +196,3 @@ class ExtClass:
 
 ZeroClass: ExtClass = ExtClass(None, [True])
 Undefined: ExtClass = ExtClass(None, [False])
-
-#we need to be careful about zero class and 0 in each degree. Should we make a function that treats 0 in each degree as a zero class? 
-
-
-
- 
