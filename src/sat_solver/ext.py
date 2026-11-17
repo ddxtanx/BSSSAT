@@ -22,7 +22,7 @@ class Ext:
 
     class_dct: dict[tuple[int, int, int], set[ExtClass]]
     known_differentials: set[Differential]
-    product_table: dict[tuple[str], dict]
+    product_table: dict[tuple[str, str], ExtClass]
 
 
     def __init__(self, E1: E1CsvParser=None, product_filename: str=None):
@@ -95,25 +95,23 @@ class Ext:
         else:
             return []
 
-#we still need to write base_product function, #recieves names with no tau powers, looks up the #yoneda product and returns base names of the product.
+
 
     def multiply_classes(
         self,
         left: ExtClass,
         right: ExtClass,
-        base_product,
-    ) -> ExtClass:
+        ) -> ExtClass:
         """
         Multiply two ExtClass objects.
 
-        The base_product function computes the ordinary Yoneda product
-        after tau-powers have been removed.
-
-        This method uses:
-
-            (tau^a x)(tau^b y) = tau^(a+b)(xy)
+        self.product_table has pairs of base names as keys and
+        ExtClass objects as values.
 
         Multiplication is extended over sums using bilinearity.
+
+        If any component product required by bilinearity is not
+        present in self.product_table, the entire multiplication is aborted by raising KeyError.
         """
         if self.E1 is None:
             raise ValueError(
@@ -138,7 +136,7 @@ class Ext:
         left_basis = self.E1.sfw_dict.get(left_degree)
         right_basis = self.E1.sfw_dict.get(right_degree)
 
-#these are just for checks! not required though.
+        # Check that both input degrees have E1 bases.
         if left_basis is None:
             raise ValueError(
                 f"No E1 basis found in degree {left_degree}"
@@ -166,14 +164,22 @@ class Ext:
                 f"{len(right_basis)} basis elements"
             )
 
-        product_basis = self.E1.sfw_dict.get(product_degree, [])
+        product_basis = self.E1.sfw_dict.get(
+            product_degree,
+            [],
+        )
 
+        # Index basis elements using their mathematical data,
+        # rather than their formatted names.
         product_indices = {
-            element["name"]: index
+            (
+                element["base_name"],
+                element["taupower"],
+            ): index
             for index, element in enumerate(product_basis)
         }
-# Initialize the product as zero in the basis of the product degree.
-# As product terms are computed, toggle their coefficients in this vector.
+
+        # Start with the zero vector in the product degree.
         result_vector = [False] * len(product_basis)
 
         selected_left_terms = [
@@ -189,50 +195,126 @@ class Ext:
             in zip(right_basis, right_vector)
             if coefficient
         ]
-#this does the bilinearity.
+
+        # Apply bilinearity.
         for left_term in selected_left_terms:
             for right_term in selected_right_terms:
                 left_base_name = left_term["base_name"]
                 right_base_name = right_term["base_name"]
-#(tau^a x)(tau^b y) = tau^(a+b)(xy)
+
                 left_taupower = left_term["taupower"]
                 right_taupower = right_term["taupower"]
 
-                total_taupower = (
-                    left_taupower + right_taupower
-                )
-#FIX ME: we still need to write base_product function.
-                base_product_names = base_product(
+                product_key = (
                     left_base_name,
                     right_base_name,
                 )
 
-                for base_product_name in base_product_names:
-                    if base_product_name == "0":
-                        continue
+                reverse_product_key = (
+                    right_base_name,
+                    left_base_name,
+                )
 
-                    result_name = (
-                        f"tau^{total_taupower} "
-                        f"{base_product_name}"
+                if product_key in self.product_table:
+                    base_product = self.product_table[
+                        product_key
+                    ]
+                elif reverse_product_key in self.product_table:
+                    base_product = self.product_table[
+                        reverse_product_key
+                    ]
+                else:
+                    # One component product is unknown, so the
+                    # product of the entire classes is unknown.
+                    # Do not return the partially computed vector.
+                    raise KeyError(
+                        "Product table does not contain "
+                        f"{left_base_name} * "
+                        f"{right_base_name}"
                     )
 
-                    result_index = product_indices.get(result_name)
+
+                # This component product is known to be zero.
+                if base_product == ZeroClass:
+                    continue
+
+                base_product_degree = (
+                    base_product.get_classdegree()
+                )
+
+                base_product_basis = self.E1.sfw_dict.get(
+                    base_product_degree
+                )
+
+                if base_product_basis is None:
+                    raise ValueError(
+                        "No E1 basis found for the product "
+                        f"of {left_base_name} and "
+                        f"{right_base_name} in degree "
+                        f"{base_product_degree}"
+                    )
+
+                base_product_vector = (
+                    base_product.get_vector()
+                )
+
+                if len(base_product_vector) != len(
+                    base_product_basis
+                ):
+                    raise ValueError(
+                        "Product vector has length "
+                        f"{len(base_product_vector)}, "
+                        f"but degree {base_product_degree} "
+                        f"has {len(base_product_basis)} "
+                        "basis elements"
+                    )
+
+                selected_base_product_terms = [
+                    element
+                    for element, coefficient
+                    in zip(
+                        base_product_basis,
+                        base_product_vector,
+                    )
+                    if coefficient
+                ]
+
+                for base_product_term in (
+                    selected_base_product_terms
+                ):
+                    # The product term may already have a tau
+                    # power, so include all three exponents.
+                    total_taupower = (
+                        left_taupower
+                        + right_taupower
+                        + base_product_term["taupower"]
+                    )
+
+                    result_key = (
+                        base_product_term["base_name"],
+                        total_taupower,
+                    )
+
+                    result_index = product_indices.get(
+                        result_key
+                    )
 
                     if result_index is None:
-                        # This tau-multiple is not present on the E1
-                        # page. It may have been killed by tau-torsion.
+                        # This tau multiple is absent from the
+                        # product basis, for example because it
+                        # is killed by tau-torsion.
                         continue
 
-                    # Coefficients are in F_2, so adding a term
-                    # means toggling its coefficient.
+                    # Addition is over F_2.
                     result_vector[result_index] ^= True
 
         if not any(result_vector):
             return ZeroClass
 
-        return ExtClass(product_degree, result_vector)
-
-
+        return ExtClass(
+            product_degree,
+            result_vector,
+        )
 
 
 #   The following functions are for finding possible sources and targets of differentials.
