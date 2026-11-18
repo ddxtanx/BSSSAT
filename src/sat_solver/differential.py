@@ -54,12 +54,6 @@ class Differential:
         """
         return self.degree_of_differential
 
-# not used
-    def is_cycle(self) -> bool:
-        """
-        Returns if the source of the differential is a cycle, i.e. if the target is ZeroClass.
-        """
-        return self.get_target() == ZeroClass
 
 #
     def __hash__(self) -> int:

@@ -22,29 +22,17 @@ class Ext:
 
     class_dct: dict[tuple[int, int, int], set[ExtClass]]
     known_differentials: set[Differential]
+    product_table: dict[tuple[str, str], ExtClass]
 
-    min_stem: int
-    min_filtration: int
-    min_weight: int
 
-    max_stem: int
-    max_filtration: int
-    max_weight: int
-
-    def __init__(self, E1: E1CsvParser=None):
+    def __init__(self, E1: E1CsvParser=None, product_filename: str=None):
         self.classes = set()
         self.class_dct = defaultdict(set) # classes, organized as (s,f,w) -> list of classes
         self.degrees_by_N = defaultdict(set) # N -> set of (s,f,w) with nonzero class(es) such that s+f-w = N
         self.known_differentials = set()
         self.E1 = E1
+        self.product_table = self.parse_products(product_filename)
 
-        self.max_stem = 0
-        self.max_filtration = 0
-        self.max_weight = 0
-
-        self.min_stem = 0
-        self.min_filtration = 0
-        self.min_weight = 0
 
         if E1 is not None:
             all_classes = E1.make_all_lin_combs()
@@ -78,7 +66,7 @@ class Ext:
         if w < self.min_weight:
             self.min_weight = w
 
-#
+#generalize previous function.
     def add_classes(self, ext_classes: list[ExtClass]) -> None:
         """
         This method adds a list of ExtClasses to the Ext algebra.
@@ -99,29 +87,7 @@ class Ext:
         self.classes = classes
         return classes
 
-# not used
-    def num_nonzero(self, s, f, w):
-        assert self.class_dct is not None
-        return len(self.class_dct[s,f,w])
 
-# not used
-    def get_classes_in_fixed_N(self, N: int) -> list[ExtClass]:
-        """
-        This method returns a list of ExtClasses whose fixed degree (s + f - w) is equal to a given value N.
-
-        Args:
-            N (int): The fixed degree s + f - w of the ExtClasses to retrieve
-
-        Returns:
-            list[ExtClass]: A list of all the ExtClasses whose fixed degree is equal to N.
-        """
-        classes = []
-        for s in range(self.min_stem, self.max_stem + 1):
-            for f in range(self.min_filtration, self.max_filtration + 1):
-                w = s + f - N
-                if (s, f, w) in self.class_dct:
-                    classes.extend(self.class_dct[(s, f, w)])
-        return classes
 
     def get_nonzero_classes_in_tridegree(
         self, tridegree: tuple[int, int, int]
@@ -141,25 +107,23 @@ class Ext:
         else:
             return []
 
-#we still need to write base_product function, #recieves names with no tau powers, looks up the #yoneda product and returns base names of the product.
+
 
     def multiply_classes(
         self,
         left: ExtClass,
         right: ExtClass,
-        base_product,
-    ) -> ExtClass:
+        ) -> ExtClass:
         """
         Multiply two ExtClass objects.
 
-        The base_product function computes the ordinary Yoneda product
-        after tau-powers have been removed.
-
-        This method uses:
-
-            (tau^a x)(tau^b y) = tau^(a+b)(xy)
+        self.product_table has pairs of base names as keys and
+        ExtClass objects as values.
 
         Multiplication is extended over sums using bilinearity.
+
+        If any component product required by bilinearity is not
+        present in self.product_table, the entire multiplication is aborted by raising KeyError.
         """
         if self.E1 is None:
             raise ValueError(
@@ -184,7 +148,7 @@ class Ext:
         left_basis = self.E1.sfw_dict.get(left_degree)
         right_basis = self.E1.sfw_dict.get(right_degree)
 
-#these are just for checks! not required though.
+        # Check that both input degrees have E1 bases.
         if left_basis is None:
             raise ValueError(
                 f"No E1 basis found in degree {left_degree}"
@@ -212,14 +176,22 @@ class Ext:
                 f"{len(right_basis)} basis elements"
             )
 
-        product_basis = self.E1.sfw_dict.get(product_degree, [])
+        product_basis = self.E1.sfw_dict.get(
+            product_degree,
+            [],
+        )
 
+        # Index basis elements using their mathematical data,
+        # rather than their formatted names.
         product_indices = {
-            element["name"]: index
+            (
+                element["base_name"],
+                element["taupower"],
+            ): index
             for index, element in enumerate(product_basis)
         }
-# Initialize the product as zero in the basis of the product degree.
-# As product terms are computed, toggle their coefficients in this vector.
+
+        # Start with the zero vector in the product degree.
         result_vector = [False] * len(product_basis)
 
         selected_left_terms = [
@@ -235,85 +207,126 @@ class Ext:
             in zip(right_basis, right_vector)
             if coefficient
         ]
-#this does the bilinearity.
+
+        # Apply bilinearity.
         for left_term in selected_left_terms:
             for right_term in selected_right_terms:
                 left_base_name = left_term["base_name"]
                 right_base_name = right_term["base_name"]
-#(tau^a x)(tau^b y) = tau^(a+b)(xy)
+
                 left_taupower = left_term["taupower"]
                 right_taupower = right_term["taupower"]
 
-                total_taupower = (
-                    left_taupower + right_taupower
-                )
-#FIX ME: we still need to write base_product function.
-                base_product_names = base_product(
+                product_key = (
                     left_base_name,
                     right_base_name,
                 )
 
-                for base_product_name in base_product_names:
-                    if base_product_name == "0":
-                        continue
+                reverse_product_key = (
+                    right_base_name,
+                    left_base_name,
+                )
 
-                    result_name = (
-                        f"tau^{total_taupower} "
-                        f"{base_product_name}"
+                if product_key in self.product_table:
+                    base_product = self.product_table[
+                        product_key
+                    ]
+                elif reverse_product_key in self.product_table:
+                    base_product = self.product_table[
+                        reverse_product_key
+                    ]
+                else:
+                    # One component product is unknown, so the
+                    # product of the entire classes is unknown.
+                    # Do not return the partially computed vector.
+                    raise KeyError(
+                        "Product table does not contain "
+                        f"{left_base_name} * "
+                        f"{right_base_name}"
                     )
 
-                    result_index = product_indices.get(result_name)
+
+                # This component product is known to be zero.
+                if base_product == ZeroClass:
+                    continue
+
+                base_product_degree = (
+                    base_product.get_classdegree()
+                )
+
+                base_product_basis = self.E1.sfw_dict.get(
+                    base_product_degree
+                )
+
+                if base_product_basis is None:
+                    raise ValueError(
+                        "No E1 basis found for the product "
+                        f"of {left_base_name} and "
+                        f"{right_base_name} in degree "
+                        f"{base_product_degree}"
+                    )
+
+                base_product_vector = (
+                    base_product.get_vector()
+                )
+
+                if len(base_product_vector) != len(
+                    base_product_basis
+                ):
+                    raise ValueError(
+                        "Product vector has length "
+                        f"{len(base_product_vector)}, "
+                        f"but degree {base_product_degree} "
+                        f"has {len(base_product_basis)} "
+                        "basis elements"
+                    )
+
+                selected_base_product_terms = [
+                    element
+                    for element, coefficient
+                    in zip(
+                        base_product_basis,
+                        base_product_vector,
+                    )
+                    if coefficient
+                ]
+
+                for base_product_term in (
+                    selected_base_product_terms
+                ):
+                    # The product term may already have a tau
+                    # power, so include all three exponents.
+                    total_taupower = (
+                        left_taupower
+                        + right_taupower
+                        + base_product_term["taupower"]
+                    )
+
+                    result_key = (
+                        base_product_term["base_name"],
+                        total_taupower,
+                    )
+
+                    result_index = product_indices.get(
+                        result_key
+                    )
 
                     if result_index is None:
-                        # This tau-multiple is not present on the E1
-                        # page. It may have been killed by tau-torsion.
+                        # This tau multiple is absent from the
+                        # product basis, for example because it
+                        # is killed by tau-torsion.
                         continue
 
-                    # Coefficients are in F_2, so adding a term
-                    # means toggling its coefficient.
+                    # Addition is over F_2.
                     result_vector[result_index] ^= True
 
         if not any(result_vector):
             return ZeroClass
 
-        return ExtClass(product_degree, result_vector)
-
-
-    def get_rho_periodic_elements(self) -> list[ExtClass]:
-        """
-        This method returns a list of ExtClasses that are known to be permanent cycles from the E1 page,
-        equivalently elements in the R-motivic Ext after inverting rho.
-        Since these are known to be permanent cycles, we can enforce that their differentials are zero in the SAT solver
-        which will help to bootstrap the solver and reduce the search space.
-
-        Returns:
-            list[ExtClass]: A list of all the ExtClasses that are known to be rho periodic.
-        """
-        # rho periodic elements are in degree (2s + f, f, s + f)
-        # (2s + f, f, s + f) = (s', f', w') implies (f' = 2w' - s')
-        rho_periodic_elts = []
-
-        for s in range(self.min_stem, self.max_stem + 1):
-            for w in range(self.min_weight, self.max_weight + 1):
-                f = 2 * w - s
-                if (s, f, w) in self.class_dct:
-                    rho_periodic_elts.extend(self.class_dct[(s, f, w)])
-        return rho_periodic_elts
-
-# not used, maybe in ext_class?
-    def is_rho_periodic(self, ext_class: ExtClass) -> bool:
-        """
-        This method returns whether a given ExtClass is known to be rho periodic.
-
-        Args:
-            ext_class (ExtClass): The ExtClass to check for rho periodicity.
-
-        Returns:
-            bool: True if the ExtClass is known to be rho periodic, False otherwise.
-        """
-        s, f, w = ext_class.get_classdegree()
-        return s - f == 2 * (w - f)
-
+        return ExtClass(
+            product_degree,
+            result_vector,
+        )
 
 
 #   The following functions are for finding possible sources and targets of differentials.
@@ -424,3 +437,16 @@ class Ext:
             list[Differential]: A list of all the known differentials in the rho-Bockstein spectral sequence.
         """
         return list(self.known_differentials)
+
+
+    def parse_products(self, filename: str) -> dict[tuple[str], dict]:
+        """
+        Parses the products from the csv file
+
+        Returns:
+        dict whose keys are pairs of names (e.g. ("{1-1}", "{1-0}")) and values are dicts like the ones in self.E1.sfw_dict
+        """
+        pass
+
+
+
