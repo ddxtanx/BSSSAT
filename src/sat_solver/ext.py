@@ -14,6 +14,8 @@ from sat_solver.ext_class import ExtClass
 from sat_solver.differential import Differential
 from sat_solver.E1_csv_parser import E1CsvParser
 
+class UnknownProductError(KeyError):
+    pass
 
 class Ext:
     """
@@ -39,6 +41,9 @@ class Ext:
             ext_classes = [ExtClass(*x) for x in all_classes]
             self.add_classes(ext_classes)
 
+    @property
+    def max_differential_r(self) -> int:
+       return 2 * self.E1.max_N
 
 #
     def add_class(self, ext_class: ExtClass) -> None:
@@ -239,7 +244,7 @@ class Ext:
                     # One component product is unknown, so the
                     # product of the entire classes is unknown.
                     # Do not return the partially computed vector.
-                    raise KeyError(
+                    raise UnknownProductError(
                         "Product table does not contain "
                         f"{left_base_name} * "
                         f"{right_base_name}"
@@ -259,7 +264,7 @@ class Ext:
                 )
 
                 if base_product_basis is None:
-                    raise ValueError(
+                    raise UnknownProductError(
                         "No E1 basis found for the product "
                         f"of {left_base_name} and "
                         f"{right_base_name} in degree "
@@ -273,7 +278,7 @@ class Ext:
                 if len(base_product_vector) != len(
                     base_product_basis
                 ):
-                    raise ValueError(
+                    raise UnknownProductError(
                         "Product vector has length "
                         f"{len(base_product_vector)}, "
                         f"but degree {base_product_degree} "
