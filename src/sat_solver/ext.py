@@ -8,13 +8,11 @@ known differentials that will be used to bootstrap the SAT solver.
 """
 
 from collections import defaultdict
-import logging
-import re
 from sat_solver.ext_class import Undefined
 from sat_solver.ext_class import ZeroClass
 from sat_solver.ext_class import ExtClass
 from sat_solver.differential import Differential
-from sat_solver.E1_csv_parser import BasisElement, E1CsvParser
+from sat_solver.E1_csv_parser import E1CsvParser
 
 
 class Ext:
@@ -24,14 +22,10 @@ class Ext:
 
     class_dct: dict[tuple[int, int, int], set[ExtClass]]
     known_differentials: set[Differential]
-    product_table: dict[tuple[str, str], list[BasisElement]]
+    product_table: dict[tuple[str], dict]
 
 
-    def __init__(
-        self,
-        E1: E1CsvParser | None = None,
-        product_filename: str | None = None,
-    ):
+    def __init__(self, E1: E1CsvParser=None, product_filename: str=None):
         self.classes = set()
         self.class_dct = defaultdict(set) # classes, organized as (s,f,w) -> list of classes
         self.degrees_by_N = defaultdict(set) # N -> set of (s,f,w) with nonzero class(es) such that s+f-w = N
@@ -351,140 +345,14 @@ class Ext:
         return list(self.known_differentials)
 
 
-    def parse_products(
-        self, filename: str | None
-    ) -> dict[tuple[str, str], list[BasisElement]]:
+    def parse_products(self, filename: str) -> dict[tuple[str], dict]:
         """
-        Parses valid product-table rows into E1-style basis records.
+        Parses the products from the csv file
 
-        Each input pair maps to a list of output records. Output terms with
-        unavailable metadata, an incompatible degree, or invalid tau-torsion
-        are omitted, and duplicate terms cancel over F_2.
+        Returns:
+        dict whose keys are pairs of names (e.g. ("{1-1}", "{1-0}")) and values are dicts like the ones in self.E1.sfw_dict
         """
-        if filename is None:
-            return {}
-        if self.E1 is None:
-            raise ValueError("E1 data is required to parse product metadata")
+        pass
 
-        classes_by_name = {
-            element["name"]: element
-            for element in self.E1.all_csv_classes
-        }
-        name_pattern = re.compile(r"^\{\d+-\d+\}$")
-        term_pattern = re.compile(r"^t\^(\d+)(?:\{(\d+-\d+)\})?$")
-        products: dict[tuple[str, str], list[BasisElement]] = {}
-        skipped_rows: list[int] = []
-        skipped_terms = defaultdict(int)
-
-        with open(filename, encoding="utf-8") as product_file:
-            for line_number, line in enumerate(product_file, start=1):
-                if not line.strip() or "[PROF]" in line:
-                    if "[PROF]" in line:
-                        skipped_rows.append(line_number)
-                    continue
-
-                fields = line.rstrip("\r\n").split("\t")
-                if (
-                    len(fields) != 5
-                    or fields[1] != "*"
-                    or fields[3] != "->"
-                    or name_pattern.fullmatch(fields[0]) is None
-                    or name_pattern.fullmatch(fields[2]) is None
-                ):
-                    skipped_rows.append(line_number)
-                    continue
-
-                left_name, right_name = fields[0], fields[2]
-                result = fields[4].strip()
-                if result == "?":
-                    skipped_rows.append(line_number)
-                    continue
-                if left_name not in classes_by_name or right_name not in classes_by_name:
-                    skipped_rows.append(line_number)
-                    continue
-
-                pair = (left_name, right_name)
-                if result == "0":
-                    products[pair] = []
-                    continue
-
-                result_terms: dict[str, BasisElement] = {}
-                for term in result.split("+"):
-                    match = term_pattern.fullmatch(term.strip())
-                    if match is None:
-                        skipped_terms["invalid syntax"] += 1
-                        continue
-
-                    taupower = int(match.group(1))
-                    base_name = (
-                        f"{{{match.group(2)}}}"
-                        if match.group(2) is not None
-                        else "{0-0}"
-                    )
-                    basis_element = classes_by_name.get(base_name)
-                    if basis_element is None:
-                        skipped_terms["missing metadata"] += 1
-                        continue
-
-                    degree = (
-                        basis_element["stem"],
-                        basis_element["Adams filtration"],
-                        basis_element["weight"] - taupower,
-                    )
-                    base_torsion = basis_element["tautorsion"]
-                    left = classes_by_name[left_name]
-                    right = classes_by_name[right_name]
-                    expected_degree = (
-                        left["stem"] + right["stem"],
-                        left["Adams filtration"] + right["Adams filtration"],
-                        left["weight"] + right["weight"],
-                    )
-                    if degree != expected_degree:
-                        skipped_terms["degree mismatch"] += 1
-                        continue
-                    if base_torsion > 0 and taupower >= base_torsion:
-                        skipped_terms["tau-torsion"] += 1
-                        continue
-
-                    remaining_torsion = (
-                        0
-                        if base_torsion == 0
-                        else max(base_torsion - taupower, 0)
-                    )
-                    name = f"tau^{taupower} {base_name}"
-                    if name in result_terms:
-                        del result_terms[name]
-                    else:
-                        result_terms[name] = {
-                            "name": name,
-                            "base_name": base_name,
-                            "taupower": taupower,
-                            "stem": degree[0],
-                            "Adams filtration": degree[1],
-                            "weight": degree[2],
-                            "tautorsion": remaining_torsion,
-                        }
-
-                products[pair] = list(result_terms.values())
-
-        if skipped_rows or sum(skipped_terms.values()):
-            logging.warning(
-                "Skipped %d malformed or unknown product row(s) and product "
-                "terms by reason %s from %s",
-                len(skipped_rows),
-                dict(skipped_terms),
-                filename,
-            )
-        return products
-
-
-    def product_basis_length(self, input_pair: tuple[str, str]) -> int:
-        """Return the number of surviving basis terms for an input pair."""
-        try:
-            return len(self.product_table[input_pair])
-        except KeyError:
-            raise KeyError(
-                f"No product-table entry for input pair {input_pair}"
-            ) from None
 
 

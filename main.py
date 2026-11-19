@@ -20,7 +20,7 @@ def main():
     print("number of E1 classes: ", len(ext_classes))
     for x in ext_classes:
         print(x.class_name(E1), x.get_classdegree())
-    ext = Ext(E1, "yoneda_data/products_all.txt")
+    ext = Ext(E1)
 
     # comment out these four lines if you want to try a different N = s+f-w
     # t2, t1h0, h02, th1 = ext_classes
@@ -47,31 +47,9 @@ def main():
   
 
 
-    iteration = 0
-    while True:
-        iteration += 1
-        sat_solver = SATSolver(ext)
-        backbone = sat_solver.find_backbone()
-        forced = sat_solver.find_forced_differentials(backbone)
-        known_differentials = set(ext.get_known_differentials())
-        newly_forced = [
-            differential
-            for differential in forced
-            if differential.source != ZeroClass
-            and differential not in known_differentials
-        ]
-        if not newly_forced:
-            print(
-                f"\nSAT iteration {iteration}: no new forced differentials; stopping."
-            )
-            break
-
-        ext.add_known_differentials(newly_forced)
-        print(
-            f"\nSAT iteration {iteration}: added {len(newly_forced)} "
-            "newly forced differentials; rerunning."
-        )
-
+    sat_solver = SATSolver(ext)
+    backbone = sat_solver.find_backbone()
+    forced = sat_solver.find_forced_differentials(backbone)
     unknown = sat_solver.find_unknown_differentials(backbone)
     print("\nnumber of SAT variables: ", len(sat_solver.literal_manager.variables))
 

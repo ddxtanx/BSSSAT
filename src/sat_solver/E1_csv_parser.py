@@ -1,15 +1,10 @@
 import csv
 from collections import defaultdict
 from itertools import product
-from typing import DefaultDict, TypeAlias
-
-Degree: TypeAlias = tuple[int, int, int]
-BasisElement: TypeAlias = dict[str, int | str]
-SfwDict: TypeAlias = DefaultDict[Degree, list[BasisElement]]
 
 class E1CsvParser:
     """
-    This class handles the data contained in the csv file representing Ext over the C-motivic Steenrod algebra.
+    This class handles the data contained in the csv file representing Ext over the C-motivic Steenrod algebra.q
 
     The set of BSS E1 classes with a fixed N = s+f-w degree is closed under rho-BSS differentials.
     Thus to avoid fringe issues we work with N <= max_N, which means we only consider
@@ -18,24 +13,14 @@ class E1CsvParser:
 
     def __init__(self, filename: str, max_N, only_one_N: bool = False):
         self.max_N = max_N
-        self.all_csv_classes = self.load_classes(filename, include_all=True)
-        self.csv_classes = [
-            element
-            for element in self.all_csv_classes
-            if element["stem"] + element["Adams filtration"] - element["weight"]
-            <= self.max_N
-        ]
-        self.sfw_dict: SfwDict = self.make_sfw_grouping(only_one_N)
-        # Dictionary mapping each (s, f, w) degree to its ordered basis elements.
+        self.csv_classes = self.load_classes(filename)
+        self.sfw_dict = self.make_sfw_grouping(only_one_N) # dictionary (s,f,w) -> list of E1 basis elements
 
 
 
-    def load_classes(self, filename: str, include_all: bool = False):
+    def load_classes(self, filename: str):
         """
         Loads the E1 basis elements from a CSV file.
-
-        If include_all is True, entries outside max_N are also retained for
-        metadata lookups used by product-table parsing.
 
         Returns:
         list: A list of dictionaries representing the E1 basis elements, each containing keys 'name', 'stem', 'Adams filtration', 'weight', and 'tautorsion'.
@@ -48,13 +33,13 @@ class E1CsvParser:
                 f = int(row['Adams filtration'])
                 w = int(row['weight'])
                 N = s + f - w
-                if include_all or N <= self.max_N:
+                if N <= self.max_N:
                     classes.append({"name": row['name'], "stem": s, "Adams filtration": f, "weight": w, "tautorsion": int(row['tautorsion'])})
         return classes
 
 
 
-    def make_sfw_grouping(self, only_one_N: bool) -> SfwDict:
+    def make_sfw_grouping(self, only_one_N):
         """
         Groups the E1 basis elements by their (s, f, w) degrees, taking into account tau multiples.
 
@@ -64,7 +49,7 @@ class E1CsvParser:
         Returns:
         dict: A dictionary mapping (s, f, w) to a list of E1 basis elements in that degree.
         """
-        elements_in_degree: SfwDict = defaultdict(list)
+        elements_in_degree = defaultdict(list)
         assert self.csv_classes is not None
         for element in self.csv_classes:
             s = element["stem"]
