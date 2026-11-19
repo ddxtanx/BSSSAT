@@ -1,0 +1,490 @@
+"""
+This module defines the Ext class which serves as the interface to
+interact with the entire cohomology of the C-motivic Steenrod Algebra
+all at once. It provides methods to retrieve various kinds of elements
+in the Ext algebra that should be useful for the creation of SAT constraints.
+In addition, it should also provide methods to assert and to retrieve
+known differentials that will be used to bootstrap the SAT solver.
+"""
+
+from collections import defaultdict
+import logging
+import re
+from sat_solver.ext_class import Undefined
+from sat_solver.ext_class import ZeroClass
+from sat_solver.ext_class import ExtClass
+from sat_solver.differential import Differential
+from sat_solver.E1_csv_parser import BasisElement, E1CsvParser
+
+
+class Ext:
+    """
+    This class represents useful pieces of information contained in the cohomology of the C-motivic Steenrod algebra.
+    """
+
+    class_dct: dict[tuple[int, int, int], set[ExtClass]]
+    known_differentials: set[Differential]
+    product_table: dict[tuple[str, str], list[BasisElement]]
+
+
+    def __init__(
+        self,
+        E1: E1CsvParser | None = None,
+        product_filename: str | None = None,
+    ):
+        self.classes = set()
+        self.class_dct = defaultdict(set) # classes, organized as (s,f,w) -> list of classes
+        self.degrees_by_N = defaultdict(set) # N -> set of (s,f,w) with nonzero class(es) such that s+f-w = N
+        self.known_differentials = set()
+        self.E1 = E1
+        self.product_table = self.parse_products(product_filename)
+
+
+        if E1 is not None:
+            all_classes = E1.make_all_lin_combs()
+            ext_classes = [ExtClass(*x) for x in all_classes]
+            self.add_classes(ext_classes)
+
+
+
+    def add_class(self, ext_class: ExtClass) -> None:
+        """
+        This method adds an ExtClass to the Ext algebra.
+
+        Args:
+            ext_class (ExtClass): The ExtClass to add to the Ext algebra.
+        """
+        s, f, w = ext_class.get_classdegree()
+
+        self.class_dct[(s, f, w)].add(ext_class)
+        self.degrees_by_N[s + f - w].add((s, f, w))
+
+
+#generalize previous function.
+    def add_classes(self, ext_classes: list[ExtClass]) -> None:
+        """
+        This method adds a list of ExtClasses to the Ext algebra.
+
+        Args:
+            ext_classes (list[ExtClass]): The list of ExtClasses to add to the Ext algebra.
+        """
+        for ext_class in ext_classes:
+            self.add_class(ext_class)
+
+
+    def get_classes(self) -> set[ExtClass]:
+        if self.classes != set():
+            return self.classes
+        classes = set()
+        for _, class_set in self.class_dct.items():
+            classes |= class_set
+        self.classes = classes
+        return classes
+
+
+
+    def get_nonzero_classes_in_tridegree(
+        self, tridegree: tuple[int, int, int]
+    ) -> list[ExtClass]:
+        """
+        This method returns a list of ExtClasses in a given tridegree (s, f, w).
+
+        Args:
+            tridegree (tuple[int, int, int]): The tridegree (s, f, w) of the ExtClasses to retrieve.
+
+        Returns:
+            list[ExtClass]: A list of all the ExtClasses in the given tridegree.
+        """
+        s, f, w = tridegree
+        if (s, f, w) in self.class_dct:
+            return list(self.class_dct[(s, f, w)])
+        else:
+            return []
+
+#we still need to write base_product function, #recieves names with no tau powers, looks up the #yoneda product and returns base names of the product.
+
+    def multiply_classes(
+        self,
+        left: ExtClass,
+        right: ExtClass,
+        base_product,
+    ) -> ExtClass:
+        """
+        Multiply two ExtClass objects.
+
+        The base_product function computes the ordinary Yoneda product
+        after tau-powers have been removed.
+
+        This method uses:
+
+            (tau^a x)(tau^b y) = tau^(a+b)(xy)
+
+        Multiplication is extended over sums using bilinearity.
+        """
+        if self.E1 is None:
+            raise ValueError(
+                "Ext multiplication requires an E1CsvParser object"
+            )
+
+        if left == Undefined or right == Undefined:
+            return Undefined
+
+        if left == ZeroClass or right == ZeroClass:
+            return ZeroClass
+
+        left_degree = left.get_classdegree()
+        right_degree = right.get_classdegree()
+
+        product_degree = tuple(
+            left_coordinate + right_coordinate
+            for left_coordinate, right_coordinate
+            in zip(left_degree, right_degree)
+        )
+
+        left_basis = self.E1.sfw_dict.get(left_degree)
+        right_basis = self.E1.sfw_dict.get(right_degree)
+
+#these are just for checks! not required though.
+        if left_basis is None:
+            raise ValueError(
+                f"No E1 basis found in degree {left_degree}"
+            )
+
+        if right_basis is None:
+            raise ValueError(
+                f"No E1 basis found in degree {right_degree}"
+            )
+
+        left_vector = left.get_vector()
+        right_vector = right.get_vector()
+
+        if len(left_vector) != len(left_basis):
+            raise ValueError(
+                f"Left vector has length {len(left_vector)}, "
+                f"but degree {left_degree} has "
+                f"{len(left_basis)} basis elements"
+            )
+
+        if len(right_vector) != len(right_basis):
+            raise ValueError(
+                f"Right vector has length {len(right_vector)}, "
+                f"but degree {right_degree} has "
+                f"{len(right_basis)} basis elements"
+            )
+
+        product_basis = self.E1.sfw_dict.get(product_degree, [])
+
+        product_indices = {
+            element["name"]: index
+            for index, element in enumerate(product_basis)
+        }
+# Initialize the product as zero in the basis of the product degree.
+# As product terms are computed, toggle their coefficients in this vector.
+        result_vector = [False] * len(product_basis)
+
+        selected_left_terms = [
+            element
+            for element, coefficient
+            in zip(left_basis, left_vector)
+            if coefficient
+        ]
+
+        selected_right_terms = [
+            element
+            for element, coefficient
+            in zip(right_basis, right_vector)
+            if coefficient
+        ]
+#this does the bilinearity.
+        for left_term in selected_left_terms:
+            for right_term in selected_right_terms:
+                left_base_name = left_term["base_name"]
+                right_base_name = right_term["base_name"]
+#(tau^a x)(tau^b y) = tau^(a+b)(xy)
+                left_taupower = left_term["taupower"]
+                right_taupower = right_term["taupower"]
+
+                total_taupower = (
+                    left_taupower + right_taupower
+                )
+#FIX ME: we still need to write base_product function.
+                base_product_names = base_product(
+                    left_base_name,
+                    right_base_name,
+                )
+
+                for base_product_name in base_product_names:
+                    if base_product_name == "0":
+                        continue
+
+                    result_name = (
+                        f"tau^{total_taupower} "
+                        f"{base_product_name}"
+                    )
+
+                    result_index = product_indices.get(result_name)
+
+                    if result_index is None:
+                        # This tau-multiple is not present on the E1
+                        # page. It may have been killed by tau-torsion.
+                        continue
+
+                    # Coefficients are in F_2, so adding a term
+                    # means toggling its coefficient.
+                    result_vector[result_index] ^= True
+
+        if not any(result_vector):
+            return ZeroClass
+
+        return ExtClass(product_degree, result_vector)
+
+
+
+
+#   The following functions are for finding possible sources and targets of differentials.
+
+    def get_possible_differential_targets(
+        self, ext_class: ExtClass, r: int
+    ) -> list[ExtClass]:
+        """
+        This method returns a list of ExtClasses that could potentially be the target of a differential of length r starting from a given ExtClass. Does not return 0 or Undef unless the input is 0 or Undef.
+
+        Args:
+            ext_class (ExtClass): The ExtClass from which the differential starts.
+            r (int): The length of the differential.
+
+        Returns:
+            list[ExtClass]: A list of all the ExtClasses that could potentially be the target of a differential of length r starting from the given ExtClass.
+        """
+        if ext_class == ZeroClass:
+            return [ZeroClass]
+        if ext_class == Undefined:
+            return [Undefined]
+        s, f, w = ext_class.get_classdegree()
+        target_s = s + r - 1
+        target_f = f + 1
+        target_w = w + r
+
+        if (target_s, target_f, target_w) in self.class_dct:
+            return list(self.class_dct[(target_s, target_f, target_w)])
+        else:
+            return []
+
+    def get_possible_nontrivial_differential_sources(
+        self, target_class: ExtClass, r: int
+    ) -> list[ExtClass]:
+        """
+        This method returns a list of ExtClasses that could potentially be the source
+        of a differential of length r ending at a given ExtClass.
+
+        Args:
+            target_class (ExtClass): The ExtClass which is the target of the differential.
+            r (int): The length of the differential.
+
+        Returns:
+            list[ExtClass]: A list of all the ExtClasses that could potentially be the source
+            of a differential of length r ending at the given ExtClass.
+        """
+        assert target_class != Undefined and target_class != ZeroClass
+
+        s, f, w = target_class.get_classdegree()
+        source_s = s - r + 1
+        source_f = f - 1
+        source_w = w - r
+
+        if (source_s, source_f, source_w) in self.class_dct:
+            return list(self.class_dct[(source_s, source_f, source_w)])
+        else:
+            return []
+
+
+    def r_with_nonzero_target(self, deg):
+        s, f, w = deg
+        possible_r = []
+        for (target_s, target_f, target_w) in self.degrees_by_N[s + f - w]:
+            if target_f == f + 1:
+                r = target_w - w
+                if r > 0:
+                    possible_r.append(r)
+        return possible_r
+
+#
+    def r_with_nonzero_source(self, deg):
+        s, f, w = deg
+        possible_r = []
+        for (source_s, source_f, source_w) in self.degrees_by_N[s + f - w]:
+            if source_f == f - 1:
+                r = w - source_w
+                if r > 0:
+                    possible_r.append(r)
+        return possible_r
+    
+#   functions below are for keeping track of known differentials. 
+    
+    def add_known_differential(self, diff: Differential) -> None:
+        """
+        This method adds a known differential to the list of known differentials in the rho-Bockstein spectral sequence.
+
+        Args:
+            diff (Differential): The Differential to add to the list of known differentials.
+        """
+        self.known_differentials.add(diff)
+
+    def add_known_differentials(self, diffs: list[Differential]) -> None:
+        """
+        This method adds a list of known differentials to the list of known differentials in the rho-Bockstein spectral sequence.
+
+        Args:
+            diffs (list[Differential]): The list of Differentials to add to the list of known differentials.
+        """
+        for diff in diffs:
+            self.add_known_differential(diff)
+
+
+    def get_known_differentials(self) -> list[Differential]:
+        """
+        This method returns a list of known differentials in the rho-Bockstein spectral sequence.
+
+        Returns:
+            list[Differential]: A list of all the known differentials in the rho-Bockstein spectral sequence.
+        """
+        return list(self.known_differentials)
+
+
+    def parse_products(
+        self, filename: str | None
+    ) -> dict[tuple[str, str], list[BasisElement]]:
+        """
+        Parses valid product-table rows into E1-style basis records.
+
+        Each input pair maps to a list of output records. Output terms with
+        unavailable metadata, an incompatible degree, or invalid tau-torsion
+        are omitted, and duplicate terms cancel over F_2.
+        """
+        if filename is None:
+            return {}
+        if self.E1 is None:
+            raise ValueError("E1 data is required to parse product metadata")
+
+        classes_by_name = {
+            element["name"]: element
+            for element in self.E1.all_csv_classes
+        }
+        name_pattern = re.compile(r"^\{\d+-\d+\}$")
+        term_pattern = re.compile(r"^t\^(\d+)(?:\{(\d+-\d+)\})?$")
+        products: dict[tuple[str, str], list[BasisElement]] = {}
+        skipped_rows: list[int] = []
+        skipped_terms = defaultdict(int)
+
+        with open(filename, encoding="utf-8") as product_file:
+            for line_number, line in enumerate(product_file, start=1):
+                if not line.strip() or "[PROF]" in line:
+                    if "[PROF]" in line:
+                        skipped_rows.append(line_number)
+                    continue
+
+                fields = line.rstrip("\r\n").split("\t")
+                if (
+                    len(fields) != 5
+                    or fields[1] != "*"
+                    or fields[3] != "->"
+                    or name_pattern.fullmatch(fields[0]) is None
+                    or name_pattern.fullmatch(fields[2]) is None
+                ):
+                    skipped_rows.append(line_number)
+                    continue
+
+                left_name, right_name = fields[0], fields[2]
+                result = fields[4].strip()
+                if result == "?":
+                    skipped_rows.append(line_number)
+                    continue
+                if left_name not in classes_by_name or right_name not in classes_by_name:
+                    skipped_rows.append(line_number)
+                    continue
+
+                pair = (left_name, right_name)
+                if result == "0":
+                    products[pair] = []
+                    continue
+
+                result_terms: dict[str, BasisElement] = {}
+                for term in result.split("+"):
+                    match = term_pattern.fullmatch(term.strip())
+                    if match is None:
+                        skipped_terms["invalid syntax"] += 1
+                        continue
+
+                    taupower = int(match.group(1))
+                    base_name = (
+                        f"{{{match.group(2)}}}"
+                        if match.group(2) is not None
+                        else "{0-0}"
+                    )
+                    basis_element = classes_by_name.get(base_name)
+                    if basis_element is None:
+                        skipped_terms["missing metadata"] += 1
+                        continue
+
+                    degree = (
+                        basis_element["stem"],
+                        basis_element["Adams filtration"],
+                        basis_element["weight"] - taupower,
+                    )
+                    base_torsion = basis_element["tautorsion"]
+                    left = classes_by_name[left_name]
+                    right = classes_by_name[right_name]
+                    expected_degree = (
+                        left["stem"] + right["stem"],
+                        left["Adams filtration"] + right["Adams filtration"],
+                        left["weight"] + right["weight"],
+                    )
+                    if degree != expected_degree:
+                        skipped_terms["degree mismatch"] += 1
+                        continue
+                    if base_torsion > 0 and taupower >= base_torsion:
+                        skipped_terms["tau-torsion"] += 1
+                        continue
+
+                    remaining_torsion = (
+                        0
+                        if base_torsion == 0
+                        else max(base_torsion - taupower, 0)
+                    )
+                    name = f"tau^{taupower} {base_name}"
+                    if name in result_terms:
+                        del result_terms[name]
+                    else:
+                        result_terms[name] = {
+                            "name": name,
+                            "base_name": base_name,
+                            "taupower": taupower,
+                            "stem": degree[0],
+                            "Adams filtration": degree[1],
+                            "weight": degree[2],
+                            "tautorsion": remaining_torsion,
+                        }
+
+                products[pair] = list(result_terms.values())
+
+        if skipped_rows or sum(skipped_terms.values()):
+            logging.warning(
+                "Skipped %d malformed or unknown product row(s) and product "
+                "terms by reason %s from %s",
+                len(skipped_rows),
+                dict(skipped_terms),
+                filename,
+            )
+        return products
+
+
+    def product_basis_length(self, input_pair: tuple[str, str]) -> int:
+        """Return the number of surviving basis terms for an input pair."""
+        try:
+            return len(self.product_table[input_pair])
+        except KeyError:
+            raise KeyError(
+                f"No product-table entry for input pair {input_pair}"
+            ) from None
+
+

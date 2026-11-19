@@ -1,5 +1,112 @@
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+# Allow this file to be run directly even when the editable install is unavailable.
+sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
+
+from sat_solver import E1CsvParser, Ext, ExtClass, SATSolver, Differential
+
+ZeroClass: ExtClass = ExtClass(None, [True])
+Undefined: ExtClass = ExtClass(None, [False])
+
+max_N = 4
+
 def main():
-    print("Hello from satsolver!")
+    E1 = E1CsvParser("ext_data/Adams-motivic-E2-machine.csv", max_N, only_one_N = False)  # s+f-w = 2
+    print(E1.sfw_dict)
+    all_classes = E1.make_all_lin_combs()
+    ext_classes = [ExtClass(*x) for x in all_classes]
+    print("number of E1 classes: ", len(ext_classes))
+    for x in ext_classes:
+        print(x.class_name(E1), x.get_classdegree())
+    ext = Ext(E1, "yoneda_data/products_all.txt")
+
+    # comment out these four lines if you want to try a different N = s+f-w
+    # t2, t1h0, h02, th1 = ext_classes
+    # print("\nAdding known differential d_2(t^2) = t h1")
+    # diff1 = Differential(t2, th1, 2)
+    # ext.add_known_differentials([diff1])
+
+    # Add Known differential for tau-multiple:
+    k = 0
+    while 2**k <= max_N:
+        r = 2**k
+        source_degree = (0, 0, -r)
+        source_name = f"tau^{r} {{0-0}}"
+        source = ExtClass(source_degree, [True])
+
+        taupower = 0 if k == 0 else 2**(k-1)
+        target_degree = (r-1, 1, 0)
+        target_name = f"tau^{taupower} {{1-{k}}}"
+        target= ExtClass.create_class_from_basis_name(E1, target_degree, target_name)
+        diff2 = Differential(source, target, r)
+        ext.add_known_differentials([diff2])
+        k += 1
+
+  
+
+
+    iteration = 0
+    while True:
+        iteration += 1
+        sat_solver = SATSolver(ext)
+        backbone = sat_solver.find_backbone()
+        forced = sat_solver.find_forced_differentials(backbone)
+        known_differentials = set(ext.get_known_differentials())
+        newly_forced = [
+            differential
+            for differential in forced
+            if differential.source != ZeroClass
+            and differential not in known_differentials
+        ]
+        if not newly_forced:
+            print(
+                f"\nSAT iteration {iteration}: no new forced differentials; stopping."
+            )
+            break
+
+        ext.add_known_differentials(newly_forced)
+        print(
+            f"\nSAT iteration {iteration}: added {len(newly_forced)} "
+            "newly forced differentials; rerunning."
+        )
+
+    unknown = sat_solver.find_unknown_differentials(backbone)
+    print("\nnumber of SAT variables: ", len(sat_solver.literal_manager.variables))
+
+    print("\nForced differentials:")
+    forced = [d for d in forced if d.source != ZeroClass]
+    for diff in sorted(forced, key=lambda d: (d.degree_of_differential, d.source.get_classdegree())):
+        r = diff.degree_of_differential
+        print(f"d_{r}: ", diff.source.class_name(E1), " -> ", diff.target.class_name(E1))
+
+    print("\nnumber of unknown differentials: ", len(unknown))
+    unknown_by_page = defaultdict(list)
+    for source, r in unknown:
+        unknown_by_page[r].append(source)
+    for r in sorted(unknown_by_page):
+        sources = sorted(unknown_by_page[r], key=lambda x: x.get_classdegree())
+        print(f"d_{r}: {len(sources)} unknown, e.g.", ", ".join(x.class_name(E1) for x in sources[:5]))
+
+
+
+
+def print_model_diffs(all_models, idx1, idx2):
+    """ all_models[i] is a list of differentials that are true in model i """
+    if len(all_models) > max(idx1, idx2):
+        m1 = all_models[idx1]
+        m2 = all_models[idx2]
+        print(f"\nIn model {idx1} but not model {idx2}: ")
+        for x in m1:
+            if x not in m2:
+                print(x)
+        print(f"\nIn model {idx2} but not model {idx1}: ")
+        for x in m2:
+            if x not in m1:
+                print(x)
+    else:
+        print("not enough solutions")
 
 
 if __name__ == "__main__":
